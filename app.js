@@ -99,7 +99,10 @@ const DRESS = ['#f7a8c0', '#c9a0e6', '#9fd8cb', '#ffd66b', '#9fd0f0', '#ef9f8a',
 const TIE = ['#e8574f', '#3f7fd0', '#f2a03d', '#7c5cc0', '#2f9e7a', '#d94f8a'];
 
 function lookFor(p) {
-  const r = () => srand();
+  // 外型用名字決定：名單增減時，其他人的樣子不會跟著變
+  let hs = 2166136261;
+  for (const ch of `${p.name}#${p.famIdx || 0}`) hs = Math.imul(hs ^ ch.codePointAt(0), 16777619) >>> 0;
+  const r = () => { hs = Math.imul(hs ^ (hs >>> 15), 2246822507) >>> 0; hs = Math.imul(hs ^ (hs >>> 13), 3266489909) >>> 0; hs ^= hs >>> 16; return (hs >>> 0) / 4294967296; };
   const lk = { g: p.g, kid: !!p.kid, skin: SKIN[Math.floor(r() * 4)], hair: p.elder ? (r() < 0.5 ? '#9a9aa2' : '#c4c4cc') : HAIR[Math.floor(r() * HAIR.length)] };
   if (p.g === 'f') {
     lk.hs = ['long', 'bob', 'pony', 'bun', 'long'][Math.floor(r() * 5)];
@@ -109,8 +112,8 @@ function lookFor(p) {
     lk.cloth = SUIT[Math.floor(r() * SUIT.length)];
     lk.tie = TIE[Math.floor(r() * TIE.length)];
   }
-  lk.glasses = p.elder ? r() < 0.6 : r() < 0.12;
-  if (p.kid) lk.cloth = p.g === 'f' ? pick(['#ffb3c8', '#ffd66b', '#b8e0a0']) : pick(['#7fb6f0', '#f2a03d', '#8fd3b0']);
+  lk.glasses = p.kid ? (r(), false) : p.elder ? r() < 0.6 : r() < 0.12;   // 小朋友不戴眼鏡
+  if (p.kid) { const k = Math.floor(r() * 3); lk.cloth = p.g === 'f' ? ['#ffb3c8', '#ffd66b', '#b8e0a0'][k] : ['#7fb6f0', '#f2a03d', '#8fd3b0'][k]; }
   if (p.look) Object.assign(lk, p.look);   // 名單裡指定的外型（髮色、膚色、眼睛顏色、鬍子…）
   return lk;
 }
@@ -898,7 +901,7 @@ function expandFamilies(list) {
     for (let i = 1; i < n; i++) {
       const kid = i >= n - kids;
       const onLap = i >= n - lap;
-      const g = i === 1 && !kid ? (p.g === 'f' ? 'm' : 'f') : (srand() < 0.5 ? 'm' : 'f');
+      const g = i === 1 && !kid ? (p.g === 'f' ? 'm' : 'f') : ((p.name.length + i) % 2 ? 'm' : 'f');
       const m = (p.members || [])[i - 1] || {};   // 家人的指定（性別、外型）
       out.push({ name: `${p.name}的家人`, table: p.table, g: m.g || g, kid, lap: onLap, baby: onLap && !!p.baby, highchair: onLap && !!p.highchair, look: m.look, family: p.name, famSize: n, famIdx: i });
     }
