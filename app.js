@@ -1294,6 +1294,13 @@ function rebuild() {
   }
   $('#app').dataset.ori = PHONE ? 'port' : 'land';
 }
+// 視窗大小改變（手機網址列收合、轉向、全螢幕）：平面圖不用重畫，只調整大小，
+// 桌子物件保持同一份，賓客和桌子的對應才不會跑掉
+function relayout() {
+  PHONE = innerWidth < innerHeight * 0.95;
+  $('#app').dataset.ori = PHONE ? 'port' : 'land';
+  sizeStage();
+}
 const TABLE_STATE = {};
 function snapshotTables() { if (!L) return; for (const T of L.tables) TABLE_STATE[T.main ? 'main' : T.n] = { dishes: T.dishes, course: T.course }; }
 
@@ -1309,7 +1316,7 @@ function init() {
   setupSearch();
   renderSeatList();
   let rt;
-  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { snapshotTables(); rebuild(); }, 150); });
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(relayout, 150); });
   $('#btnNames').addEventListener('click', (e) => { state.names = !state.names; stage.classList.toggle('names', state.names); e.currentTarget.classList.toggle('on', state.names); });
   $('#btnFull').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); });
   $('#btnPanel').addEventListener('click', () => { $('#app').classList.toggle('nopanel'); sizeStage(); });
