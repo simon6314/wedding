@@ -193,7 +193,6 @@ function bodySvg(lk) {
 function headSvg(lk) {
   const ear = `<ellipse cx="19.6" cy="38.5" rx="3.2" ry="4" fill="${lk.skin}" ${OUT}/><ellipse cx="60.4" cy="38.5" rx="3.2" ry="4" fill="${lk.skin}" ${OUT}/>`;
   return `<g class="hd">${ear}<ellipse cx="40" cy="36" rx="${lk.faceRx || 21}" ry="20" fill="${lk.skin}" ${OUT}/>
-    <path d="M22 42 Q40 60 58 42 Q52 55 40 55.6 Q28 55 22 42Z" fill="#000" opacity=".04"/>
     ${faceSvg(lk)}${hairFront(lk)}${lk.glasses ? GLASSES : ''}</g>`;
 }
 function personSvg(lk, extraBack = '', extraFront = '') {
@@ -208,7 +207,7 @@ function vipSvg(role, side) {
     const h = lk.hair;
     const veil = `<path d="M23 22 Q40 4 57 22 Q68 52 65 86 Q40 92 15 86 Q12 52 23 22 Z" fill="#fff" opacity=".55" stroke="#efe2ea" stroke-width="1"/>
       <path d="M18 50 Q16 70 17 84 M62 50 Q64 70 63 84" stroke="#fff" stroke-width="1.1" opacity=".8" fill="none"/>`;
-    const backHair = `<path d="M19 36 Q16 11 40 11 Q64 11 61 36 L59 46 L21 46 Z" fill="${shade(h, -0.08)}"/>`;
+    const backHair = `<path d="M19 36 Q16 11 40 11 Q64 11 61 36 L60 48 Q56 54 50 53 L30 50 L21 46 Z" fill="${shade(h, -0.08)}"/>`;
     const gown = `<path d="M33.5 56 Q40 53 46.5 56 L48 65 Q61 76 66 89 Q40 94.6 14 89 Q19 76 32 65 Z" fill="#fffafc" ${OUT}/>
       <path d="M44 66.6 Q57 77 61.6 89.6 Q53 91.8 47 92 Q48.6 78 44 66.6Z" fill="#c8a8c0" opacity=".14"/>
       <path d="M32 65 Q40 67.8 48 65" stroke="#f7a8c0" stroke-width="2.2" fill="none"/><path d="M38.4 66.6 l1.6 -1.8 1.6 1.8 -1.6 1.8 Z" fill="#f08fb0"/>
@@ -218,13 +217,13 @@ function vipSvg(role, side) {
       <circle cx="30" cy="75" r=".9" fill="#f0dce6"/><circle cx="50" cy="75" r=".9" fill="#f0dce6"/><circle cx="40" cy="77" r=".9" fill="#f0dce6"/>
       <g class="arm arm-l"><path d="M33 59 Q27 67 28.4 76" stroke="#ffe6d6" stroke-width="4.4" stroke-linecap="round" fill="none"/><circle cx="28.5" cy="77" r="2.7" fill="${lk.skin}" ${OUT}/></g>
       <g class="arm arm-r"><path d="M47 59 Q53 67 51.6 76" stroke="#ffe6d6" stroke-width="4.4" stroke-linecap="round" fill="none"/><circle cx="51.5" cy="77" r="2.7" fill="${lk.skin}" ${OUT}/></g>`;
-    // 側邊辮子：從右耳後面編下來，垂到右肩前面，髮尾綁小花
-    const braidPts = [[58.6, 37], [61.4, 42.6], [63.2, 48.4], [63.8, 54.2], [63.4, 60], [62.8, 65.8], [62.8, 71.4]];
+    // 低編髮：從脖子後面往右肩前編下來，不長，髮尾綁小花
+    const braidPts = [[53.6, 51.6], [56, 56.4], [57.4, 61.4], [58, 66.4]];   // 低編髮：從脖子後面開始，短短的
     const braid = braidPts.map(([x, y], k) => `<ellipse cx="${x}" cy="${y}" rx="4.6" ry="3.5" transform="rotate(${k % 2 ? 28 : -28} ${x} ${y})" fill="${h}" ${OUT}/>
       <path d="M${x - 2.6} ${y - 0.6} Q${x} ${y + (k % 2 ? 1.6 : -1.6)} ${x + 2.6} ${y + 0.6}" stroke="#fff" stroke-opacity=".22" stroke-width="1" fill="none" stroke-linecap="round"/>`).join('');
     const pony = `${braid}
-      <path d="M60.6 74.6 Q62.8 80.6 60 84 M62.8 74.8 Q64 80.4 63.4 84.6 M64.6 74.4 Q66.8 79.4 66.4 83" stroke="${h}" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <g transform="translate(62.8 74.4) scale(.75)"><circle r="3.4" fill="#fff" stroke="#f0d4e0" stroke-width=".6"/><circle cx="-2.4" cy="-1.8" r="2" fill="#ffd1dc"/><circle cx="2.4" cy="-1.8" r="2" fill="#ffd1dc"/><circle cy="2.6" r="2" fill="#ffd1dc"/><circle r="1.3" fill="#ffd66b"/></g>
+      <path d="M56.4 69.4 Q57.6 73.6 55.8 76 M58 69.6 Q59 73.4 58.6 76.6 M59.6 69.2 Q61.4 72.6 61 75.4" stroke="${h}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <g transform="translate(58 69.2) scale(.65)"><circle r="3.4" fill="#fff" stroke="#f0d4e0" stroke-width=".6"/><circle cx="-2.4" cy="-1.8" r="2" fill="#ffd1dc"/><circle cx="2.4" cy="-1.8" r="2" fill="#ffd1dc"/><circle cy="2.6" r="2" fill="#ffd1dc"/><circle r="1.3" fill="#ffd66b"/></g>
       <g transform="translate(60.5 31.5) scale(.7)"><circle r="3.4" fill="#fff" stroke="#f0d4e0" stroke-width=".6"/><circle cx="-2.4" cy="-1.8" r="2" fill="#ffd1dc"/><circle cx="2.4" cy="-1.8" r="2" fill="#ffd1dc"/><circle cy="2.6" r="2" fill="#ffd1dc"/><circle r="1.3" fill="#ffd66b"/></g>`;
     const bangs = `<path d="M19 34 Q16 10 42 11 Q64 12 61 33 Q56 20 46 19.4 Q36 20 30 27 Q24 30.4 19 34 Z" fill="${h}"/>
       <path d="M27 18 Q35 13.6 45 14.6" stroke="#fff" stroke-opacity=".28" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
