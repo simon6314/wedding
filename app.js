@@ -513,7 +513,7 @@ function sizeStage() {
 let ZOOM = 1;
 
 // ---- 狀態與面板 ----
-const state = { phase: 'arrival', course: -1, toasts: 0, cheers: 0, event: '', toastOrder: [], names: false };
+const state = { phase: 'party', course: -1, toasts: 0, cheers: 0, event: '', toastOrder: [], names: false };
 function banner(text, ms = 3500) {
   const b = $('#banner');
   b.textContent = text; b.classList.add('show');
@@ -625,7 +625,7 @@ function tick(now) {
       walkers++;
       const tgt = a.path[0];
       const dx = tgt[0] - a.pos[0], dy = tgt[1] - a.pos[1], d = Math.hypot(dx, dy);
-      const step = a.speed * dt * (state.phase === 'arrival' && a.kind === 'guest' ? 1.4 : 1);
+      const step = a.speed * dt;
       if (Math.abs(dx) > 0.5) setFace(a, dx < 0 ? -1 : 1);
       if (d <= step) { a.pos = tgt.slice(); a.path.shift(); } else { a.pos[0] += dx / d * step; a.pos[1] += dy / d * step; }
       if (!a.path.length) { a.path = null; setPose(a, ''); const f = a.onArrive; a.onArrive = null; if (f) f(); }
@@ -672,10 +672,10 @@ function guestAct(a, walkers) {
       return;
     }
   }
-  if (r < 0.7 && walkers < 12) { routine(a, () => getDrink(a)); return; }
-  if (r < 0.78 && walkers < 12) { routine(a, () => visitFriend(a)); return; }
-  if (r < 0.84 && walkers < 12) { routine(a, () => stageFun(a)); return; }
-  if (r < 0.87 && walkers < 12) { routine(a, () => albumLook(a)); return; }
+  if (r < 0.68 && walkers < 16) { routine(a, () => getDrink(a)); return; }
+  if (r < 0.82 && walkers < 16) { routine(a, () => visitFriend(a)); return; }
+  if (r < 0.88 && walkers < 16) { routine(a, () => stageFun(a)); return; }
+  if (r < 0.91 && walkers < 16) { routine(a, () => albumLook(a)); return; }
   if (a.prop && Math.random() < 0.5) { setPose(a, 'sip'); setTimeout(() => { if (a.pose === 'sip') setPose(a, 'sit'); }, 1600); return; }
   if (!quiet && !a.bubbleOn && Math.random() < 0.5) say(a, a.info.kid ? pick(KID_LINES) : pick(SOLO));
 }
@@ -741,82 +741,16 @@ async function kidRun(a) {
   await goHome(a);
 }
 
-// ---- 進場 ----
-async function arrival() {
-  state.phase = 'arrival';
-  setStatus('賓客入場中');
-  banner('🎉 歡迎光臨！賓客入場中', 5000);
-  logLine('賓客陸續入場');
-  // 新人和主婚人在門口迎賓
-  const order = ['groom', 'bride', 'gdad', 'gmom', 'bdad', 'bmom'];
-  order.forEach((id, i) => { const a = vip[id]; if (!a) return; a.pos = L.P.greet[i].slice(); setPose(a, ''); setFace(a, -1); showProp(a); place(a); });
-  const greetLoop = setInterval(() => { const a = vip[pick(order)]; if (a && !a.bubbleOn && state.phase === 'arrival') say(a, pick(['歡迎歡迎！', '謝謝你來！', '裡面請～', '好久不見！'])); }, 1400);
-  for (const s of staff) s.busy = true;
-  const list = shuffle(guests);
-  for (const a of list) { a.hidden = true; a.el.classList.add('hide'); a.pos = L.P.guestIn.slice(); place(a); }
-  const done = list.map((a, i) => (async () => {
-    await wait(i * 330);
-    a.hidden = false; a.el.classList.remove('hide');
-    await walkTo(a, L.P.ent1);
-    await walkTo(a, [L.P.gift[0] + rand(-4, 4), L.P.gift[1] + rand(-8, 8)]);
-    a.temp = '🧧'; showProp(a); setFace(a, -1);
-    if (Math.random() < 0.3) say(a, pick(['恭喜恭喜！', '新婚快樂！', '紅包在這～']), 1600);
-    await wait(500);
-    a.temp = ''; showProp(a);
-    await goHome(a);
-  })());
-  await Promise.all(done);
-  clearInterval(greetLoop);
-  await wait(1200);
-}
-async function entrance() {
-  state.phase = 'entrance';
-  setStatus('新人進場');
-  banner('💒 新人進場！', 6000);
-  logLine('新人進場');
-  screenShow(`${CFG.groom || '新郎'} ❤ ${CFG.bride || '新娘'}`, 16000);
-  const g = vip.groom, b = vip.bride;
-  // 主婚人回主桌
-  for (const id of ['gdad', 'gmom', 'bdad', 'bmom']) if (vip[id]) goHome(vip[id]);
-  // 新人從入口 2 沿著建議動線進場
-  for (const [a, off] of [[g, 0], [b, 1]]) { a.el.classList.add('hide'); a.hidden = true; }
-  await wait(1500);
-  const start = L.P.ent2;
-  g.pos = [start[0], start[1]]; b.pos = [start[0] + 16, start[1]];
-  for (const a of [g, b]) { a.el.classList.remove('hide'); a.hidden = false; place(a); }
-  const clap = setInterval(() => {
-    const c = pick(guests);
-    if (!c.busy) { setPose(c, 'clap'); if (!c.bubbleOn && Math.random() < 0.5) say(c, pick(['👏👏', '好美！', '新婚快樂！', '好帥！', '❤❤❤']), 1800); }
-  }, 260);
-  const trail = setInterval(() => { fx(pick(['❤', '✨', '💕']), [g.pos[0] + 8, g.pos[1] - 34]); }, 450);
-  const route = [...L.P.route, L.P.stageC];
-  const pair = async (a, dx) => { for (const p of route) await walkTo(a, [p[0] + dx, p[1]]); };
-  const ox = ORI === 'land' ? 16 : 16;
-  await Promise.all([pair(g, -ox / 2), pair(b, ox / 2)]);
-  clearInterval(trail);
-  setFace(g, 1); setFace(b, -1);
-  setPose(g, 'kiss'); setPose(b, 'kiss');
-  hearts([(g.pos[0] + b.pos[0]) / 2, g.pos[1]], 14);
-  say(g, '謝謝大家！', 2400, 'love');
-  await wait(1400);
-  say(b, '今天好開心 ❤', 2400, 'love');
-  await wait(2200);
-  clearInterval(clap);
-  for (const c of guests) if (c.pose === 'clap') setPose(c, 'sit');
-  setPose(g, ''); setPose(b, '');
-  await Promise.all([goHome(g), goHome(b)]);
-}
-
 // ---- 婚宴進行中 ----
 async function party() {
   state.phase = 'party';
   setStatus('用餐中');
   logLine('開始上菜');
-  for (const a of guests) a.next = simT + rand(1000, 9000);
+  for (const a of guests) a.next = simT + rand(300, 8000);
   courseLoop();
   staff.forEach((s, i) => staffLoop(s, i));
   for (const id of ['gdad', 'gmom', 'bdad', 'bmom']) if (vip[id]) parentLoop(vip[id]);
-  await wait(9000);
+  await wait(rand(15000, 25000));
   for (;;) {
     const ev = weighted([[toastTour, 34], [cheersAll, 18], [kissEvent, 16], [bouquetEvent, 12], [groupPhoto, 20]]);
     try { await ev(); } catch (e) { console.error(e); }
@@ -1111,7 +1045,6 @@ function init() {
   $('#btnFull').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); });
   $('#btnPanel').addEventListener('click', () => { $('#app').classList.toggle('nopanel'); sizeStage(); });
   $('#btnShow').addEventListener('click', () => { $('#app').classList.remove('nopanel'); sizeStage(); });
-  $('#btnReplay').addEventListener('click', () => { location.search = ''; location.reload(); });
   $('#zoomIn').addEventListener('click', () => { ZOOM = Math.min(3, ZOOM + 0.5); sizeStage(); });
   $('#zoomOut').addEventListener('click', () => { ZOOM = Math.max(1, ZOOM - 0.5); sizeStage(); });
   stage.addEventListener('click', () => clearHl());
@@ -1120,12 +1053,8 @@ function init() {
   run();
 }
 async function run() {
-  if (params.has('skip')) {
-    for (const a of actors) { if (a.seat) { a.pos = a.seat.sit.slice(); settle(a); place(a); } }
-  } else {
-    await arrival();
-    await entrance();
-  }
+  // 一打開就是大家已經在場內
+  for (const a of actors) { if (a.seat) { a.pos = a.seat.sit.slice(); settle(a); place(a); } }
   for (const id of Object.keys(vip)) { vip[id].busy = true; if (atSeat(vip[id])) settle(vip[id]); }
   for (const s of staff) s.busy = true;
   party();
