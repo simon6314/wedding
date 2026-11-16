@@ -229,18 +229,37 @@ function vipSvg(role, side) {
     const lk = { g: 'm', skin: side === 'g' ? '#f6d2b8' : '#fcdcc4', hair: side === 'g' ? '#6e6a70' : '#3b3438', hs: side === 'g' ? 'short' : 'side', cloth: side === 'g' ? '#34405a' : '#4a4a52', tie: '#c23b4a', glasses: side === 'b' };
     return personSvg(lk, '', CORSAGE);
   }
-  // 主婚人媽媽：休閒穿搭（上衣＋開襟針織外套＋長褲）
-  const lk = { g: 'f', skin: '#ffe4d0', hair: side === 'g' ? '#3b2f2f' : '#5b3a29', hs: side === 'g' ? 'bob' : 'bun', glasses: side === 'g' };
-  const top = side === 'g' ? '#f6d6c8' : '#dfe8f4', cardi = side === 'g' ? '#c98f7a' : '#8fa8c9', pants = side === 'g' ? '#6b5a52' : '#4f5d75';
-  lk.bodyOverride = `<rect x="30" y="76" width="8.6" height="12" rx="3" fill="${pants}"/><rect x="41.4" y="76" width="8.6" height="12" rx="3" fill="${pants}"/>
-    <ellipse cx="34" cy="89" rx="4.6" ry="2.2" fill="#f4efe8" stroke="#cfc2b4" stroke-width=".6"/><ellipse cx="46" cy="89" rx="4.6" ry="2.2" fill="#f4efe8" stroke="#cfc2b4" stroke-width=".6"/>
-    <path d="M28 57 Q40 53 52 57 L54.5 78 Q40 81 25.5 78 Z" fill="${top}" ${OUT}/>
-    <path d="M34 57.4 Q40 62 46 57.4" stroke="${shade(top, -0.18)}" stroke-width="1.3" fill="none"/>
-    <path d="M28 57 Q31.5 56 34 57.6 L36.6 80 Q31 80 25.5 78 Z" fill="${cardi}" ${OUT}/>
-    <path d="M52 57 Q48.5 56 46 57.6 L43.4 80 Q49 80 54.5 78 Z" fill="${cardi}" ${OUT}/>
-    <path d="M30 66 h4.4 M45.6 66 h4.4 M30.6 70 h4.4 M45 70 h4.4" stroke="${shade(cardi, -0.15)}" stroke-width=".7" opacity=".7"/>
-    <circle cx="35.4" cy="73" r=".8" fill="${shade(cardi, -0.3)}"/>
-    ${armsSvg(cardi, lk.skin)}`;
+  // 主婚人媽媽
+  //   男方（月娥）：長髮、不戴眼鏡，白色上衣＋牛仔外套＋長裙
+  //   女方（玉華）：短髮、戴眼鏡，藍色襯衫＋黃色長裙
+  const shoes = '<ellipse cx="34.5" cy="89.4" rx="4.4" ry="2.1" fill="#4a3a33"/><ellipse cx="45.5" cy="89.4" rx="4.4" ry="2.1" fill="#4a3a33"/>';
+  const longSkirt = (c) => `<path d="M27 71 Q40 74 53 71 L59 88.5 Q40 92.4 21 88.5 Z" fill="${c}" ${OUT}/>
+    <path d="M47 73 L52.5 72 L58.6 88.4 Q54 89.8 50 90.2 Z" fill="#000" opacity=".07"/>
+    <path d="M34 75 L31.5 89 M40 75.4 V90.4 M46 75 L48.5 89" stroke="${shade(c, -0.2)}" stroke-width=".8" opacity=".6"/>`;
+  let lk;
+  if (side === 'g') {
+    lk = { g: 'f', skin: '#ffe4d0', hair: '#3b2f2f', hs: 'long', glasses: false };
+    const denim = '#5b84b1', dd = shade(denim, -0.25);
+    lk.bodyOverride = `${shoes}${longSkirt('#8a6f63')}
+      <path d="M28 57 Q40 53 52 57 L53.5 73 Q40 76 26.5 73 Z" fill="#fbf7f0" ${OUT}/>
+      <path d="M28 57 Q31.5 55.6 34.6 57.4 L37 75.6 Q31 76 25.6 73.4 Z" fill="${denim}" ${OUT}/>
+      <path d="M52 57 Q48.5 55.6 45.4 57.4 L43 75.6 Q49 76 54.4 73.4 Z" fill="${denim}" ${OUT}/>
+      <path d="M34.6 57.4 L31.6 63 L35.6 62 Z M45.4 57.4 L48.4 63 L44.4 62 Z" fill="${dd}"/>
+      <path d="M29 66 h5 M46 66 h5" stroke="#e8c26a" stroke-width=".8" stroke-dasharray="1.2 1"/>
+      <rect x="29.2" y="64" width="4.6" height="3.6" rx=".6" fill="none" stroke="${dd}" stroke-width=".7"/><rect x="46.2" y="64" width="4.6" height="3.6" rx=".6" fill="none" stroke="${dd}" stroke-width=".7"/>
+      <circle cx="35.6" cy="68" r=".8" fill="#e8c26a"/><circle cx="35.9" cy="72" r=".8" fill="#e8c26a"/>
+      ${armsSvg(denim, lk.skin)}`;
+  } else {
+    lk = { g: 'f', skin: '#fcdcc4', hair: '#4a3530', hs: 'bob', glasses: true };
+    const shirt = '#7fa9d8', sd = shade(shirt, -0.22);
+    lk.bodyOverride = `${shoes}${longSkirt('#f2c94c')}
+      <path d="M28 57 Q40 53 52 57 L53.5 73.4 Q40 76 26.5 73.4 Z" fill="${shirt}" ${OUT}/>
+      <path d="M35 56.4 L40 61 L45 56.4 L42.6 55.6 L40 58.4 L37.4 55.6 Z" fill="${shade(shirt, 0.35)}"/>
+      <path d="M40 61 V73.6" stroke="${sd}" stroke-width=".8"/>
+      <circle cx="40" cy="64" r=".75" fill="#fff"/><circle cx="40" cy="67.6" r=".75" fill="#fff"/><circle cx="40" cy="71.2" r=".75" fill="#fff"/>
+      <path d="M27 72.6 Q40 75.4 53 72.6" stroke="${shade('#f2c94c', -0.25)}" stroke-width="1.6" fill="none"/>
+      ${armsSvg(shirt, lk.skin)}`;
+  }
   const pearl = '<circle cx="19.6" cy="44" r="1.4" fill="#fffaf0" stroke="#d9cbb8" stroke-width=".5"/><circle cx="60.4" cy="44" r="1.4" fill="#fffaf0" stroke="#d9cbb8" stroke-width=".5"/>';
   return personSvg(lk, '', CORSAGE + pearl);
 }
