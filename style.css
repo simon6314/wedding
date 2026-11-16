@@ -187,3 +187,20 @@ button { font: inherit; color: inherit; }
 #swipeHint { position: absolute; left: 50%; transform: translateX(-50%); display: none; width: max-content; padding: 6px 14px; border-radius: 999px; background: rgba(74, 58, 48, .78); color: #fff; font-size: 13px; z-index: 20; pointer-events: none; opacity: 0; transition: opacity .4s; }
 #app[data-ori="port"] #swipeHint { display: block; }
 #swipeHint.show { opacity: 1; }
+
+/* 點桌子跳出的名單 */
+#tablePop { position: absolute; z-index: 9700; transform: translate(-50%, 0) scale(.9); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; background: #fffdf9; border: 2px solid #f2b9c8; border-radius: 14px; padding: .5em .8em .6em; box-shadow: 0 6px 18px rgba(90, 60, 40, .22); font-size: max(calc(var(--u) * 10), 12px); max-width: max(calc(var(--u) * 260), 220px); }
+#tablePop.above { transform: translate(-50%, -100%) scale(.9); }
+#tablePop.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
+#tablePop.above.show { transform: translate(-50%, -100%) scale(1); }
+#tablePop b { display: block; color: #b23a62; margin-bottom: .3em; }
+#tablePop span { display: flex; flex-wrap: wrap; gap: .3em; }
+#tablePop i { font-style: normal; background: #fff1f4; border-radius: 999px; padding: .1em .55em; white-space: nowrap; }
+/* 面板座位表 */
+#seatList { display: grid; gap: 8px; max-height: 34vh; overflow-y: auto; padding-right: 4px; }
+#app[data-ori="port"] #seatList { max-height: none; }
+.seat-row { display: grid; grid-template-columns: 4.2em 1fr; gap: 6px; align-items: start; font-size: 13px; }
+.seat-row b { color: #8a6a52; cursor: pointer; padding-top: 3px; }
+.seat-row span { display: flex; flex-wrap: wrap; gap: 4px; }
+.seat-row button { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 2px 8px; font-size: 12.5px; cursor: pointer; }
+.seat-row button:hover { border-color: var(--pink); }

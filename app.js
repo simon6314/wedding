@@ -1200,11 +1200,40 @@ function tapActor(a) {
   say(a, `${who}：${line}`, 3200);
   a.el.classList.add('poke'); setTimeout(() => a.el.classList.remove('poke'), 500);
 }
+function tableNames(T) {
+  if (T.main) return Object.values(vip).map((v) => v.name);
+  return guests.filter((g) => g.table === T).map((g) => g.name);
+}
+const tableTitle = (T) => (T.main ? '主桌' : '第 ' + T.n + ' 桌');
+// 點桌子：在桌子旁邊跳出這桌的名單（面板裡也會顯示）
 function tapTable(T) {
-  const ppl = guests.filter((g) => g.table === T).map((g) => g.name);
+  const ppl = tableNames(T);
   const box = $('#tableInfo');
+  if (box) box.innerHTML = `<b>${tableTitle(T)}</b>　${ppl.join('、') || '（空桌）'}`;
+  const pop = $('#tablePop');
+  pop.innerHTML = `<b>${tableTitle(T)}</b><span>${ppl.length ? ppl.map((n) => `<i>${n}</i>`).join('') : '（空桌）'}</span>`;
+  const above = T.cy > SH * 0.42;
+  pop.style.left = Math.min(Math.max(T.cx / SW * 100, 12), 88) + '%';
+  pop.style.top = ((above ? T.y - 6 : T.y + T.h + 34) / SH * 100) + '%';
+  pop.classList.toggle('above', above);
+  pop.classList.add('show');
+  for (const t of L.tables) t.el.classList.toggle('hl', t === T);
+  clearTimeout(tapTable.t);
+  tapTable.t = setTimeout(closePop, 9000);
+}
+function closePop() { $('#tablePop').classList.remove('show'); for (const t of L.tables) t.el.classList.remove('hl'); }
+// 面板裡的完整座位表
+function renderSeatList() {
+  const box = $('#seatList');
   if (!box) return;
-  box.innerHTML = `<b>${T.main ? '主桌' : '第 ' + T.n + ' 桌'}</b>　${T.main ? '新郎、新娘、雙方主婚人' : ppl.join('、') || '（空桌）'}`;
+  const order = [...L.tables].sort((a, b) => (a.main ? -1 : b.main ? 1 : a.n - b.n));
+  box.innerHTML = order.map((T) => `<div class="seat-row"><b data-t="${T.main ? 'main' : T.n}">${tableTitle(T)}</b><span>${tableNames(T).map((n) => `<button type="button" data-name="${n}">${n}</button>`).join('')}</span></div>`).join('');
+  box.onclick = (e) => {
+    const nb = e.target.closest('button[data-name]');
+    if (nb) { const a = actors.find((x) => x.name === nb.dataset.name); if (a) highlight(a); return; }
+    const tb = e.target.closest('b[data-t]');
+    if (tb) { const T = L.tables.find((t) => (t.main ? 'main' : String(t.n)) === tb.dataset.t); if (T) { tapTable(T); if (PHONE) T.el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'smooth' }); } }
+  };
 }
 function highlight(a) {
   clearHl();
@@ -1272,6 +1301,7 @@ function init() {
   createPeople();
   $('#count').textContent = `${guests.length + Object.keys(vip).length} 位`;
   setupSearch();
+  renderSeatList();
   let rt;
   addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { snapshotTables(); rebuild(); }, 150); });
   $('#btnNames').addEventListener('click', (e) => { state.names = !state.names; stage.classList.toggle('names', state.names); e.currentTarget.classList.toggle('on', state.names); });
@@ -1280,7 +1310,7 @@ function init() {
   $('#btnShow').addEventListener('click', () => { $('#app').classList.remove('nopanel'); sizeStage(); });
   $('#zoomIn').addEventListener('click', () => { ZOOM = Math.min(2.2, ZOOM * 1.25); sizeStage(); });
   $('#zoomOut').addEventListener('click', () => { ZOOM = Math.max(0.3, ZOOM / 1.25); sizeStage(); });
-  stage.addEventListener('click', () => clearHl());
+  stage.addEventListener('click', () => { clearHl(); closePop(); });
   if (PHONE) { const hint = $('#swipeHint'); hint.style.top = (stage.offsetHeight - 46) + 'px'; hint.classList.add('show'); const off = () => hint.classList.remove('show'); setTimeout(off, 4500); setTimeout(() => $('#stageWrap').addEventListener('scroll', off, { once: true }), 800); }
   setInterval(screenTick, 4500); screenTick();
   requestAnimationFrame(tick);
