@@ -16,15 +16,15 @@ const AREAS = [
   { id: 'kitchen', kind: 'kitchen', x: 39, y: 453, w: 61, h: 75, label: '出菜口', solid: true },
   { id: 'counter', kind: 'counter', x: 38, y: 534, w: 392, h: 138, label: '備餐區 / 櫃台', solid: true },
   { id: 'gift', kind: 'gift', x: 437, y: 552, w: 52, h: 82, label: '收禮桌', solid: true },
-  { id: 'ent1', kind: 'dash', x: 484, y: 641, w: 102, h: 30, label: '入口處 1' },
-  { id: 'door', kind: 'door', x: 438, y: 683, w: 196, h: 85, label: '透明玻璃門' },
-  { id: 'album', kind: 'album', x: 484, y: 738, w: 72, h: 30, label: '相本桌', solid: true },
+  { id: 'ent1', kind: 'dash', x: 484, y: 641, w: 102, h: 30, label: '入口處 1', keep: 1 },
+  { id: 'door', kind: 'door', x: 438, y: 683, w: 196, h: 85, label: '透明玻璃門', keep: 1 },
+  { id: 'album', kind: 'album', x: 484, y: 738, w: 72, h: 30, label: '相本桌', solid: true, keep: 1 },
   { id: 'stage', kind: 'stage', x: 951, y: 392, w: 112, h: 165, label: '活動區' },
   { id: 'screen', kind: 'screen', x: 1067, y: 392, w: 31, h: 155, solid: true },
-  { id: 'long1', kind: 'long', x: 581, y: 374, w: 363, h: 30, solid: true },
-  { id: 'long2', kind: 'long', x: 581, y: 409, w: 363, h: 29, solid: true },
-  { id: 'sofa1', kind: 'sofa', x: 987, y: 40, w: 73, h: 30, solid: true },
-  { id: 'sofa2', kind: 'sofa', x: 1063, y: 40, w: 37, h: 128, solid: true },
+  { id: 'long1', kind: 'long', x: 581, y: 374, w: 363, h: 30, solid: true, keep: 1.15 },
+  { id: 'long2', kind: 'long', x: 581, y: 409, w: 363, h: 29, solid: true, keep: 1.15 },
+  { id: 'sofa1', kind: 'sofa', x: 987, y: 40, w: 73, h: 30, solid: true, keep: 1 },
+  { id: 'sofa2', kind: 'sofa', x: 1063, y: 40, w: 37, h: 128, solid: true, keep: 1 },
 ];
 // 桌子：seats = 座位數（7、8 桌平面圖寫 6–8 位，先抓 8）
 const TABLES = [
@@ -44,9 +44,9 @@ const TABLES = [
 ];
 // 可以走的範圍：大廳、入口 1 的門口、門外（相本桌、賓客入口）
 const WALKABLE = [
-  { x: 30, y: 22, w: 1078, h: 652 },
-  { x: 492, y: 668, w: 88, h: 18 },
-  { x: 436, y: 682, w: 380, h: 86 },
+  { x: 30, y: 22, w: 1078, h: 652, raw: true },
+  { x: 492, y: 668, w: 88, h: 18, keep: 1 },
+  { x: 220, y: 682, w: 480, h: 86, raw: true },
 ];
 const PTS = {
   guestIn: [800, 742], ent1: [536, 692], gift: [508, 596], ent2: [92, 112],
@@ -283,8 +283,17 @@ const DRINKS = ['🥤', '🍹', '☕', '🧋', '🍷'];
 
 // ---- 版面（橫式／直式） ----
 let ORI = 'land', PHONE = false, SW = PW, SH = PH;
-const mp = ([x, y]) => (ORI === 'land' ? [x, y] : [y, PW - x]);
-const mr = (r) => (ORI === 'land' ? { ...r } : { ...r, x: r.y, y: PW - (r.x + r.w), w: r.h, h: r.w });
+// 版面調整：左邊（招牌、包廂、備餐區、入口）縮窄，右邊用餐區拉寬，桌子之間比較不擠
+// 平面圖座標 x 0–560 壓到 0–340，560–1120 拉到 340–1120
+const SPLIT = 560, NEW_SPLIT = 340;
+const remapX = (x) => (x <= SPLIT ? x * NEW_SPLIT / SPLIT : NEW_SPLIT + (x - SPLIT) * (PW - NEW_SPLIT) / (PW - SPLIT));
+const mp = ([x, y]) => [remapX(x), y];
+// keep：位置跟著移、寬度保持（乘上 keep 倍數）；沒有 keep 就整塊等比例縮放
+const mr = (r, keep) => {
+  if (r.raw) return { ...r };
+  if (keep) { const c = remapX(r.x + r.w / 2), w = r.w * keep; return { ...r, x: c - w / 2, w }; }
+  return { ...r, x: remapX(r.x), w: remapX(r.x + r.w) - remapX(r.x) };
+};
 let L = null;   // 換算後的版面
 
 function buildLayout() {
@@ -292,11 +301,11 @@ function buildLayout() {
   PHONE = innerWidth < innerHeight * 0.95;
   ORI = 'land';
   SW = ORI === 'land' ? PW : PH; SH = ORI === 'land' ? PH : PW;
-  const areas = AREAS.map((a) => ({ ...a, ...mr(a) }));
+  const areas = AREAS.map((a) => ({ ...a, ...mr(a, a.keep) }));
   const tables = TABLES.map((t) => {
     let r;
-    if (t.round) r = mr({ x: t.cx - t.r, y: t.cy - t.r, w: t.r * 2, h: t.r * 2 });
-    else r = mr(t);
+    if (t.round) r = mr({ x: t.cx - t.r, y: t.cy - t.r, w: t.r * 2, h: t.r * 2 }, 1);
+    else r = mr(t, 1.12);   // 桌子跟著移到新位置，稍微加寬，椅子間距比較鬆
     const T = { ...t, ...r, cx: r.x + r.w / 2, cy: r.y + r.h / 2 };
     T.seatList = seatsFor(T);
     T.serve = T.round ? [T.cx, T.y + T.h + 34] : (T.w >= T.h ? [T.x - 16, T.cy + 12] : [T.cx, T.y + T.h + 22]);
@@ -306,7 +315,7 @@ function buildLayout() {
   const obst = [];
   for (const a of areas) if (a.solid) obst.push(inflate(a, 7));
   for (const t of tables) obst.push(inflate(t, 6));
-  const walk = WALKABLE.map(mr);
+  const walk = WALKABLE.map((w) => mr(w, w.keep));
   const P = {};
   for (const k of Object.keys(PTS)) {
     const v = PTS[k];
@@ -520,7 +529,7 @@ function areaSvg(a) {
         <g transform="translate(${bx} ${by})"><rect x="-22" y="-10" width="44" height="18" rx="3" fill="#4a4a52"/>${[-15, -7, 1, 9].map((dx, i) => `<rect x="${dx}" y="-6" width="3" height="10" rx="1" fill="#2b2b33"/><rect x="${dx - 1}" y="${-4 + (i % 3) * 3}" width="5" height="2.4" rx="1" fill="${['#ef7d9a', '#ffd66b', '#9fd0f0', '#8fd3b0'][i]}"/>`).join('')}<circle cx="17" cy="-5" r="2" fill="#8fd3b0" class="led"/></g>
         <g transform="translate(${x + 14} ${y + h - 18})"><rect x="-7" y="-10" width="14" height="20" rx="3" fill="#3d3532"/><circle cy="-3" r="3.6" fill="#6b6260"/><circle cy="5" r="2" fill="#6b6260"/></g>
         <g transform="translate(${x + w - 14} ${y + h - 18})"><rect x="-7" y="-10" width="14" height="20" rx="3" fill="#3d3532"/><circle cy="-3" r="3.6" fill="#6b6260"/><circle cy="5" r="2" fill="#6b6260"/></g>
-        ${text(a.label, 6, 12)}${text(a.sub, 22, 9, 'lb sm')}`;
+        ${vert ? text(a.label, 0, 12) : text(a.label, 6, 12) + text(a.sub, 22, 9, 'lb sm')}`;
     }
     case 'drink': {
       // 飲料吧台：三桶飲料、一疊杯子
@@ -623,8 +632,8 @@ function drawFloor() {
     <radialGradient id="spot"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
     <radialGradient id="vign" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#5a3a24" stop-opacity="0"/><stop offset="1" stop-color="#5a3a24" stop-opacity=".22"/></radialGradient>
   </defs>`);
-  const hall = mr({ x: 22, y: 18, w: 1092, h: 660 });
-  const outside = mr({ x: 0, y: 680, w: PW, h: 90 });
+  const hall = { x: 22, y: 18, w: 1092, h: 660 };
+  const outside = { x: 0, y: 680, w: PW, h: 90 };
   parts.push(`<rect x="0" y="0" width="${SW}" height="${SH}" fill="#bfae9e"/>`);
   parts.push(`<rect x="${outside.x}" y="${outside.y}" width="${outside.w}" height="${outside.h}" fill="url(#tile)"/>`);
   // 門外的人行道花圃
@@ -634,9 +643,9 @@ function drawFloor() {
   parts.push(`<rect x="${hall.x}" y="${hall.y}" width="${hall.w}" height="${hall.h}" rx="10" fill="url(#floor-marble)"/><rect x="${hall.x}" y="${hall.y}" width="${hall.w}" height="${hall.h}" rx="10" fill="url(#sheen)"/>`);
   parts.push(`<rect x="${hall.x + 3}" y="${hall.y + 3}" width="${hall.w - 6}" height="${hall.h - 6}" rx="8" fill="none" stroke="#f6e7d4" stroke-width="2" opacity=".8"/>`);
   // 入口 1 的門口
-  const gap = mr({ x: 490, y: 668, w: 92, h: 16 });
+  const gap = mr({ x: 490, y: 668, w: 92, h: 16 }, 1);
   parts.push(`<rect x="${gap.x}" y="${gap.y}" width="${gap.w}" height="${gap.h}" fill="#efe9e2"/>`);
-  const mat = mr({ x: 500, y: 650, w: 72, h: 20 });
+  const mat = mr({ x: 500, y: 650, w: 72, h: 20 }, 1);
   parts.push(`<rect x="${mat.x}" y="${mat.y}" width="${mat.w}" height="${mat.h}" rx="4" fill="#b85a5a" opacity=".85"/><rect x="${mat.x + 3}" y="${mat.y + 3}" width="${mat.w - 6}" height="${mat.h - 6}" rx="3" fill="none" stroke="#f3c6a0" stroke-width="1" stroke-dasharray="3 2"/>`);
   // 每張桌子上方的吊燈光暈
   for (const T of L.tables) parts.push(`<ellipse cx="${T.cx}" cy="${T.cy}" rx="${T.w / 2 + 40}" ry="${T.h / 2 + 40}" fill="url(#glow)"/>`);
