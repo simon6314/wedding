@@ -8,6 +8,8 @@
 //     kids  其中幾位是小朋友（不填就是 0）
 //     lap   小朋友裡有幾位不佔座位（坐大人腿上）；baby: true 表示是嬰兒（畫得更小）
 //     note  身分備註，例如 '主持人'、'婚禮歌手'
+//     look  外型，例如 { hair: '#1f1b1d', skin: '#dba47c', hs: 'bob' }（hs 髮型：long/bob/pony/bun/short/side）
+//     members 家人的性別和外型，例如 [{ g: 'f', look: { hs: 'bob' } }]
 //   畫面上會出現 count 個人：代表本人＋「王小明的家人」，同一家坐在一起，
 //   點桌子會顯示「王小明（一家 4 位）」，搜尋王小明會把一家人一起標出來。
 window.WEDDING = {
@@ -36,7 +38,7 @@ window.WEDDING = {
     { name: '品劭', table: 3, g: 'f' },
     { name: '芸岑', table: 3, g: 'f', count: 2 },
     // 第 4 桌
-    { name: '建智', table: 4, g: 'm', count: 2, note: '主持人' },
+    { name: '建智', table: 4, g: 'm', count: 2, note: '主持人', members: [{ g: 'f', look: { hs: 'bob' } }] },   // 家人：短髮年輕女性
     { name: 'Glenn', table: 4, g: 'm', count: 2, note: '婚禮歌手', look: { skin: '#dba47c', hair: '#1f1b1d', hs: 'side' } },   // 菲律賓人：小麥色皮膚、黑髮
     // 第 5 桌
     { name: '宜妏', table: 5, g: 'f', count: 5 },

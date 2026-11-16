@@ -866,7 +866,8 @@ function expandFamilies(list) {
       const kid = i >= n - kids;
       const onLap = i >= n - lap;
       const g = i === 1 && !kid ? (p.g === 'f' ? 'm' : 'f') : (srand() < 0.5 ? 'm' : 'f');
-      out.push({ name: `${p.name}的家人`, table: p.table, g, kid, lap: onLap, baby: onLap && !!p.baby, family: p.name, famSize: n, famIdx: i });
+      const m = (p.members || [])[i - 1] || {};   // 家人的指定（性別、外型）
+      out.push({ name: `${p.name}的家人`, table: p.table, g: m.g || g, kid, lap: onLap, baby: onLap && !!p.baby, look: m.look, family: p.name, famSize: n, famIdx: i });
     }
   }
   return out;
