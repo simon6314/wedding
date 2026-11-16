@@ -40,9 +40,21 @@ window.WEDDING = {
     { name: 'glenn', table: 4, g: 'm', count: 2, note: '婚禮歌手' },
     // 第 5 桌
     { name: '宜妏', table: 5, g: 'f', count: 5 },
-    // 第 7 桌
-    { name: '宗益', table: 7, g: 'm', count: 3 },
+    { name: '新娘大姨', table: 5, g: 'f' },
+    // 第 6 桌
+    { name: '宜秀', table: 6, g: 'f' },
+    { name: '淑鈴', table: 6, g: 'f' },
+    { name: '昱靜', table: 6, g: 'f' },
+    { name: '芃磬', table: 6, g: 'f' },
+    { name: '瀅琦', table: 6, g: 'f' },
+    { name: '士堯', table: 6, g: 'm' },
+    // 第 7 桌（共 9 位，比平面圖寫的 6–8 位多 1 位）
+    { name: '宗益', table: 7, g: 'm', count: 4 },
     { name: '新娘大姑', table: 7, g: 'f' },
+    { name: '玫秀', table: 7, g: 'f' },
+    { name: '玉智', table: 7, g: 'f' },
+    { name: '小燕阿姨', table: 7, g: 'f' },
+    { name: '莊阿姨', table: 7, g: 'f' },
     // 第 8 桌
     { name: '峻緯', table: 8, g: 'm', count: 3 },
     { name: '筠霏', table: 8, g: 'f', count: 2 },
@@ -66,5 +78,5 @@ window.WEDDING = {
     { name: '新郎三姑姑', table: 12, g: 'f', count: 5, kids: 1, lap: 1 },     // 含一位兒童（座椅不佔位）
   ],
   // 桌子備註
-  tableNotes: { 1: '預備桌', 6: '先空桌' },
+  tableNotes: { 1: '預備桌' },
 };
