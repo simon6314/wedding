@@ -30,7 +30,7 @@ window.WEDDING = {
     // 第 2 桌
     { name: '姵汝', table: 2, g: 'f' },
     { name: '鈺庭', table: 2, g: 'f', count: 3, kids: 1, lap: 1, baby: true },   // 兩位成人＋未滿一歲幼兒
-    { name: '明兌', table: 2, g: 'm', count: 2, kids: 1 },                       // 一位成人＋一位兒童
+    { name: '明兌', table: 2, g: 'f', count: 2, kids: 1 },                       // 一位成人＋一位兒童
     // 第 3 桌
     { name: '麗珠', table: 3, g: 'f' },
     { name: '品劭', table: 3, g: 'm' },
