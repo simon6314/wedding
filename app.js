@@ -707,11 +707,16 @@ function drawTables() {
     d.style.left = (T.x / SW * 100) + '%'; d.style.top = (T.y / SH * 100) + '%';
     d.style.width = (T.w / SW * 100) + '%'; d.style.height = (T.h / SH * 100) + '%';
     d.style.zIndex = String(Math.round(T.cy));
-    const chairs = T.seatList.map((s) => {
-      const off = s.side === 'top' ? [0, -9] : s.side === 'bottom' ? [0, -16] : s.side === 'left' ? [-2, -13] : s.side === 'right' ? [2, -13] : [0, -13];
-      return `<i class="chair ${s.side}" style="left:${((s.sit[0] + off[0] - T.x) / T.w * 100)}%;top:${((s.sit[1] + off[1] - T.y) / T.h * 100)}%"></i>`;
-    }).join('');
-    d.innerHTML = `<div class="cloth">${tableTopSvg(T)}</div>${chairs}<span class="tno">${T.main ? '主桌' : T.n}</span><span class="dishes"></span>`;
+    // 椅子放在獨立一層、畫在所有人後面：人坐在椅子上，椅子不會擋到身體
+    for (const st of T.seatList) {
+      const off = st.side === 'top' ? [0, -15] : st.side === 'bottom' ? [0, -11] : [0, -12];
+      const c = document.createElement('i');
+      c.className = 'chair ' + st.side;
+      c.style.left = ((st.sit[0] + off[0]) / SW * 100) + '%';
+      c.style.top = ((st.sit[1] + off[1]) / SH * 100) + '%';
+      tableLayer.appendChild(c);
+    }
+    d.innerHTML = `<div class="cloth">${tableTopSvg(T)}</div><span class="tno">${T.main ? '主桌' : T.n}</span><span class="dishes"></span>`;
     T.el = d; T.dishEl = d.querySelector('.dishes');
     d.addEventListener('click', (e) => { e.stopPropagation(); tapTable(T); });
     tableLayer.appendChild(d);

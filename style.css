@@ -57,7 +57,7 @@ button { font: inherit; color: inherit; }
 .table .cloth .top { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .table.hl .cloth { filter: drop-shadow(0 0 calc(var(--u) * 6) rgba(239, 125, 154, .9)); animation: pulse 1s ease-in-out infinite; }
 @keyframes pulse { 50% { filter: drop-shadow(0 0 calc(var(--u) * 12) rgba(239, 125, 154, .5)); } }
-.chair { position: absolute; width: calc(var(--u) * 14); height: calc(var(--u) * 11); margin-left: calc(var(--u) * -7); margin-top: calc(var(--u) * -5.5); background: linear-gradient(#d4ad86, #b98e66); border-radius: calc(var(--u) * 3.5); z-index: -1; box-shadow: 0 calc(var(--u) * 1.5) calc(var(--u) * 2) rgba(70, 40, 20, .25); }
+.chair { position: absolute; width: calc(var(--u) * 19); height: calc(var(--u) * 13); margin-left: calc(var(--u) * -9.5); margin-top: calc(var(--u) * -6.5); pointer-events: none; background: linear-gradient(#d4ad86, #b98e66); border-radius: calc(var(--u) * 3.5); z-index: 1; box-shadow: 0 calc(var(--u) * 1.5) calc(var(--u) * 2) rgba(70, 40, 20, .25); }
 .chair.top { border-top: calc(var(--u) * 3) solid #8f6646; }
 .chair.bottom { border-bottom: calc(var(--u) * 3) solid #8f6646; }
 .chair.left { border-left: calc(var(--u) * 3) solid #8f6646; }
