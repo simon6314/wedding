@@ -26,7 +26,7 @@ const AREAS = [
   { id: 'sofa1', kind: 'sofa', x: 987, y: 40, w: 73, h: 30, solid: true, keep: 1 },
   { id: 'sofa2', kind: 'sofa', x: 1063, y: 40, w: 37, h: 128, solid: true, keep: 1 },
 ];
-// 桌子：seats = 座位數（第 7 桌 8 位、第 8 桌 6 位）
+// 桌子：seats = 座位數（第 8、10 桌是 6 人桌）
 const TABLES = [
   { n: 1, round: true, cx: 1020, cy: 118, r: 25, seats: 6 },
   { n: 2, x: 868, y: 38, w: 84, h: 110, seats: 6 },
@@ -37,7 +37,7 @@ const TABLES = [
   { n: 7, x: 791, y: 305, w: 145, h: 62, seats: 8 },   // 8 人桌，大小和第 11、12 桌一樣
   { n: 8, x: 638, y: 307, w: 109, h: 57, seats: 6 },
   { n: 9, x: 813, y: 447, w: 109, h: 58, seats: 6 },
-  { n: 10, x: 583, y: 447, w: 175, h: 60, seats: 8 },
+  { n: 10, x: 616, y: 447, w: 109, h: 58, seats: 6 },   // 6 人桌，大小和第 8、9 桌一樣
   { n: 11, x: 862, y: 568, w: 145, h: 69, seats: 8 },
   { n: 12, x: 660, y: 571, w: 144, h: 69, seats: 8 },
   { n: 0, main: true, x: 998, y: 244, w: 69, h: 142, seats: 6 },   // 主桌（活動區旁）
