@@ -48,10 +48,9 @@ window.WEDDING = {
     { name: '芃磬', table: 6, g: 'f' },
     { name: '瀅琦', table: 6, g: 'f' },
     { name: '士堯', table: 6, g: 'm' },
-    // 第 7 桌（共 9 位，比平面圖寫的 6–8 位多 1 位）
+    // 第 7 桌
     { name: '宗益', table: 7, g: 'm', count: 4 },
-    { name: '新娘大姑', table: 7, g: 'f' },
-    { name: '玫秀', table: 7, g: 'f' },
+    { name: '玫秀', table: 7, g: 'f', note: '新娘大姑' },
     { name: '玉智', table: 7, g: 'f' },
     { name: '小燕阿姨', table: 7, g: 'f' },
     { name: '莊阿姨', table: 7, g: 'f' },
