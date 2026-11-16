@@ -325,9 +325,9 @@ const CHAT = [
   ['今天天氣真好', '新人運氣好～'],
   ['你們家寶寶好可愛', '謝謝～一直跑來跑去'],
 ];
-const SOLO = ['好好吃 😋', '好飽～', '要幸福喔！', '新婚快樂 🎉', '這杯好喝', '百年好合！', '永浴愛河 ❤', '早生貴子～', '吃不完了啦', '拍照拍照 📸'];
+const SOLO = ['好好吃 😋', '好飽～', '要幸福喔！', '新婚快樂 🎉', '這杯好喝', '百年好合！', '永浴愛河 ❤', '吃不完了啦', '拍照拍照 📸'];
 const KID_LINES = ['我要喝果汁！', '好好玩～', '新娘好像公主！', '我要吃蛋糕！', '抓不到我～', '嘿嘿'];
-const BLESS = ['乾杯！', '新婚快樂！', '百年好合！', '永浴愛河！', '早生貴子！', '白頭偕老！', '要幸福喔！', 'Cheers 🥂'];
+const BLESS = ['乾杯！', '新婚快樂！', '百年好合！', '永浴愛河！', '白頭偕老！', '要幸福喔！', 'Cheers 🥂'];
 const COUPLE_THANKS = ['謝謝大家來！', '吃飽喝足喔～', '今天好開心 ❤', '謝謝你們！', '多吃一點喔'];
 const PARENT_LINES = ['謝謝你們來！', '多吃一點喔', '招待不周請見諒', '今天好開心', '菜還合胃口嗎？'];
 const GUEST_REPLY = ['恭喜恭喜！', '好好吃！', '新娘好漂亮', '謝謝招待～', '恭喜您！'];
@@ -347,9 +347,9 @@ const EN = {
   '甜點什麼時候上？': 'When is dessert?', '聽說有蛋糕！': 'I heard there is ice cream!',
   '今天天氣真好': 'Lovely weather today', '新人運氣好～': 'Lucky couple~',
   '好好吃 😋': 'Yummy 😋', '好飽～': "I'm so full~", '要幸福喔！': 'Be happy forever!', '新婚快樂 🎉': 'Happy wedding day 🎉',
-  '這杯好喝': 'Great drink!', '百年好合！': 'Best wishes!', '永浴愛河 ❤': 'Love always ❤', '早生貴子～': 'Wishing you a happy family~',
+  '這杯好喝': 'Great drink!', '百年好合！': 'Best wishes!', '永浴愛河 ❤': 'Love always ❤',
   '吃不完了啦': "I can't finish this", '拍照拍照 📸': 'Photo time 📸',
-  '乾杯！': 'Cheers! 🥂', '新婚快樂！': 'Congratulations!', '永浴愛河！': 'Love always!', '早生貴子！': 'Happy family!',
+  '乾杯！': 'Cheers! 🥂', '新婚快樂！': 'Congratulations!', '永浴愛河！': 'Love always!',
   '白頭偕老！': 'Forever together!', '恭喜恭喜！': 'Congrats! 🎉', '好好吃！': 'Delicious!', '新娘好漂亮': 'Beautiful bride!',
   '謝謝招待～': 'Thanks for having us~', '恭喜您！': 'Congratulations!',
   '親一個！': 'Kiss! Kiss! 💋', '👏👏👏': '👏👏👏', '呀～～': 'Awww~', '好甜！': 'So sweet!', '閃瞎了 😎': 'So romantic 😎',
