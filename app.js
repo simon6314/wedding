@@ -317,7 +317,7 @@ const CHAT = [
   ['下一個換你了吧？', '先吃飯先吃飯 😅'],
   ['等等去拍照嗎？', '走！去活動區'],
   ['剛剛好感動 🥹', '我也差點哭'],
-  ['你喝什麼？', '水果氣泡飲～'],
+  ['你喝什麼？', '果汁～'],
   ['好久不見！', '上次見是畢業耶'],
   ['他們好登對', '天生一對！'],
   ['這裡好溫馨', '咖啡廳婚禮好可愛'],
@@ -341,7 +341,7 @@ const EN = {
   '下一個換你了吧？': "You're next, right? 😉", '先吃飯先吃飯 😅': "Let's just eat 😅",
   '等等去拍照嗎？': 'Photo later?', '走！去活動區': "Let's go to the stage!",
   '剛剛好感動 🥹': 'That was so touching 🥹', '我也差點哭': 'I almost cried too',
-  '你喝什麼？': 'What are you drinking?', '水果氣泡飲～': 'Fruit soda~',
+  '你喝什麼？': 'What are you drinking?', '果汁～': 'Juice~',
   '好久不見！': 'Long time no see!', '上次見是畢業耶': 'Since graduation!',
   '他們好登對': 'They look perfect together', '天生一對！': 'A perfect match!',
   '這裡好溫馨': 'Such a cozy place', '咖啡廳婚禮好可愛': 'Café weddings are so cute',
@@ -360,7 +360,7 @@ const EN = {
   '一起去好多地方旅行 ✈️': 'Travel the world together ✈️', '永遠是彼此最好的朋友': 'Best friends forever',
   '親一個！': 'Kiss! Kiss! 💋', '👏👏👏': '👏👏👏', '呀～～': 'Awww~', '好甜！': 'So sweet!', '閃瞎了 😎': 'So romantic 😎',
 };
-const EN_ANY = ['This is delicious! 😋', 'So happy for you two!', 'What a lovely party! 🎉', 'Cheers! 🥂', 'Congrats! 💕', 'Great food!', 'Love this place ☕'];
+const EN_ANY = ['This is delicious! 😋', 'So happy for you two!', 'What a lovely party! 🎉', 'Cheers! 🥂', 'Congrats! 💕', 'Great food!', 'Love this place 💕'];
 const toEn = (text) => EN[text] || (/[\u3400-\u9fff]/.test(text) ? pick(EN_ANY) : text);
 // 我們的菜單（Honey Wood Café 西式婚禮專案，沒有選加價菜色）：[圖示, 簡稱（對話用）, 完整菜名]
 const COURSES = [
@@ -375,7 +375,7 @@ const COURSES = [
   ['🐠', '紙包鱸魚', '火烤紙包時蔬黑松露卡邦尼醬鱸菲力'],
   ['🍨', '義式冰淇淋', '塔拉朵義式冰淇淋'],
 ];
-const DRINKS = ['🥤', '🍹', '☕', '🧋', '🍷'];
+const DRINKS = ['🧃', '🥤'];   // 飲料只有果汁
 
 // ---- 版面（橫式／直式） ----
 let ORI = 'land', PHONE = false, SW = PW, SH = PH;
@@ -1068,7 +1068,7 @@ async function getDrink(a) {
   const spot = pick(L.P.drink);
   await walkTo(a, spot);
   setPose(a, 'pour');
-  if (Math.random() < 0.4) say(a, pick(['要喝哪個呢～', '我要冰的！', '續杯！', '拿鐵好香']));
+  if (Math.random() < 0.4) say(a, pick(['要喝哪個口味呢～', '我要冰的！', '續杯！', '果汁好好喝']));
   await wait(2200);
   a.prop = a.info.kid ? '🧃' : pick(DRINKS);
   showProp(a);
