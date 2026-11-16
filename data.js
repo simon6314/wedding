@@ -82,7 +82,7 @@ window.WEDDING = {
     { name: '新郎二舅舅', table: 11, g: 'm' },
     // 第 12 桌
     { name: '民政', table: 12, g: 'm', count: 4 },
-    { name: '新郎三姑姑', table: 12, g: 'f', count: 5, kids: 1, lap: 1 },     // 含一位兒童（座椅不佔位）
+    { name: '新郎三姑姑', table: 12, g: 'f', count: 5, kids: 1, lap: 1, highchair: true },     // 含一位兒童（坐兒童座椅，不佔一般座位）
   ],
   // 桌子備註
   tableNotes: { 1: '預備桌' },
