@@ -58,7 +58,7 @@ window.WEDDING = {
     { name: '士堯', table: 6, g: 'm' },
     // 第 7 桌
     { name: '宗益', table: 7, g: 'm', count: 4 },
-    { name: '玫秀', table: 7, g: 'f', look: { hair: '#f6f4fa', hairLine: true, hs: 'pony', skin: '#fff3ee', cloth: '#ff8fab' } },   // 有活力的白髮、皮膚白皙、年輕
+    { name: '玫秀', table: 7, g: 'f', look: { hair: '#b9bcc4', hs: 'bob', skin: '#fcdcc4', cloth: '#ff8fab' } },   // 銀灰色短髮、年輕
     { name: '玉智', table: 7, g: 'f' },
     { name: '小燕', table: 7, g: 'f' },
     { name: '莊', table: 7, g: 'f' },
