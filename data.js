@@ -16,7 +16,7 @@ window.WEDDING = {
   title: '我們的婚禮派對',
   groom: '思宏',
   bride: '瀅安',
-  date: '',                 // 例如 '2027.03.20'
+  date: '2026.11.29',       // 115 年 11 月 29 日 午宴
   venue: 'Honeywood 美式饗宴',
   // 主桌：新郎新娘＋雙方主婚人（名字可改）
   vip: [
