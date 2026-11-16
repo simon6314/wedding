@@ -815,10 +815,26 @@ function flash() { const f = $('#flash'); f.classList.remove('on'); void f.offse
 
 // ---- 建立人物 ----
 const guests = [], vip = {}, staff = [];
+// 一筆報名代表一家人：{ name: '王小明', table: 3, count: 4, kids: 2 }
+// 會展開成 count 個人：第一位是填表的人，其他人叫「王小明的家人」，最後 kids 位是小朋友
+function expandFamilies(list) {
+  const out = [];
+  for (const p of list) {
+    const n = Math.max(1, Math.round(+p.count || 1));
+    const kids = Math.min(n - 1, Math.max(0, Math.round(+p.kids || 0)));
+    out.push({ ...p, family: n > 1 ? p.name : '', famSize: n, famIdx: 0 });
+    for (let i = 1; i < n; i++) {
+      const kid = i >= n - kids;
+      const g = i === 1 && !kid ? (p.g === 'f' ? 'm' : 'f') : (srand() < 0.5 ? 'm' : 'f');
+      out.push({ name: `${p.name}的家人`, table: p.table, g, kid, family: p.name, famSize: n, famIdx: i });
+    }
+  }
+  return out;
+}
 function createPeople() {
   actorLayer.innerHTML = ''; actors.length = 0; guests.length = 0; staff.length = 0;
   seed = 20261116;
-  const list = CFG.GUESTS || fakeGuests();
+  const list = expandFamilies(CFG.GUESTS || fakeGuests());
   const byTable = {};
   for (const p of list) (byTable[p.table] = byTable[p.table] || []).push(p);
   for (const T of L.tables) {
@@ -1208,7 +1224,8 @@ function tapActor(a) {
 }
 function tableNames(T) {
   if (T.main) return Object.values(vip).map((v) => v.name);
-  return guests.filter((g) => g.table === T).map((g) => g.name);
+  // 同一家只列填表的人，後面標幾位
+  return guests.filter((g) => g.table === T && !g.info.famIdx).map((g) => (g.info.famSize > 1 ? `${g.name}（一家 ${g.info.famSize} 位）` : g.name));
 }
 const tableTitle = (T) => (T.main ? '主桌' : '第 ' + T.n + ' 桌');
 // 點桌子：在桌子旁邊跳出這桌的名單（面板裡也會顯示）
@@ -1233,7 +1250,7 @@ function renderSeatList() {
   const box = $('#seatList');
   if (!box) return;
   const order = [...L.tables].sort((a, b) => (a.main ? -1 : b.main ? 1 : a.n - b.n));
-  box.innerHTML = order.map((T) => `<div class="seat-row"><b data-t="${T.main ? 'main' : T.n}">${tableTitle(T)}</b><span>${tableNames(T).map((n) => `<button type="button" data-name="${n}">${n}</button>`).join('')}</span></div>`).join('');
+  box.innerHTML = order.map((T) => `<div class="seat-row"><b data-t="${T.main ? 'main' : T.n}">${tableTitle(T)}</b><span>${tableNames(T).map((n) => `<button type="button" data-name="${n.replace(/（一家 \d+ 位）$/, '')}">${n}</button>`).join('')}</span></div>`).join('');
   box.onclick = (e) => {
     const nb = e.target.closest('button[data-name]');
     if (nb) { const a = actors.find((x) => x.name === nb.dataset.name); if (a) highlight(a); return; }
@@ -1243,7 +1260,9 @@ function renderSeatList() {
 }
 function highlight(a) {
   clearHl();
-  a.hl = true; a.el.classList.add('hl'); place(a);
+  // 一家人一起標出來
+  const fam = a.info && a.info.family ? guests.filter((g) => g.info.family === a.info.family && g.table === a.table) : [a];
+  for (const m of fam) { m.hl = true; m.el.classList.add('hl'); place(m); setTimeout(() => { if (m.hl) { m.hl = false; m.el.classList.remove('hl'); place(m); } }, 12000); }
   if (a.table) { a.table.el.classList.add('hl'); tapTable(a.table); }
   if (PHONE) a.el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'smooth' });
   setTimeout(() => { if (a.hl) { a.hl = false; a.el.classList.remove('hl'); place(a); a.table && a.table.el.classList.remove('hl'); } }, 12000);
@@ -1254,8 +1273,8 @@ function setupSearch() {
     const q = inp.value.trim();
     out.innerHTML = '';
     if (!q) return;
-    const hits = actors.filter((a) => a.kind !== 'staff' && a.name.includes(q)).slice(0, 8);
-    out.innerHTML = hits.length ? hits.map((a, i) => `<button type="button" data-i="${actors.indexOf(a)}">${a.name}${a.table ? ' · ' + (a.table.main ? '主桌' : '第 ' + a.table.n + ' 桌') : ''}</button>`).join('') : '<span class="muted">找不到這個名字</span>';
+    const hits = actors.filter((a) => a.kind !== 'staff' && !(a.info && a.info.famIdx) && a.name.includes(q)).slice(0, 8);
+    out.innerHTML = hits.length ? hits.map((a, i) => `<button type="button" data-i="${actors.indexOf(a)}">${a.name}${a.info && a.info.famSize > 1 ? `（一家 ${a.info.famSize} 位）` : ''}${a.table ? ' · ' + (a.table.main ? '主桌' : '第 ' + a.table.n + ' 桌') : ''}</button>`).join('') : '<span class="muted">找不到這個名字</span>';
   });
   out.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) highlight(actors[+b.dataset.i]); });
 }
