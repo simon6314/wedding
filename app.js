@@ -51,7 +51,6 @@ const WALKABLE = [
 const PTS = {
   guestIn: [800, 742], ent1: [536, 692], gift: [508, 596], ent2: [92, 112],
   kitchen: [116, 492], album: [520, 726], stageC: [1004, 476],
-  route: [[96, 150], [100, 430], [530, 432]],
   greet: [[566, 612], [590, 612], [546, 570], [569, 570], [592, 570], [615, 570]],
   drink: [[452, 298], [483, 302], [514, 298], [541, 272], [545, 246], [540, 222]],
   staffIdle: [[180, 520], [260, 522], [340, 520]],
@@ -449,9 +448,6 @@ function drawFloor() {
   // 入口 1 的門口（牆上的缺口）
   const gap = mr({ x: 490, y: 672, w: 92, h: 12 });
   parts.push(`<rect x="${gap.x}" y="${gap.y}" width="${gap.w}" height="${gap.h}" fill="#ead6bf"/>`);
-  // 建議進場動線
-  const route = [PTS.ent2, ...PTS.route].map(mp);
-  parts.push(`<path d="M${route.map((p) => p.join(' ')).join(' L')}" class="route"/>`);
   // 牆上的串燈
   let bulbs = '';
   for (let i = 0; i < 26; i++) {
