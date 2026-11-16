@@ -71,20 +71,21 @@ const SURNAME = ['陳', '林', '黃', '張', '李', '王', '吳', '劉', '蔡', 
 const GIVEN_M = ['家豪', '冠宇', '承翰', '志明', '建宏', '宗翰', '俊傑', '彥廷', '柏宇', '冠廷', '文華', '宥辰', '品睿', '子軒'];
 const GIVEN_F = ['怡君', '雅婷', '佳穎', '欣怡', '淑芬', '詩涵', '雅筑', '郁婷', '品妤', '思妤', '美玲', '子晴', '語彤', '筱涵'];
 function fakeGuests() {
+  // 每桌人數（含一家 4 口）；7、8、11、12 桌各有一組一家 4 口（爸爸填表、2 個小朋友）
   const counts = { 1: 5, 2: 6, 3: 6, 4: 5, 5: 6, 6: 5, 7: 6, 8: 7, 9: 5, 10: 4, 11: 5, 12: 4 };
+  const families = { 7: 1, 8: 1, 11: 1, 12: 1 };
   const out = [];
-  let kids = 0;
   for (const t of Object.keys(counts)) {
-    for (let i = 0; i < counts[t]; i++) {
-      const g = srand() < 0.5 ? 'm' : 'f';
-      // 賓客先都用年輕人的樣子（沒有長輩和小朋友）
-      const kid = false; srand();
-      if (kid) kids++;
-      const elder = false; srand();
+    let left = counts[t];
+    for (let f = 0; f < (families[t] || 0); f++) {
       const sn = SURNAME[Math.floor(srand() * SURNAME.length)];
-      const name = kid ? '小' + (g === 'm' ? GIVEN_M : GIVEN_F)[Math.floor(srand() * 14)].slice(1)
-        : sn + (g === 'm' ? GIVEN_M : GIVEN_F)[Math.floor(srand() * 14)];
-      out.push({ name, table: +t, g, kid, elder });
+      out.push({ name: sn + GIVEN_M[Math.floor(srand() * 14)], table: +t, g: 'm', count: 4, kids: 2 });
+      left -= 4;
+    }
+    for (let i = 0; i < left; i++) {
+      const g = srand() < 0.5 ? 'm' : 'f';
+      const sn = SURNAME[Math.floor(srand() * SURNAME.length)];
+      out.push({ name: sn + (g === 'm' ? GIVEN_M : GIVEN_F)[Math.floor(srand() * 14)], table: +t, g });
     }
   }
   return out;
