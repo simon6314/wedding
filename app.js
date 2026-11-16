@@ -195,6 +195,9 @@ function headSvg(lk) {
   return `<g class="hd">${ear}<ellipse cx="40" cy="36" rx="${lk.faceRx || 21}" ry="20" fill="${lk.skin}" ${OUT}/>
     ${faceSvg(lk)}${hairFront(lk)}${lk.glasses ? GLASSES : ''}</g>`;
 }
+// 兒童座椅：高椅背、細長椅腳、前面一塊餐盤
+const HIGHCHAIR_BACK = '<path d="M27 92 L24 102 M53 92 L56 102" stroke="#a87b56" stroke-width="3" stroke-linecap="round"/><rect x="23" y="44" width="34" height="48" rx="7" fill="#e3bf93" stroke="#b98a5c" stroke-width="1.5"/>';
+const HIGHCHAIR_FRONT = '<rect x="18" y="70" width="44" height="7" rx="3" fill="#f4e3cc" stroke="#c9a27c" stroke-width="1.4"/>';
 function personSvg(lk, extraBack = '', extraFront = '') {
   const inner = `${extraBack}${hairBack(lk)}${lk.bodyOverride || bodySvg(lk)}${headSvg(lk)}${extraFront}`;
   const g = lk.kid ? `<g transform="translate(40 92) scale(${lk.baby ? 0.6 : 0.78}) translate(-40 -92)">${inner}</g>` : inner;
@@ -897,7 +900,7 @@ function expandFamilies(list) {
       const onLap = i >= n - lap;
       const g = i === 1 && !kid ? (p.g === 'f' ? 'm' : 'f') : (srand() < 0.5 ? 'm' : 'f');
       const m = (p.members || [])[i - 1] || {};   // 家人的指定（性別、外型）
-      out.push({ name: `${p.name}的家人`, table: p.table, g: m.g || g, kid, lap: onLap, baby: onLap && !!p.baby, look: m.look, family: p.name, famSize: n, famIdx: i });
+      out.push({ name: `${p.name}的家人`, table: p.table, g: m.g || g, kid, lap: onLap, baby: onLap && !!p.baby, highchair: onLap && !!p.highchair, look: m.look, family: p.name, famSize: n, famIdx: i });
     }
   }
   return out;
@@ -921,14 +924,17 @@ function createPeople() {
       if (p.lap && lastSeat) {
         // 坐在家人旁邊（腿上），不佔座位
         si = lastSi;
-        seat = { ...lastSeat, sit: [lastSeat.sit[0] + (lastSeat.side === 'right' ? -9 : 9), lastSeat.sit[1] + 2], lap: true };
+        const off = p.highchair ? 15 : 9;   // 兒童座椅放在大人旁邊，離遠一點
+        // 兒童座椅：坐在桌子兩側時放在大人外側，上下排就放旁邊
+        const dx = p.highchair ? (lastSeat.side === 'right' ? off : lastSeat.side === 'left' ? -off : off) : (lastSeat.side === 'right' ? -off : off);
+        seat = { ...lastSeat, sit: [lastSeat.sit[0] + dx, lastSeat.sit[1] + (p.highchair ? 6 : 2)], lap: true };
       } else {
         if (k >= order.length) console.warn(`第 ${T.n} 桌人數超過座位數`);
         si = order[k % order.length]; k++;
         seat = T.seatList[si];
         lastSeat = seat; lastSi = si;
       }
-      const a = makeActor({ kind: 'guest', name: p.name, info: p, lk, table: T, seatIdx: si, svg: personSvg(lk), speed: p.kid ? 95 : rand(62, 78), cls: p.kid ? 'kid' : '' });
+      const a = makeActor({ kind: 'guest', name: p.name, info: p, lk, table: T, seatIdx: si, svg: p.highchair ? personSvg(lk, HIGHCHAIR_BACK, HIGHCHAIR_FRONT) : personSvg(lk), speed: p.kid ? 95 : rand(62, 78), cls: p.kid ? 'kid' : '' });
       a.seat = seat;
       guests.push(a);
     });

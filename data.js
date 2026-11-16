@@ -6,7 +6,7 @@
 //     g     代表的性別 'm' 男 / 'f' 女
 //     count 這一家總共幾位（含代表，不填就是 1 位）
 //     kids  其中幾位是小朋友（不填就是 0）
-//     lap   小朋友裡有幾位不佔座位（坐大人腿上）；baby: true 表示是嬰兒（畫得更小）
+//     lap   小朋友裡有幾位不佔座位（坐大人腿上）；baby: true 表示是嬰兒（畫得更小）；highchair: true 表示坐兒童座椅
 //     note  身分備註，例如 '主持人'、'婚禮歌手'
 //     look  外型，例如 { hair: '#1f1b1d', skin: '#dba47c', hs: 'bob' }（hs 髮型：long/bob/pony/bun/short/side）
 //     members 家人的性別和外型，例如 [{ g: 'f', look: { hs: 'bob' } }]
@@ -32,7 +32,9 @@ window.WEDDING = {
     // 第 2 桌
     { name: '姵汝', table: 2, g: 'f' },
     { name: '鈺庭', table: 2, g: 'f', count: 3, kids: 1, lap: 1, baby: true },   // 兩位成人＋未滿一歲幼兒
-    { name: '明兌', table: 2, g: 'f', count: 2, kids: 1 },                       // 一位成人＋一位兒童
+    { name: '明兌', table: 2, g: 'f', count: 2, kids: 1, lap: 1, highchair: true },   // 一位成人＋一位兒童（坐兒童座椅，不佔一般座位）
+    { name: '閤祈', table: 2, g: 'f' },
+    { name: '孟庭', table: 2, g: 'm' },
     // 第 3 桌
     { name: '麗珠', table: 3, g: 'f' },
     { name: '品劭', table: 3, g: 'f' },
