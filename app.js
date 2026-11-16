@@ -331,6 +331,31 @@ const BLESS = ['乾杯！', '新婚快樂！', '百年好合！', '永浴愛河�
 const COUPLE_THANKS = ['謝謝大家來！', '吃飽喝足喔～', '今天好開心 ❤', '謝謝你們！', '多吃一點喔'];
 const PARENT_LINES = ['謝謝你們來！', '多吃一點喔', '招待不周請見諒', '今天好開心', '菜還合胃口嗎？'];
 const GUEST_REPLY = ['恭喜恭喜！', '好好吃！', '新娘好漂亮', '謝謝招待～', '恭喜您！'];
+// 只會英文的賓客（名單裡 lang: 'en'）：常用台詞對照，沒有對照的就從英文台詞裡挑一句
+const EN = {
+  '新娘今天好美！': 'The bride looks stunning! ✨', '真的！婚紗超好看': 'Right? Love the dress!',
+  '新郎今天好帥': 'The groom looks so sharp!', '平常都沒這麼帥 😂': 'Never seen him this dressed up 😂',
+  '你怎麼認識新人的？': 'How do you know the couple?', '大學同學啊～': 'We go way back!',
+  '這個好好吃！': 'This is so good!', '我要再來一塊': 'I need another piece',
+  '下一個換你了吧？': "You're next, right? 😉", '先吃飯先吃飯 😅': "Let's just eat 😅",
+  '等等去拍照嗎？': 'Photo later?', '走！去活動區': "Let's go to the stage!",
+  '剛剛好感動 🥹': 'That was so touching 🥹', '我也差點哭': 'I almost cried too',
+  '你喝什麼？': 'What are you drinking?', '水果氣泡飲～': 'Fruit soda~',
+  '好久不見！': 'Long time no see!', '上次見是畢業耶': 'Since graduation!',
+  '他們好登對': 'They look perfect together', '天生一對！': 'A perfect match!',
+  '這裡好溫馨': 'Such a cozy place', '咖啡廳婚禮好可愛': 'Café weddings are so cute',
+  '甜點什麼時候上？': 'When is dessert?', '聽說有蛋糕！': 'I heard there is ice cream!',
+  '今天天氣真好': 'Lovely weather today', '新人運氣好～': 'Lucky couple~',
+  '好好吃 😋': 'Yummy 😋', '好飽～': "I'm so full~", '要幸福喔！': 'Be happy forever!', '新婚快樂 🎉': 'Happy wedding day 🎉',
+  '這杯好喝': 'Great drink!', '百年好合！': 'Best wishes!', '永浴愛河 ❤': 'Love always ❤', '早生貴子～': 'Wishing you a happy family~',
+  '吃不完了啦': "I can't finish this", '拍照拍照 📸': 'Photo time 📸',
+  '乾杯！': 'Cheers! 🥂', '新婚快樂！': 'Congratulations!', '永浴愛河！': 'Love always!', '早生貴子！': 'Happy family!',
+  '白頭偕老！': 'Forever together!', '恭喜恭喜！': 'Congrats! 🎉', '好好吃！': 'Delicious!', '新娘好漂亮': 'Beautiful bride!',
+  '謝謝招待～': 'Thanks for having us~', '恭喜您！': 'Congratulations!',
+  '親一個！': 'Kiss! Kiss! 💋', '👏👏👏': '👏👏👏', '呀～～': 'Awww~', '好甜！': 'So sweet!', '閃瞎了 😎': 'So romantic 😎',
+};
+const EN_ANY = ['This is delicious! 😋', 'So happy for you two!', 'What a lovely party! 🎉', 'Cheers! 🥂', 'Congrats! 💕', 'Great food!', 'Love this place ☕'];
+const toEn = (text) => EN[text] || (/[\u3400-\u9fff]/.test(text) ? pick(EN_ANY) : text);
 // 我們的菜單（Honey Wood Café 西式婚禮專案，沒有選加價菜色）：[圖示, 簡稱（對話用）, 完整菜名]
 const COURSES = [
   ['🍣', '煙燻鮭魚冷盤', '煙燻鮭魚切達乾酪＆刺山柑酸豆法式槍魷水晶凍'],
@@ -529,6 +554,7 @@ function setFace(a, f) { if (a.face === f) return; a.face = f; a.figEl.classList
 let bubbleCount = 0;
 function say(a, text, ms = 2600, cls = '') {
   if (a.hidden) return;
+  if (a.info && a.info.lang === 'en') text = toEn(text);   // Glenn 只會英文
   if (a.bubT) clearTimeout(a.bubT); else bubbleCount++;
   a.bubEl.textContent = text;
   a.bubEl.className = 'bub show ' + cls;
@@ -1317,7 +1343,7 @@ function clearHl() { for (const a of actors) if (a.hl) { a.hl = false; a.el.clas
 function tapActor(a) {
   const who = a.kind === 'guest' ? `${a.name}（第 ${a.table.n} 桌）` : a.name;
   const line = a.kind === 'guest' ? (a.info.kid ? pick(KID_LINES) : pick([...SOLO, ...GUEST_REPLY])) : a.kind === 'staff' ? pick(['請慢用～', '需要什麼嗎？']) : a.kind === 'groom' || a.kind === 'bride' ? pick(COUPLE_THANKS) : pick(PARENT_LINES);
-  say(a, `${who}：${line}`, 3200);
+  say(a, a.info && a.info.lang === 'en' ? `${a.name}: ${toEn(line)}` : `${who}：${line}`, 3200);
   a.el.classList.add('poke'); setTimeout(() => a.el.classList.remove('poke'), 500);
 }
 function tableNames(T) {

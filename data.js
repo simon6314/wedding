@@ -44,7 +44,7 @@ window.WEDDING = {
     { name: '嘉真', table: 3, g: 'f' },
     // 第 4 桌
     { name: '建智', table: 4, g: 'm', count: 2, note: '主持人', members: [{ g: 'f', look: { hs: 'bob' } }] },   // 家人：短髮年輕女性
-    { name: 'Glenn', table: 4, g: 'm', count: 2, note: '婚禮歌手', look: { skin: '#dba47c', hair: '#1f1b1d', hs: 'side' } },   // 菲律賓人：小麥色皮膚、黑髮
+    { name: 'Glenn', table: 4, g: 'm', count: 2, note: '婚禮歌手', lang: 'en', look: { skin: '#dba47c', hair: '#1f1b1d', hs: 'side' } },   // 只會英文   // 菲律賓人：小麥色皮膚、黑髮
     { name: '寶桂', table: 4, g: 'f', count: 2 },
     // 第 5 桌
     { name: '宜妏', table: 5, g: 'f', count: 5 },
