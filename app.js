@@ -740,8 +740,7 @@ function logLine(text) {
   const ul = $('#log');
   if (!ul) return;
   const li = document.createElement('li');
-  const d = new Date();
-  li.innerHTML = `<b>${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}</b> ${text}`;
+  li.textContent = text;
   ul.prepend(li);
   while (ul.children.length > 8) ul.lastChild.remove();
 }
