@@ -38,6 +38,8 @@ window.WEDDING = {
     { name: '品劭', table: 3, g: 'f' },
     { name: '芸岑', table: 3, g: 'f' },
     { name: '芸岑朋友', table: 3, g: 'm' },
+    { name: '菁莓', table: 3, g: 'f' },
+    { name: '嘉真', table: 3, g: 'f' },
     // 第 4 桌
     { name: '建智', table: 4, g: 'm', count: 2, note: '主持人', members: [{ g: 'f', look: { hs: 'bob' } }] },   // 家人：短髮年輕女性
     { name: 'Glenn', table: 4, g: 'm', count: 2, note: '婚禮歌手', look: { skin: '#dba47c', hair: '#1f1b1d', hs: 'side' } },   // 菲律賓人：小麥色皮膚、黑髮
