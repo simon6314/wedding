@@ -12,18 +12,18 @@
 //   點桌子會顯示「王小明（一家 4 位）」，搜尋王小明會把一家人一起標出來。
 window.WEDDING = {
   title: '我們的婚禮派對',
-  groom: '新郎',
-  bride: '新娘',
+  groom: '思宏',
+  bride: '瀅安',
   date: '',                 // 例如 '2027.03.20'
   venue: 'Honeywood 美式饗宴',
   // 主桌：新郎新娘＋雙方主婚人（名字可改）
   vip: [
-    { id: 'groom', name: '新郎', role: 'groom' },
-    { id: 'bride', name: '新娘', role: 'bride' },
-    { id: 'gdad', name: '男方主婚人（爸爸）', role: 'dad', side: 'g' },
-    { id: 'gmom', name: '男方主婚人（媽媽）', role: 'mom', side: 'g' },
-    { id: 'bdad', name: '女方主婚人（爸爸）', role: 'dad', side: 'b' },
-    { id: 'bmom', name: '女方主婚人（媽媽）', role: 'mom', side: 'b' },
+    { id: 'groom', name: '思宏（新郎）', role: 'groom' },
+    { id: 'bride', name: '瀅安（新娘）', role: 'bride' },
+    { id: 'gdad', name: '民星（男方主婚人）', role: 'dad', side: 'g' },
+    { id: 'gmom', name: '月娥（男方主婚人）', role: 'mom', side: 'g' },
+    { id: 'bdad', name: '定震（女方主婚人）', role: 'dad', side: 'b' },
+    { id: 'bmom', name: '玉華（女方主婚人）', role: 'mom', side: 'b' },
   ],
   // 真名單放這裡；留 null 就會用假資料
   GUESTS: [

@@ -882,7 +882,7 @@ function createPeople() {
   const main = L.tables.find((t) => t.main);
   const vipSeat = { groom: 0, bride: 1, gdad: 2, gmom: 3, bdad: 4, bmom: 5 };
   for (const v of (CFG.vip || [])) {
-    const name = v.role === 'groom' ? (CFG.groom || v.name) : v.role === 'bride' ? (CFG.bride || v.name) : v.name;
+    const name = v.name;
     const a = makeActor({ kind: v.role, name, svg: vipSvg(v.role, v.side), speed: 72, table: main, cls: 'vip ' + v.role, busy: true });
     a.seat = main.seatList[vipSeat[v.id]];
     vip[v.id] = a;
