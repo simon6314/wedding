@@ -77,9 +77,10 @@ function fakeGuests() {
   for (const t of Object.keys(counts)) {
     for (let i = 0; i < counts[t]; i++) {
       const g = srand() < 0.5 ? 'm' : 'f';
-      const kid = kids < 5 && srand() < 0.09;
+      // 賓客先都用年輕人的樣子（沒有長輩和小朋友）
+      const kid = false; srand();
       if (kid) kids++;
-      const elder = !kid && srand() < 0.14;
+      const elder = false; srand();
       const sn = SURNAME[Math.floor(srand() * SURNAME.length)];
       const name = kid ? '小' + (g === 'm' ? GIVEN_M : GIVEN_F)[Math.floor(srand() * 14)].slice(1)
         : sn + (g === 'm' ? GIVEN_M : GIVEN_F)[Math.floor(srand() * 14)];
