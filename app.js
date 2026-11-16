@@ -191,7 +191,7 @@ function headSvg(lk) {
 }
 function personSvg(lk, extraBack = '', extraFront = '') {
   const inner = `${extraBack}${hairBack(lk)}${lk.bodyOverride || bodySvg(lk)}${headSvg(lk)}${extraFront}`;
-  const g = lk.kid ? `<g transform="translate(40 92) scale(0.78) translate(-40 -92)">${inner}</g>` : inner;
+  const g = lk.kid ? `<g transform="translate(40 92) scale(${lk.baby ? 0.6 : 0.78}) translate(-40 -92)">${inner}</g>` : inner;
   return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="89" rx="18" ry="3.6" fill="rgba(70,40,20,0.22)"/>${g}</svg>`;
 }
 function vipSvg(role, side) {
@@ -828,11 +828,13 @@ function expandFamilies(list) {
   for (const p of list) {
     const n = Math.max(1, Math.round(+p.count || 1));
     const kids = Math.min(n - 1, Math.max(0, Math.round(+p.kids || 0)));
+    const lap = Math.min(kids, Math.max(0, Math.round(+p.lap || 0)));   // 不佔座位、坐在大人腿上的小朋友
     out.push({ ...p, family: n > 1 ? p.name : '', famSize: n, famIdx: 0 });
     for (let i = 1; i < n; i++) {
       const kid = i >= n - kids;
+      const onLap = i >= n - lap;
       const g = i === 1 && !kid ? (p.g === 'f' ? 'm' : 'f') : (srand() < 0.5 ? 'm' : 'f');
-      out.push({ name: `${p.name}的家人`, table: p.table, g, kid, family: p.name, famSize: n, famIdx: i });
+      out.push({ name: `${p.name}的家人`, table: p.table, g, kid, lap: onLap, baby: onLap && !!p.baby, family: p.name, famSize: n, famIdx: i });
     }
   }
   return out;
@@ -848,11 +850,23 @@ function createPeople() {
     const ps = byTable[T.n] || [];
     // 先坐不會被桌子擋住的位子
     const order = T.seatList.map((s, i) => i);
-    ps.forEach((p, k) => {
-      const si = order[k % order.length];
+    let k = 0, lastSeat = null, lastSi = 0;
+    ps.forEach((p) => {
       const lk = lookFor(p);
+      if (p.baby) lk.baby = true;
+      let seat, si;
+      if (p.lap && lastSeat) {
+        // 坐在家人旁邊（腿上），不佔座位
+        si = lastSi;
+        seat = { ...lastSeat, sit: [lastSeat.sit[0] + (lastSeat.side === 'right' ? -9 : 9), lastSeat.sit[1] + 2], lap: true };
+      } else {
+        if (k >= order.length) console.warn(`第 ${T.n} 桌人數超過座位數`);
+        si = order[k % order.length]; k++;
+        seat = T.seatList[si];
+        lastSeat = seat; lastSi = si;
+      }
       const a = makeActor({ kind: 'guest', name: p.name, info: p, lk, table: T, seatIdx: si, svg: personSvg(lk), speed: p.kid ? 95 : rand(62, 78), cls: p.kid ? 'kid' : '' });
-      a.seat = T.seatList[si];
+      a.seat = seat;
       guests.push(a);
     });
   }
@@ -1231,16 +1245,20 @@ function tapActor(a) {
 function tableNames(T) {
   if (T.main) return Object.values(vip).map((v) => v.name);
   // 同一家只列填表的人，後面標幾位
-  return guests.filter((g) => g.table === T && !g.info.famIdx).map((g) => (g.info.famSize > 1 ? `${g.name}（一家 ${g.info.famSize} 位）` : g.name));
+  return guests.filter((g) => g.table === T && !g.info.famIdx).map((g) => {
+    const tags = [g.info.note, g.info.famSize > 1 ? `一家 ${g.info.famSize} 位` : ''].filter(Boolean);
+    return tags.length ? `${g.name}（${tags.join('・')}）` : g.name;
+  });
 }
 const tableTitle = (T) => (T.main ? '主桌' : '第 ' + T.n + ' 桌');
 // 點桌子：在桌子旁邊跳出這桌的名單（面板裡也會顯示）
 function tapTable(T) {
   const ppl = tableNames(T);
   const box = $('#tableInfo');
-  if (box) box.innerHTML = `<b>${tableTitle(T)}</b>　${ppl.join('、') || '（空桌）'}`;
+  if (box) box.innerHTML = `<b>${tableTitle(T)}${(CFG.tableNotes || {})[T.n] ? '・' + CFG.tableNotes[T.n] : ''}</b>　${ppl.join('、') || '（空桌）'}`;
   const pop = $('#tablePop');
-  pop.innerHTML = `<b>${tableTitle(T)}</b><span>${ppl.length ? ppl.map((n) => `<i>${n}</i>`).join('') : '（空桌）'}</span>`;
+  const note = (CFG.tableNotes || {})[T.n];
+  pop.innerHTML = `<b>${tableTitle(T)}${note ? '・' + note : ''}</b><span>${ppl.length ? ppl.map((n) => `<i>${n}</i>`).join('') : '（空桌）'}</span>`;
   const above = T.cy > SH * 0.42;
   pop.style.left = Math.min(Math.max(T.cx / SW * 100, 12), 88) + '%';
   pop.style.top = ((above ? T.y - 6 : T.y + T.h + 34) / SH * 100) + '%';
@@ -1256,7 +1274,7 @@ function renderSeatList() {
   const box = $('#seatList');
   if (!box) return;
   const order = [...L.tables].sort((a, b) => (a.main ? -1 : b.main ? 1 : a.n - b.n));
-  box.innerHTML = order.map((T) => `<div class="seat-row"><b data-t="${T.main ? 'main' : T.n}">${tableTitle(T)}</b><span>${tableNames(T).map((n) => `<button type="button" data-name="${n.replace(/（一家 \d+ 位）$/, '')}">${n}</button>`).join('')}</span></div>`).join('');
+  box.innerHTML = order.map((T) => `<div class="seat-row"><b data-t="${T.main ? 'main' : T.n}">${tableTitle(T)}</b><span>${tableNames(T).map((n) => `<button type="button" data-name="${n.replace(/（.*）$/, '')}">${n}</button>`).join('') || `<em class="muted">${(CFG.tableNotes || {})[T.n] || '空桌'}</em>`}</span></div>`).join('');
   box.onclick = (e) => {
     const nb = e.target.closest('button[data-name]');
     if (nb) { const a = actors.find((x) => x.name === nb.dataset.name); if (a) highlight(a); return; }
