@@ -377,7 +377,10 @@ function los(a, b) {
 }
 function findPath(from, to) {
   const s = nearestFree(cellOf(from)), g = nearestFree(cellOf(to));
-  const N = GC * GR, gs = new Float32Array(N).fill(1e9), par = new Int32Array(N).fill(-1), closed = new Uint8Array(N);
+  const N = GC * GR;
+  if (!findPath.buf || findPath.buf.n !== N) findPath.buf = { n: N, gs: new Float32Array(N), par: new Int32Array(N), closed: new Uint8Array(N) };
+  const { gs, par, closed } = findPath.buf;
+  gs.fill(1e9); par.fill(-1); closed.fill(0);
   const si = s[1] * GC + s[0], gi = g[1] * GC + g[0];
   const heap = [[0, si]]; gs[si] = 0;
   const h = (i) => Math.hypot((i % GC) - g[0], Math.floor(i / GC) - g[1]);
@@ -437,12 +440,13 @@ function makeActor(o) {
   return a;
 }
 function place(a) {
-  a.el.style.left = (a.pos[0] / SW * 100) + '%';
-  a.el.style.top = (a.pos[1] / SH * 100) + '%';
+  // 用 transform 移動（交給 GPU，不用重新排版），比改 left/top 順很多
+  a.el.style.transform = `translate3d(${(a.pos[0] * UPX).toFixed(1)}px,${(a.pos[1] * UPX).toFixed(1)}px,0) translate(-50%,-100%)`;
   // 坐在桌子左右兩側的人要畫在椅子和桌子前面
   let z = a.pos[1];
   if (a.seat && a.table && a.seat.side !== 'top' && a.seat.side !== 'bottom' && atSeat(a)) z = Math.max(z, a.table.cy + 1);
-  a.el.style.zIndex = String(Math.round(z) + (a.bubbleOn ? 3000 : 0) + (a.hl ? 4000 : 0));
+  const zi = Math.round(z) + (a.bubbleOn ? 3000 : 0) + (a.hl ? 4000 : 0);
+  if (zi !== a._z) { a._z = zi; a.el.style.zIndex = String(zi); }
 }
 function setPose(a, p) { if (a.pose === p) return; a.el.classList.remove('p-' + a.pose); a.pose = p; if (p) a.el.classList.add('p-' + p); }
 function showProp(a) { const p = a.temp || a.prop; if (a.propEl.textContent !== p) a.propEl.textContent = p; }
@@ -663,9 +667,9 @@ function tableTopSvg(T) {
   const cloth = main ? '#fff6f8' : '#fffdf9', rim = main ? '#f2b9c8' : '#e3d2c2';
   let s = '';
   if (T.round) {
-    s += `<circle cx="${w / 2}" cy="${h / 2}" r="${w / 2 - 1}" fill="${cloth}" stroke="${rim}" stroke-width="2"/><circle cx="${w / 2}" cy="${h / 2}" r="${w / 2 - 6}" fill="none" stroke="${rim}" stroke-width=".8" stroke-dasharray="2 2"/>`;
+    s += `<circle cx="${w / 2 + 1}" cy="${h / 2 + 3}" r="${w / 2 - 1}" fill="rgba(90,60,40,.16)"/><circle cx="${w / 2}" cy="${h / 2}" r="${w / 2 - 1}" fill="${cloth}" stroke="${rim}" stroke-width="2"/><circle cx="${w / 2}" cy="${h / 2}" r="${w / 2 - 6}" fill="none" stroke="${rim}" stroke-width=".8" stroke-dasharray="2 2"/>`;
   } else {
-    s += `<rect x="1" y="1" width="${w - 2}" height="${h - 2}" rx="7" fill="${cloth}" stroke="${rim}" stroke-width="2"/>`;
+    s += `<rect x="2" y="4" width="${w - 2}" height="${h - 2}" rx="7" fill="rgba(90,60,40,.16)"/><rect x="1" y="1" width="${w - 2}" height="${h - 2}" rx="7" fill="${cloth}" stroke="${rim}" stroke-width="2"/>`;
     s += `<rect x="5" y="5" width="${w - 10}" height="${h - 10}" rx="5" fill="none" stroke="${rim}" stroke-width=".8" stroke-dasharray="2 2"/>`;
     // 桌旗
     const rc = main ? '#f7b7c8' : '#f3d9c6';
@@ -738,13 +742,15 @@ function sizeStage() {
   stage.style.width = w + 'px';
   stage.style.height = (w * SH / SW) + 'px';
   stage.style.setProperty('--u', (w / SW) + 'px');
+  UPX = w / SW;
+  for (const a of actors) place(a);
   if (PHONE) {
     // 第一次先置中在用餐區；縮放時維持看的中心
     if (!prevW || !sizeStage.done) { wrap.scrollLeft = (w - aw) * 0.62; wrap.scrollTop = 0; sizeStage.done = true; }
     else if (prevW !== w) { const c = (wrap.scrollLeft + aw / 2) / prevW; wrap.scrollLeft = c * w - aw / 2; }
   }
 }
-let ZOOM = 1;
+let ZOOM = 1, UPX = 1;
 
 // ---- 狀態與面板 ----
 const state = { phase: 'party', course: -1, toasts: 0, cheers: 0, event: '', toastOrder: [], names: false };
