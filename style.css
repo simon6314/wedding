@@ -12,10 +12,10 @@ button { font: inherit; color: inherit; }
 
 #app { display: flex; height: 100dvh; width: 100vw; overflow: hidden; }
 #app[data-ori="land"] { flex-direction: row; }
-#app[data-ori="port"] { flex-direction: column; height: auto; min-height: 100dvh; overflow: visible; }
+#app[data-ori="port"] { flex-direction: column; height: auto; min-height: 100dvh; overflow: visible; position: relative; }
 
 #stageWrap { flex: 1 1 auto; min-width: 0; min-height: 0; display: flex; align-items: center; justify-content: center; position: relative; }
-#app[data-ori="port"] #stageWrap { display: block; overflow: auto; flex: none; max-height: 78dvh; -webkit-overflow-scrolling: touch; }
+#app[data-ori="port"] #stageWrap { display: block; overflow: auto; flex: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
 #stage { position: relative; flex: none; overflow: hidden; border-radius: 14px; box-shadow: 0 6px 24px rgba(90, 60, 40, .18); background: #cbb8a6; user-select: none; -webkit-user-select: none; }
 #app[data-ori="port"] #stage { border-radius: 0; }
 #floor { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -183,3 +183,7 @@ button { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .actor svg, .route, .bulb, .candle { animation: none !important; }
 }
+
+#swipeHint { position: absolute; left: 50%; transform: translateX(-50%); display: none; width: max-content; padding: 6px 14px; border-radius: 999px; background: rgba(74, 58, 48, .78); color: #fff; font-size: 13px; z-index: 20; pointer-events: none; opacity: 0; transition: opacity .4s; }
+#app[data-ori="port"] #swipeHint { display: block; }
+#swipeHint.show { opacity: 1; }

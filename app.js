@@ -280,13 +280,15 @@ const COURSES = [['🥗', '凱薩沙拉'], ['🍤', '酥炸拼盤'], ['🍗', '�
 const DRINKS = ['🥤', '🍹', '☕', '🧋', '🍷'];
 
 // ---- 版面（橫式／直式） ----
-let ORI = 'land', SW = PW, SH = PH;
+let ORI = 'land', PHONE = false, SW = PW, SH = PH;
 const mp = ([x, y]) => (ORI === 'land' ? [x, y] : [y, PW - x]);
 const mr = (r) => (ORI === 'land' ? { ...r } : { ...r, x: r.y, y: PW - (r.x + r.w), w: r.h, h: r.w });
 let L = null;   // 換算後的版面
 
 function buildLayout() {
-  ORI = (innerWidth >= innerHeight * 0.95) ? 'land' : 'port';
+  // 手機直式也用橫式平面圖，畫面比較寬、可以左右滑動，桌子不會擠在一起
+  PHONE = innerWidth < innerHeight * 0.95;
+  ORI = 'land';
   SW = ORI === 'land' ? PW : PH; SH = ORI === 'land' ? PH : PW;
   const areas = AREAS.map((a) => ({ ...a, ...mr(a) }));
   const tables = TABLES.map((t) => {
@@ -596,11 +598,14 @@ function longDecor(a) {
 function drawFloor() {
   const parts = [];
   parts.push(`<defs>
-    <pattern id="wood" width="120" height="22" patternUnits="userSpaceOnUse" ${ORI === 'port' ? 'patternTransform="rotate(90)"' : ''}>
-      <rect width="120" height="22" fill="#ecd9c2"/><rect y="0" width="70" height="11" fill="#e8d2b8"/><rect x="70" y="0" width="50" height="11" fill="#efdcc6"/>
-      <rect x="0" y="11" width="35" height="11" fill="#f0dec9"/><rect x="35" y="11" width="85" height="11" fill="#e6d0b5"/>
-      <path d="M0 11 H120 M0 22 H120 M70 0 V11 M35 11 V22" stroke="#d6bc9c" stroke-width="1"/>
-      <path d="M8 5 q12 -2 24 0 M80 6 q10 2 22 0 M44 16 q14 -2 28 0" stroke="#dcc3a6" stroke-width=".8" fill="none"/></pattern>
+    <pattern id="floor-marble" width="160" height="160" patternUnits="userSpaceOnUse">
+      <rect width="160" height="160" fill="#f1ece6"/><rect width="80" height="80" fill="#f6f2ed"/><rect x="80" y="80" width="80" height="80" fill="#f6f2ed"/>
+      <path d="M0 26 Q22 18 38 30 T80 22 M80 60 Q100 44 122 52 T160 40 M6 110 Q30 98 46 118 Q60 132 80 120 M88 150 Q110 128 136 140 T160 126" stroke="#d8cdc0" stroke-width="1.1" fill="none" opacity=".75"/>
+      <path d="M18 0 Q30 30 22 54 Q16 70 30 80 M120 80 Q132 100 126 122 Q122 140 140 160 M40 80 Q52 90 48 104" stroke="#e2d8cc" stroke-width=".8" fill="none" opacity=".8"/>
+      <path d="M100 10 q10 6 22 2 M56 140 q8 -6 18 -2" stroke="#cfc2b4" stroke-width=".6" fill="none" opacity=".6"/>
+      <path d="M0 0 H160 M0 80 H160 M0 0 V160 M80 0 V160" stroke="#e0d6ca" stroke-width="1.2"/>
+      <path d="M0 1 H160 M0 81 H160 M1 0 V160 M81 0 V160" stroke="#fff" stroke-width=".8" opacity=".7"/></pattern>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset=".7" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
     <pattern id="tile" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="18" fill="#d9d4cf"/><rect width="9" height="9" fill="#e7e2dc"/><rect x="9" y="9" width="9" height="9" fill="#e7e2dc"/></pattern>
     <pattern id="plank" width="40" height="12" patternUnits="userSpaceOnUse"><rect width="40" height="12" fill="#c99b72"/><rect width="40" height="6" fill="#c2936a"/><path d="M0 6 H40 M0 12 H40 M22 0 V6 M8 6 V12" stroke="#a87b56" stroke-width=".8"/></pattern>
     <pattern id="roomfloor" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#f4eee8"/><path d="M0 14 L14 0" stroke="#e8ded4" stroke-width="1"/></pattern>
@@ -617,11 +622,11 @@ function drawFloor() {
   for (const [px, py, k] of [[700, 724, 0], [860, 724, 1], [960, 724, 0], [380, 724, 1]]) { const [qx, qy] = mp([px, py]); parts.push(plantSvg(qx, qy + 14, 0.8, k)); }
   // 牆：外框深色、內側一條淺色飾條
   parts.push(`<rect x="${hall.x - 4}" y="${hall.y - 4}" width="${hall.w + 8}" height="${hall.h + 8}" rx="14" fill="#7a5a44"/>`);
-  parts.push(`<rect x="${hall.x}" y="${hall.y}" width="${hall.w}" height="${hall.h}" rx="10" fill="url(#wood)"/>`);
+  parts.push(`<rect x="${hall.x}" y="${hall.y}" width="${hall.w}" height="${hall.h}" rx="10" fill="url(#floor-marble)"/><rect x="${hall.x}" y="${hall.y}" width="${hall.w}" height="${hall.h}" rx="10" fill="url(#sheen)"/>`);
   parts.push(`<rect x="${hall.x + 3}" y="${hall.y + 3}" width="${hall.w - 6}" height="${hall.h - 6}" rx="8" fill="none" stroke="#f6e7d4" stroke-width="2" opacity=".8"/>`);
   // 入口 1 的門口
   const gap = mr({ x: 490, y: 668, w: 92, h: 16 });
-  parts.push(`<rect x="${gap.x}" y="${gap.y}" width="${gap.w}" height="${gap.h}" fill="#e7d3bb"/>`);
+  parts.push(`<rect x="${gap.x}" y="${gap.y}" width="${gap.w}" height="${gap.h}" fill="#efe9e2"/>`);
   const mat = mr({ x: 500, y: 650, w: 72, h: 20 });
   parts.push(`<rect x="${mat.x}" y="${mat.y}" width="${mat.w}" height="${mat.h}" rx="4" fill="#b85a5a" opacity=".85"/><rect x="${mat.x + 3}" y="${mat.y + 3}" width="${mat.w - 6}" height="${mat.h - 6}" rx="3" fill="none" stroke="#f3c6a0" stroke-width="1" stroke-dasharray="3 2"/>`);
   // 每張桌子上方的吊燈光暈
@@ -716,14 +721,24 @@ function renderDishes(T) {
 
 function sizeStage() {
   const wrap = $('#stageWrap');
-  const zoom = ORI === 'port' ? ZOOM : 1;
   const aw = wrap.clientWidth, ah = wrap.clientHeight;
-  let w = Math.min(aw, ah * SW / SH);
-  if (ORI === 'port') w = aw;
-  w *= zoom;
+  let w;
+  if (PHONE) {
+    // 高度大約佔螢幕七成，寬度跟著平面圖比例變寬，左右滑動看
+    const h = Math.max(360, Math.min(innerHeight * 0.68, 640));
+    w = Math.max(aw, h * SW / SH * ZOOM);
+  } else {
+    w = Math.min(aw, ah * SW / SH);
+  }
+  const prevW = parseFloat(stage.style.width) || 0;
   stage.style.width = w + 'px';
   stage.style.height = (w * SH / SW) + 'px';
   stage.style.setProperty('--u', (w / SW) + 'px');
+  if (PHONE) {
+    // 第一次先置中在用餐區；縮放時維持看的中心
+    if (!prevW || !sizeStage.done) { wrap.scrollLeft = (w - aw) * 0.62; wrap.scrollTop = 0; sizeStage.done = true; }
+    else if (prevW !== w) { const c = (wrap.scrollLeft + aw / 2) / prevW; wrap.scrollLeft = c * w - aw / 2; }
+  }
 }
 let ZOOM = 1;
 
@@ -865,7 +880,7 @@ function guestAct(a, walkers) {
   const r = Math.random();
   const T = a.table;
   if (a.info.kid && r < 0.45 && walkers < 14) { routine(a, () => kidRun(a)); return; }
-  const quiet = bubbleCount >= (ORI === 'port' ? 7 : 16);
+  const quiet = bubbleCount >= (PHONE ? 10 : 16);
   if (r < 0.3 && !quiet) {
     const nb = seatedNeighbors(a);
     if (nb.length && !a.bubbleOn) {
@@ -1191,7 +1206,7 @@ function highlight(a) {
   clearHl();
   a.hl = true; a.el.classList.add('hl'); place(a);
   if (a.table) { a.table.el.classList.add('hl'); tapTable(a.table); }
-  if (ORI === 'port') a.el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'smooth' });
+  if (PHONE) a.el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'smooth' });
   setTimeout(() => { if (a.hl) { a.hl = false; a.el.classList.remove('hl'); place(a); a.table && a.table.el.classList.remove('hl'); } }, 12000);
 }
 function setupSearch() {
@@ -1211,7 +1226,7 @@ function rebuild() {
   const prevOri = ORI;
   const wasSeated = new Set(actors.filter((a) => atSeat(a) && !a.path));
   buildLayout();
-  $('#app').dataset.ori = ORI;
+  $('#app').dataset.ori = PHONE ? 'port' : 'land';
   drawFloor();
   drawTables();
   sizeStage();
@@ -1238,7 +1253,7 @@ function rebuild() {
       if (old) { T.dishes = old.dishes; T.course = old.course; T.claimed = false; renderDishes(T); }
     }
   }
-  $('#app').dataset.ori = ORI;
+  $('#app').dataset.ori = PHONE ? 'port' : 'land';
 }
 const TABLE_STATE = {};
 function snapshotTables() { if (!L) return; for (const T of L.tables) TABLE_STATE[T.main ? 'main' : T.n] = { dishes: T.dishes, course: T.course }; }
@@ -1259,9 +1274,10 @@ function init() {
   $('#btnFull').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); });
   $('#btnPanel').addEventListener('click', () => { $('#app').classList.toggle('nopanel'); sizeStage(); });
   $('#btnShow').addEventListener('click', () => { $('#app').classList.remove('nopanel'); sizeStage(); });
-  $('#zoomIn').addEventListener('click', () => { ZOOM = Math.min(3, ZOOM + 0.5); sizeStage(); });
-  $('#zoomOut').addEventListener('click', () => { ZOOM = Math.max(1, ZOOM - 0.5); sizeStage(); });
+  $('#zoomIn').addEventListener('click', () => { ZOOM = Math.min(2.2, ZOOM * 1.25); sizeStage(); });
+  $('#zoomOut').addEventListener('click', () => { ZOOM = Math.max(0.3, ZOOM / 1.25); sizeStage(); });
   stage.addEventListener('click', () => clearHl());
+  if (PHONE) { const hint = $('#swipeHint'); hint.style.top = (stage.offsetHeight - 46) + 'px'; hint.classList.add('show'); const off = () => hint.classList.remove('show'); setTimeout(off, 4500); setTimeout(() => $('#stageWrap').addEventListener('scroll', off, { once: true }), 800); }
   setInterval(screenTick, 4500); screenTick();
   requestAnimationFrame(tick);
   run();
