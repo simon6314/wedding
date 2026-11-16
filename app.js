@@ -202,7 +202,10 @@ function headSvg(lk) {
 const HIGHCHAIR_BACK = '<path d="M27 92 L24 102 M53 92 L56 102" stroke="#a87b56" stroke-width="3" stroke-linecap="round"/><rect x="23" y="44" width="34" height="48" rx="7" fill="#e3bf93" stroke="#b98a5c" stroke-width="1.5"/>';
 const HIGHCHAIR_FRONT = '<rect x="18" y="70" width="44" height="7" rx="3" fill="#f4e3cc" stroke="#c9a27c" stroke-width="1.4"/>';
 function personSvg(lk, extraBack = '', extraFront = '') {
-  const inner = `${extraBack}${hairBack(lk)}${lk.bodyOverride || bodySvg(lk)}${headSvg(lk)}${extraFront}`;
+  const body = lk.bodyOverride || bodySvg(lk);
+  // 壯一點：身體和手臂往橫向放大
+  const bodyG = lk.big ? `<g transform="translate(40 89) scale(1.32 1.08) translate(-40 -89)">${body}</g>` : body;
+  const inner = `${extraBack}${hairBack(lk)}${bodyG}${headSvg(lk)}${extraFront}`;
   const g = lk.kid ? `<g transform="translate(40 92) scale(${lk.baby ? 0.6 : 0.78}) translate(-40 -92)">${inner}</g>` : inner;
   return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="89" rx="18" ry="3.6" fill="rgba(70,40,20,0.22)"/>${g}</svg>`;
 }
@@ -255,6 +258,7 @@ function vipSvg(role, side) {
   }
   if (role === 'dad') {
     const lk = { g: 'm', skin: side === 'g' ? '#f6d2b8' : '#fcdcc4', hair: side === 'g' ? '#2b2628' : '#3b3438', hs: side === 'g' ? 'short' : 'side', cloth: side === 'g' ? '#34405a' : '#4a4a52', tie: '#c23b4a', glasses: false };
+    if (side === 'g') { lk.big = true; lk.faceRx = 22.4; }   // 民星：壯一點（身體寬、臉圓一點）
     return personSvg(lk, '', CORSAGE);
   }
   // 主婚人媽媽
