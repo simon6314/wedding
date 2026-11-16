@@ -32,8 +32,8 @@ window.WEDDING = {
     // 第 2 桌
     { name: '姵汝', table: 2, g: 'f' },
     { name: '鈺庭', table: 2, g: 'f', count: 3, kids: 1, lap: 1, baby: true },   // 兩位成人＋未滿一歲幼兒
-    { name: '明兌', table: 2, g: 'f', count: 2, kids: 1, lap: 1, members: [{ g: 'f' }] },   // 一位成人＋女兒（坐大人腿上，不佔座位）
-    { name: '閤祈', table: 2, g: 'f', count: 2, kids: 1, lap: 1, members: [{ g: 'f' }] },   // 加一位女兒（坐大人腿上，不佔座位）
+    { name: '明兌', table: 2, g: 'f', count: 2, kids: 1, lap: 1, highchair: true, members: [{ g: 'f' }] },   // 一位成人＋女兒（坐兒童座椅，不佔一般座位）
+    { name: '閤祈', table: 2, g: 'f', count: 2, kids: 1, lap: 1, highchair: true, members: [{ g: 'f' }] },   // 加一位女兒（坐兒童座椅，不佔一般座位）
     { name: '孟庭', table: 2, g: 'm' },
     // 第 3 桌
     { name: '麗珠', table: 3, g: 'f' },

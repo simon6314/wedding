@@ -202,7 +202,7 @@ function headSvg(lk) {
 }
 // 兒童座椅：高椅背、細長椅腳、前面一塊餐盤
 const HIGHCHAIR_BACK = '<path d="M27 92 L24 102 M53 92 L56 102" stroke="#a87b56" stroke-width="3" stroke-linecap="round"/><rect x="23" y="44" width="34" height="48" rx="7" fill="#e3bf93" stroke="#b98a5c" stroke-width="1.5"/>';
-const HIGHCHAIR_FRONT = '<rect x="18" y="70" width="44" height="7" rx="3" fill="#f4e3cc" stroke="#c9a27c" stroke-width="1.4"/>';
+const HIGHCHAIR_FRONT = '<rect x="24" y="70" width="32" height="7" rx="3" fill="#f4e3cc" stroke="#c9a27c" stroke-width="1.4"/>';
 function personSvg(lk, extraBack = '', extraFront = '') {
   const body = lk.bodyOverride || bodySvg(lk);
   // 壯一點：身體和手臂往橫向放大
@@ -935,7 +935,7 @@ function expandFamilies(list) {
     const n = Math.max(1, Math.round(+p.count || 1));
     const kids = Math.min(n - 1, Math.max(0, Math.round(+p.kids || 0)));
     const lap = Math.min(kids, Math.max(0, Math.round(+p.lap || 0)));   // 不佔座位、坐在大人腿上的小朋友
-    out.push({ ...p, lap: false, baby: false, family: n > 1 ? p.name : '', famSize: n, famIdx: 0 });   // 填表的人本身一定佔座位
+    out.push({ ...p, lap: false, baby: false, highchair: false, family: n > 1 ? p.name : '', famSize: n, famIdx: 0 });   // 填表的人本身一定佔座位
     for (let i = 1; i < n; i++) {
       const kid = i >= n - kids;
       const onLap = i >= n - lap;
@@ -965,7 +965,7 @@ function createPeople() {
       if (p.lap && lastSeat) {
         // 坐在家人旁邊（腿上），不佔座位
         si = lastSi;
-        const off = p.highchair ? 15 : 9;   // 兒童座椅放在大人旁邊，離遠一點
+        const off = p.highchair ? 27 : 9;   // 兒童座椅放在大人旁邊，隔開一點，不要跟大人疊在一起
         // 兒童座椅：坐在桌子兩側時放在大人外側，上下排就放旁邊
         const dx = p.highchair ? (lastSeat.side === 'right' ? off : lastSeat.side === 'left' ? -off : off) : (lastSeat.side === 'right' ? -off : off);
         seat = { ...lastSeat, sit: [lastSeat.sit[0] + dx, lastSeat.sit[1] + (p.highchair ? 6 : 2)], lap: true };
