@@ -26,7 +26,7 @@ const AREAS = [
   { id: 'sofa1', kind: 'sofa', x: 987, y: 40, w: 73, h: 30, solid: true, keep: 1 },
   { id: 'sofa2', kind: 'sofa', x: 1063, y: 40, w: 37, h: 128, solid: true, keep: 1 },
 ];
-// 桌子：seats = 座位數（7、8 桌平面圖寫 6–8 位，先抓 8）
+// 桌子：seats = 座位數（第 7 桌 8 位、第 8 桌 6 位）
 const TABLES = [
   { n: 1, round: true, cx: 1020, cy: 118, r: 25, seats: 6 },
   { n: 2, x: 868, y: 38, w: 84, h: 110, seats: 6 },
@@ -35,7 +35,7 @@ const TABLES = [
   { n: 5, x: 843, y: 194, w: 123, h: 64, seats: 6 },
   { n: 6, x: 635, y: 192, w: 146, h: 68, seats: 6 },
   { n: 7, x: 809, y: 307, w: 109, h: 57, seats: 8 },
-  { n: 8, x: 638, y: 307, w: 109, h: 57, seats: 8 },
+  { n: 8, x: 638, y: 307, w: 109, h: 57, seats: 6 },
   { n: 9, x: 813, y: 447, w: 109, h: 58, seats: 6 },
   { n: 10, x: 583, y: 447, w: 175, h: 60, seats: 8 },
   { n: 11, x: 862, y: 568, w: 145, h: 69, seats: 8 },
