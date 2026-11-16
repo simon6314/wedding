@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6ece2">
+<title>婚禮派對</title>
+<link rel="stylesheet" href="style.css?v=20261116_1">
+</head>
+<body>
+<div id="app" data-ori="land">
+  <div id="stageWrap">
+    <div id="stage">
+      <svg id="floor" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
+      <div id="tables"></div>
+      <div id="screen"><span class="sc-in"></span></div>
+      <div id="actors"></div>
+      <div id="fx"></div>
+      <div id="flash"></div>
+      <div id="banner"></div>
+    </div>
+    <button type="button" id="btnShow">顯示面板</button>
+  </div>
+  <aside id="panel">
+    <header>
+      <h1 id="ttl">我們的婚禮派對</h1>
+      <p id="sub"></p>
+      <p class="muted"><span id="venue"></span> · <span id="count"></span></p>
+    </header>
+    <section class="now">
+      <div><span class="k">現在</span><b id="nowEvent">準備中</b></div>
+      <div><span class="k">上菜</span><b id="nowCourse">—</b></div>
+    </section>
+    <section class="find">
+      <label for="find" class="k">找座位</label>
+      <input id="find" type="search" placeholder="輸入名字，例如：王" autocomplete="off">
+      <div id="findOut"></div>
+      <p id="tableInfo" class="muted">點一下桌子可以看這桌坐誰</p>
+    </section>
+    <section>
+      <span class="k">最新動態</span>
+      <ul id="log"></ul>
+    </section>
+    <nav class="btns">
+      <button type="button" id="btnNames">名牌</button>
+      <button type="button" id="btnFull">全螢幕</button>
+      <button type="button" id="btnReplay">重播進場</button>
+      <button type="button" id="btnPanel" class="land-only">隱藏面板</button>
+      <span class="port-only zoom"><button type="button" id="zoomOut">－</button><button type="button" id="zoomIn">＋</button></span>
+    </nav>
+    <p class="muted tiny">目前是假名單，正式名單之後再換上</p>
+  </aside>
+</div>
+<script src="data.js?v=20261116_1"></script>
+<script src="app.js?v=20261116_1"></script>
+</body>
+</html>

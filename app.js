@@ -1,0 +1,1133 @@
+'use strict';
+// ===== 婚宴咖啡廳：Q 版賓客在平面圖裡自己走動 =====
+// 座標以平面圖（橫式 1120 × 770）為準；直式手機版把整張圖逆時針轉 90 度，人物維持正立。
+
+const CFG = window.WEDDING || {};
+const PW = 1120, PH = 770;
+
+// ---- 場地（照 Honeywood 的平面圖） ----
+const AREAS = [
+  { id: 'sign', kind: 'sign', x: 143, y: 44, w: 297, h: 110, label: 'Honeywood', sub: '美式饗宴', solid: true },
+  { id: 'room', kind: 'room', x: 145, y: 160, w: 292, h: 116, label: '包廂區', sub: '（不安排入座）', solid: true },
+  { id: 'sound', kind: 'zone', x: 443, y: 71, w: 89, h: 139, label: '音控區', sub: '工作人員', solid: true },
+  { id: 'drink', kind: 'drink', x: 441, y: 226, w: 84, h: 54, label: '飲料區', solid: true },
+  { id: 'send', kind: 'dash', x: 154, y: 286, w: 200, h: 36, label: '送客區' },
+  { id: 'ent2', kind: 'dash', x: 40, y: 50, w: 100, h: 46, label: '入口處 2' },
+  { id: 'kitchen', kind: 'kitchen', x: 39, y: 453, w: 61, h: 75, label: '出菜口', solid: true },
+  { id: 'counter', kind: 'counter', x: 38, y: 534, w: 392, h: 138, label: '備餐區 / 櫃台', solid: true },
+  { id: 'gift', kind: 'gift', x: 437, y: 552, w: 52, h: 82, label: '收禮桌', solid: true },
+  { id: 'ent1', kind: 'dash', x: 484, y: 641, w: 102, h: 30, label: '入口處 1' },
+  { id: 'door', kind: 'door', x: 438, y: 683, w: 196, h: 85, label: '透明玻璃門' },
+  { id: 'album', kind: 'album', x: 484, y: 738, w: 72, h: 30, label: '相本桌', solid: true },
+  { id: 'stage', kind: 'stage', x: 951, y: 392, w: 112, h: 165, label: '活動區' },
+  { id: 'screen', kind: 'screen', x: 1067, y: 392, w: 31, h: 155, solid: true },
+  { id: 'long1', kind: 'long', x: 581, y: 374, w: 363, h: 30, solid: true },
+  { id: 'long2', kind: 'long', x: 581, y: 409, w: 363, h: 29, solid: true },
+  { id: 'sofa1', kind: 'sofa', x: 987, y: 40, w: 73, h: 30, solid: true },
+  { id: 'sofa2', kind: 'sofa', x: 1063, y: 40, w: 37, h: 128, solid: true },
+];
+// 桌子：seats = 座位數（7、8 桌平面圖寫 6–8 位，先抓 8）
+const TABLES = [
+  { n: 1, round: true, cx: 1020, cy: 118, r: 25, seats: 6 },
+  { n: 2, x: 868, y: 38, w: 84, h: 110, seats: 6 },
+  { n: 3, x: 733, y: 38, w: 84, h: 110, seats: 6 },
+  { n: 4, x: 598, y: 38, w: 84, h: 110, seats: 6 },
+  { n: 5, x: 843, y: 194, w: 123, h: 64, seats: 6 },
+  { n: 6, x: 635, y: 192, w: 146, h: 68, seats: 6 },
+  { n: 7, x: 809, y: 307, w: 109, h: 57, seats: 8 },
+  { n: 8, x: 638, y: 307, w: 109, h: 57, seats: 8 },
+  { n: 9, x: 813, y: 447, w: 109, h: 58, seats: 6 },
+  { n: 10, x: 583, y: 447, w: 175, h: 60, seats: 8 },
+  { n: 11, x: 862, y: 568, w: 145, h: 69, seats: 8 },
+  { n: 12, x: 660, y: 571, w: 144, h: 69, seats: 8 },
+  { n: 0, main: true, x: 998, y: 244, w: 69, h: 142, seats: 6 },   // 主桌（活動區旁）
+];
+// 可以走的範圍：大廳、入口 1 的門口、門外（相本桌、賓客入口）
+const WALKABLE = [
+  { x: 30, y: 22, w: 1078, h: 652 },
+  { x: 492, y: 668, w: 88, h: 18 },
+  { x: 436, y: 682, w: 380, h: 86 },
+];
+const PTS = {
+  guestIn: [800, 742], ent1: [536, 692], gift: [508, 596], ent2: [92, 112],
+  kitchen: [116, 492], album: [520, 726], stageC: [1004, 476],
+  route: [[96, 150], [100, 430], [530, 432]],
+  greet: [[566, 612], [590, 612], [546, 570], [569, 570], [592, 570], [615, 570]],
+  drink: [[452, 298], [483, 302], [514, 298], [541, 272], [545, 246], [540, 222]],
+  staffIdle: [[180, 520], [260, 522], [340, 520]],
+  lounge: { x: 110, y: 340, w: 440, h: 170 },
+};
+
+// ---- 小工具 ----
+let seed = 20261116;
+const srand = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const $ = (s) => document.querySelector(s);
+const params = new URLSearchParams(location.search);
+
+// ---- 假賓客 ----
+const SURNAME = ['陳', '林', '黃', '張', '李', '王', '吳', '劉', '蔡', '楊', '許', '鄭', '謝', '郭', '洪', '曾', '邱', '廖', '賴', '周', '徐', '蘇'];
+const GIVEN_M = ['家豪', '冠宇', '承翰', '志明', '建宏', '宗翰', '俊傑', '彥廷', '柏宇', '冠廷', '文華', '宥辰', '品睿', '子軒'];
+const GIVEN_F = ['怡君', '雅婷', '佳穎', '欣怡', '淑芬', '詩涵', '雅筑', '郁婷', '品妤', '思妤', '美玲', '子晴', '語彤', '筱涵'];
+function fakeGuests() {
+  const counts = { 1: 5, 2: 6, 3: 6, 4: 5, 5: 6, 6: 5, 7: 6, 8: 7, 9: 5, 10: 4, 11: 5, 12: 4 };
+  const out = [];
+  let kids = 0;
+  for (const t of Object.keys(counts)) {
+    for (let i = 0; i < counts[t]; i++) {
+      const g = srand() < 0.5 ? 'm' : 'f';
+      const kid = kids < 5 && srand() < 0.09;
+      if (kid) kids++;
+      const elder = !kid && srand() < 0.14;
+      const sn = SURNAME[Math.floor(srand() * SURNAME.length)];
+      const name = kid ? '小' + (g === 'm' ? GIVEN_M : GIVEN_F)[Math.floor(srand() * 14)].slice(1)
+        : sn + (g === 'm' ? GIVEN_M : GIVEN_F)[Math.floor(srand() * 14)];
+      out.push({ name, table: +t, g, kid, elder });
+    }
+  }
+  return out;
+}
+
+// ---- Q 版角色 ----
+const SKIN = ['#ffe4d0', '#fcdcc4', '#f6d2b8', '#f0c6a6'];
+const HAIR = ['#2e2a30', '#3b2f2f', '#5b3a29', '#7a523c', '#4a3b52', '#8c5a3c', '#1f1d24', '#a8743f'];
+const SUIT = ['#3b4a6b', '#5c6370', '#7a5c48', '#2f3a4a', '#4f6f5f', '#8a7a6a', '#6a4f7a', '#a9b7c9'];
+const DRESS = ['#f7a8c0', '#c9a0e6', '#9fd8cb', '#ffd66b', '#9fd0f0', '#ef9f8a', '#f2c6a0', '#b8e0a0', '#e6b8d8', '#f5b48f'];
+const TIE = ['#e8574f', '#3f7fd0', '#f2a03d', '#7c5cc0', '#2f9e7a', '#d94f8a'];
+
+function lookFor(p) {
+  const r = () => srand();
+  const lk = { g: p.g, kid: !!p.kid, skin: SKIN[Math.floor(r() * 4)], hair: p.elder ? (r() < 0.5 ? '#9a9aa2' : '#c4c4cc') : HAIR[Math.floor(r() * HAIR.length)] };
+  if (p.g === 'f') {
+    lk.hs = ['long', 'bob', 'pony', 'bun', 'long'][Math.floor(r() * 5)];
+    lk.cloth = DRESS[Math.floor(r() * DRESS.length)];
+  } else {
+    lk.hs = r() < 0.5 ? 'short' : 'side';
+    lk.cloth = SUIT[Math.floor(r() * SUIT.length)];
+    lk.tie = TIE[Math.floor(r() * TIE.length)];
+  }
+  lk.glasses = p.elder ? r() < 0.6 : r() < 0.12;
+  if (p.kid) lk.cloth = p.g === 'f' ? pick(['#ffb3c8', '#ffd66b', '#b8e0a0']) : pick(['#7fb6f0', '#f2a03d', '#8fd3b0']);
+  return lk;
+}
+const FACE = (ey = 38) => `
+  <g class="eye"><circle cx="31" cy="${ey}" r="3" fill="#3b2f2f"/><circle cx="32" cy="${ey - 1}" r="1" fill="#fff"/><circle cx="49" cy="${ey}" r="3" fill="#3b2f2f"/><circle cx="50" cy="${ey - 1}" r="1" fill="#fff"/></g>
+  <g class="eye-h"><path d="M27.5 ${ey + 1} Q31 ${ey - 3} 34.5 ${ey + 1}" fill="none" stroke="#3b2f2f" stroke-width="1.8" stroke-linecap="round"/><path d="M45.5 ${ey + 1} Q49 ${ey - 3} 52.5 ${ey + 1}" fill="none" stroke="#3b2f2f" stroke-width="1.8" stroke-linecap="round"/></g>
+  <path class="mouth" d="M36 ${ey + 9} Q40 ${ey + 12.5} 44 ${ey + 9}" fill="none" stroke="#b9728a" stroke-width="1.5" stroke-linecap="round"/>
+  <ellipse cx="24.5" cy="${ey + 6}" rx="3.8" ry="2.3" fill="#ff9fb0" opacity="0.6"/>
+  <ellipse cx="55.5" cy="${ey + 6}" rx="3.8" ry="2.3" fill="#ff9fb0" opacity="0.6"/>`;
+const GLASSES = '<circle cx="31" cy="38" r="5.6" fill="rgba(255,255,255,0.35)" stroke="#5a5360" stroke-width="1.5"/><circle cx="49" cy="38" r="5.6" fill="rgba(255,255,255,0.35)" stroke="#5a5360" stroke-width="1.5"/><path d="M36.6 38 h6.8" stroke="#5a5360" stroke-width="1.5"/>';
+const CORSAGE = '<g><path d="M49 66 l-2.4 9 M53 66 l2.4 9" stroke="#e8455f" stroke-width="2.2" stroke-linecap="round"/><circle cx="51" cy="64" r="4.2" fill="#e8455f"/><circle cx="51" cy="64" r="1.8" fill="#ffd66b"/></g>';
+
+function hairBack(lk) {
+  const h = lk.hair;
+  if (lk.hs === 'long') return `<path d="M18 34 Q15 11 40 11 Q65 11 62 34 L64 66 Q50 64 50 52 L30 52 Q30 64 16 66 Z" fill="${h}"/>`;
+  if (lk.hs === 'bob') return `<path d="M17 36 Q14 11 40 11 Q66 11 63 36 L63 53 Q53 52 51 45 L29 45 Q27 52 17 53 Z" fill="${h}"/>`;
+  if (lk.hs === 'pony') return `<path d="M57 20 Q76 24 71 52 Q66 41 57 36 Z" fill="${h}"/>`;
+  if (lk.hs === 'bun') return `<circle cx="40" cy="10" r="8.5" fill="${h}"/>`;
+  return '';
+}
+function hairFront(lk) {
+  const h = lk.hair;
+  if (lk.hs === 'short') return `<path d="M18.5 36 Q16 11 40 11 Q64 11 61.5 36 Q57 22 40 22 Q23 22 18.5 36 Z" fill="${h}"/>`;
+  if (lk.hs === 'side') return `<path d="M18.5 36 Q15 10 42 11 Q65 12 61.5 34 Q55 23 34 21 Q24 25 18.5 36 Z" fill="${h}"/>`;
+  return `<path d="M19 34 Q17 11 40 11 Q63 11 61 34 Q55 20 45 21 Q42 27 36 21 Q25 21 19 34 Z" fill="${h}"/>`;
+}
+function bodySvg(lk) {
+  if (lk.g === 'f') return `<path d="M28 58 Q40 54 52 58 L60 88 Q40 92 20 88 Z" fill="${lk.cloth}"/><path d="M31 60 Q40 65 49 60" stroke="#fff" stroke-width="1.6" fill="none" opacity=".75"/>`;
+  return `<ellipse cx="40" cy="73" rx="16.5" ry="14.5" fill="${lk.cloth}"/><path d="M34 59 L40 68 L46 59 Z" fill="#fff"/><path d="M40 62 L38 71 L40 74 L42 71 Z" fill="${lk.tie || '#e8574f'}"/>`;
+}
+function personSvg(lk, extraBack = '', extraFront = '') {
+  const inner = `${extraBack}${hairBack(lk)}${bodySvg(lk)}
+    <g class="hd"><ellipse cx="40" cy="36" rx="21" ry="20" fill="${lk.skin}"/>${FACE()}${hairFront(lk)}${lk.glasses ? GLASSES : ''}</g>${extraFront}`;
+  const g = lk.kid ? `<g transform="translate(40 90) scale(0.78) translate(-40 -90)">${inner}</g>` : inner;
+  return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="88" rx="17" ry="3.6" fill="rgba(80,50,30,0.2)"/>${g}</svg>`;
+}
+function vipSvg(role, side) {
+  if (role === 'bride') {
+    const lk = { g: 'f', skin: '#ffe4d0', hair: '#4a332a', hs: 'bun' };
+    const veil = '<path d="M21 22 Q40 4 59 22 Q72 52 68 86 Q40 92 12 86 Q8 52 21 22 Z" fill="#fff" opacity=".6" stroke="#efe2ea" stroke-width="1"/>';
+    const gown = '<path d="M30 56 Q40 52 50 56 L52 64 Q66 76 71 89 Q40 95 9 89 Q14 76 28 64 Z" fill="#fffafc" stroke="#e8d3df" stroke-width="1.3"/><path d="M28 64 Q40 68 52 64" stroke="#f7a8c0" stroke-width="2.4" fill="none"/><circle cx="24" cy="82" r="1.3" fill="#f0dce6"/><circle cx="36" cy="86" r="1.3" fill="#f0dce6"/><circle cx="50" cy="85" r="1.3" fill="#f0dce6"/><circle cx="60" cy="81" r="1.3" fill="#f0dce6"/>';
+    const tiara = '<path d="M30 15 l3 -5 3 4 4 -6 4 6 3 -4 3 5 Z" fill="#ffe08a" stroke="#d9a930" stroke-width=".8"/><circle cx="40" cy="9" r="1.5" fill="#ff8fb0"/>';
+    return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="89" rx="26" ry="3.6" fill="rgba(80,50,30,0.2)"/>${veil}${hairBack(lk)}${gown}
+      <g class="hd"><ellipse cx="40" cy="36" rx="21" ry="20" fill="${lk.skin}"/>${FACE()}${hairFront(lk)}${tiara}</g></svg>`;
+  }
+  if (role === 'groom') {
+    const lk = { g: 'm', skin: '#fcdcc4', hair: '#1f1d24', hs: 'side', cloth: '#2b2b33' };
+    const body = '<ellipse cx="40" cy="73" rx="16.5" ry="14.5" fill="#2b2b33"/><path d="M33 59 L40 72 L47 59 Z" fill="#fff"/><path d="M34.5 61 L40 63.5 L34.5 66 Z M45.5 61 L40 63.5 L45.5 66 Z" fill="#141418"/><circle cx="40" cy="63.5" r="1.5" fill="#141418"/><circle cx="51" cy="66" r="3.4" fill="#fff"/><circle cx="51" cy="66" r="1.3" fill="#ffd66b"/><path d="M51 69 l-1 4" stroke="#6fae6a" stroke-width="1.6"/>';
+    return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="88" rx="17" ry="3.6" fill="rgba(80,50,30,0.2)"/>${body}
+      <g class="hd"><ellipse cx="40" cy="36" rx="21" ry="20" fill="${lk.skin}"/>${FACE()}${hairFront(lk)}</g></svg>`;
+  }
+  if (role === 'dad') {
+    const lk = { g: 'm', skin: side === 'g' ? '#f6d2b8' : '#fcdcc4', hair: side === 'g' ? '#6e6a70' : '#3b3438', hs: side === 'g' ? 'short' : 'side', cloth: side === 'g' ? '#34405a' : '#4a4a52', tie: '#c23b4a', glasses: side === 'b' };
+    return personSvg(lk, '', CORSAGE);
+  }
+  // mom：旗袍＋包頭
+  const lk = { g: 'f', skin: '#ffe4d0', hair: side === 'g' ? '#3b2f2f' : '#5b3a29', hs: 'bun', cloth: side === 'g' ? '#c23b4a' : '#7b4fa0', glasses: side === 'g' };
+  const qipao = `<path d="M35 57 Q40 61 45 57" stroke="#ffd66b" stroke-width="1.6" fill="none"/><path d="M40 61 Q46 66 47 74" stroke="#ffd66b" stroke-width="1.3" fill="none"/>`;
+  return personSvg(lk, '', qipao + CORSAGE);
+}
+function staffSvg() {
+  const lk = { g: 'm', skin: '#fcdcc4', hair: pick(['#2e2a30', '#5b3a29']), hs: 'short', cloth: '#f4f1ec', tie: '#2b2b33' };
+  return personSvg(lk, '', '<path d="M29 70 h22 l2 16 h-26 Z" fill="#2b2b33"/><path d="M33 74 h14" stroke="#c9a27c" stroke-width="1.4"/>');
+}
+
+// ---- 台詞 ----
+const CHAT = [
+  ['新娘今天好美！', '真的！婚紗超好看'],
+  ['新郎今天好帥', '平常都沒這麼帥 😂'],
+  ['你怎麼認識新人的？', '大學同學啊～'],
+  ['這個好好吃！', '我要再來一塊'],
+  ['下一個換你了吧？', '先吃飯先吃飯 😅'],
+  ['等等去拍照嗎？', '走！去活動區'],
+  ['剛剛好感動 🥹', '我也差點哭'],
+  ['你喝什麼？', '水果氣泡飲～'],
+  ['好久不見！', '上次見是畢業耶'],
+  ['他們好登對', '天生一對！'],
+  ['這裡好溫馨', '咖啡廳婚禮好可愛'],
+  ['甜點什麼時候上？', '聽說有蛋糕！'],
+  ['今天天氣真好', '新人運氣好～'],
+  ['你們家寶寶好可愛', '謝謝～一直跑來跑去'],
+];
+const SOLO = ['好好吃 😋', '好飽～', '要幸福喔！', '新婚快樂 🎉', '這杯好喝', '百年好合！', '永浴愛河 ❤', '早生貴子～', '吃不完了啦', '拍照拍照 📸'];
+const KID_LINES = ['我要喝果汁！', '好好玩～', '新娘好像公主！', '我要吃蛋糕！', '抓不到我～', '嘿嘿'];
+const BLESS = ['乾杯！', '新婚快樂！', '百年好合！', '永浴愛河！', '早生貴子！', '白頭偕老！', '要幸福喔！', 'Cheers 🥂'];
+const COUPLE_THANKS = ['謝謝大家來！', '吃飽喝足喔～', '今天好開心 ❤', '謝謝你們！', '多吃一點喔'];
+const PARENT_LINES = ['謝謝你們來！', '多吃一點喔', '招待不周請見諒', '今天好開心', '菜還合胃口嗎？'];
+const GUEST_REPLY = ['恭喜恭喜！', '好好吃！', '新娘好漂亮', '謝謝招待～', '恭喜您！'];
+const COURSES = [['🥗', '凱薩沙拉'], ['🍤', '酥炸拼盤'], ['🍗', '美式炸雞'], ['🥩', '碳烤牛排'], ['🍝', '奶油義大利麵'], ['🍕', '手工披薩'], ['🍰', '甜點']];
+const DRINKS = ['🥤', '🍹', '☕', '🧋', '🍷'];
+
+// ---- 版面（橫式／直式） ----
+let ORI = 'land', SW = PW, SH = PH;
+const mp = ([x, y]) => (ORI === 'land' ? [x, y] : [y, PW - x]);
+const mr = (r) => (ORI === 'land' ? { ...r } : { ...r, x: r.y, y: PW - (r.x + r.w), w: r.h, h: r.w });
+let L = null;   // 換算後的版面
+
+function buildLayout() {
+  ORI = (innerWidth >= innerHeight * 0.95) ? 'land' : 'port';
+  SW = ORI === 'land' ? PW : PH; SH = ORI === 'land' ? PH : PW;
+  const areas = AREAS.map((a) => ({ ...a, ...mr(a) }));
+  const tables = TABLES.map((t) => {
+    let r;
+    if (t.round) r = mr({ x: t.cx - t.r, y: t.cy - t.r, w: t.r * 2, h: t.r * 2 });
+    else r = mr(t);
+    const T = { ...t, ...r, cx: r.x + r.w / 2, cy: r.y + r.h / 2 };
+    T.seatList = seatsFor(T);
+    T.serve = T.round ? [T.cx, T.y + T.h + 34] : (T.w >= T.h ? [T.x - 16, T.cy + 12] : [T.cx, T.y + T.h + 22]);
+    T.toast = T.round ? [T.cx - 10, T.y + T.h + 36] : (T.w >= T.h ? [T.x + T.w + 14, T.cy + 12] : [T.cx - 6, T.y + T.h + 24]);
+    return T;
+  });
+  const obst = [];
+  for (const a of areas) if (a.solid) obst.push(inflate(a, 7));
+  for (const t of tables) obst.push(inflate(t, 6));
+  const walk = WALKABLE.map(mr);
+  const P = {};
+  for (const k of Object.keys(PTS)) {
+    const v = PTS[k];
+    if (k === 'lounge') P[k] = mr(v);
+    else if (Array.isArray(v[0])) P[k] = v.map(mp);
+    else P[k] = mp(v);
+  }
+  L = { areas, tables, obst, walk, P };
+  buildGrid();
+}
+function inflate(r, d) { return { x: r.x - d, y: r.y - d, w: r.w + 2 * d, h: r.h + 2 * d }; }
+function seatsFor(T) {
+  const n = T.seats, out = [];
+  if (T.round) {
+    const R = T.w / 2;
+    for (let i = 0; i < n; i++) {
+      const a = -Math.PI / 2 + (i + 0.5) * Math.PI * 2 / n;
+      const dx = Math.cos(a), dy = Math.sin(a);
+      const top = dy < -0.3;
+      out.push({ sit: [T.cx + dx * (R + 14), top ? T.y + 8 : T.cy + dy * (R + 10) + 18], side: top ? 'top' : 'side' });
+    }
+    return out;
+  }
+  if (T.w >= T.h) {
+    const k1 = Math.ceil(n / 2), k2 = n - k1;
+    for (let i = 0; i < k1; i++) out.push({ sit: [T.x + (i + 0.5) * T.w / k1, T.y + 7], side: 'top' });
+    for (let i = 0; i < k2; i++) out.push({ sit: [T.x + (i + 0.5) * T.w / k2, T.y + T.h + 29], side: 'bottom' });
+  } else {
+    const k1 = Math.ceil(n / 2), k2 = n - k1;
+    for (let i = 0; i < k1; i++) out.push({ sit: [T.x - 15, T.y + (i + 0.5) * T.h / k1 + 16], side: 'left' });
+    for (let i = 0; i < k2; i++) out.push({ sit: [T.x + T.w + 15, T.y + (i + 0.5) * T.h / k2 + 16], side: 'right' });
+  }
+  return out;
+}
+
+// ---- 走路：格子 A* ----
+const CELL = 8;
+let GC = 0, GR = 0, FREE = null;
+const inR = (r, x, y) => x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
+function buildGrid() {
+  GC = Math.ceil(SW / CELL); GR = Math.ceil(SH / CELL);
+  FREE = new Uint8Array(GC * GR);
+  for (let j = 0; j < GR; j++) for (let i = 0; i < GC; i++) {
+    const x = (i + 0.5) * CELL, y = (j + 0.5) * CELL;
+    FREE[j * GC + i] = L.walk.some((r) => inR(r, x, y)) && !L.obst.some((r) => inR(r, x, y)) ? 1 : 0;
+  }
+}
+const cellOf = ([x, y]) => [Math.max(0, Math.min(GC - 1, Math.floor(x / CELL))), Math.max(0, Math.min(GR - 1, Math.floor(y / CELL)))];
+function nearestFree(c) {
+  if (FREE[c[1] * GC + c[0]]) return c;
+  for (let d = 1; d < 40; d++) {
+    let best = null, bd = 1e9;
+    for (let dj = -d; dj <= d; dj++) for (let di = -d; di <= d; di++) {
+      if (Math.max(Math.abs(di), Math.abs(dj)) !== d) continue;
+      const i = c[0] + di, j = c[1] + dj;
+      if (i < 0 || j < 0 || i >= GC || j >= GR || !FREE[j * GC + i]) continue;
+      const dd = di * di + dj * dj;
+      if (dd < bd) { bd = dd; best = [i, j]; }
+    }
+    if (best) return best;
+  }
+  return c;
+}
+const isFreeAt = (x, y) => { const i = Math.floor(x / CELL), j = Math.floor(y / CELL); return i >= 0 && j >= 0 && i < GC && j < GR && FREE[j * GC + i] === 1; };
+function los(a, b) {
+  const d = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.ceil(d / 3);
+  for (let k = 1; k < n; k++) { const t = k / n; if (!isFreeAt(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t)) return false; }
+  return true;
+}
+function findPath(from, to) {
+  const s = nearestFree(cellOf(from)), g = nearestFree(cellOf(to));
+  const N = GC * GR, gs = new Float32Array(N).fill(1e9), par = new Int32Array(N).fill(-1), closed = new Uint8Array(N);
+  const si = s[1] * GC + s[0], gi = g[1] * GC + g[0];
+  const heap = [[0, si]]; gs[si] = 0;
+  const h = (i) => Math.hypot((i % GC) - g[0], Math.floor(i / GC) - g[1]);
+  const push = (it) => { heap.push(it); let k = heap.length - 1; while (k > 0) { const p = (k - 1) >> 1; if (heap[p][0] <= heap[k][0]) break; [heap[p], heap[k]] = [heap[k], heap[p]]; k = p; } };
+  const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let k = 0; for (;;) { const l = 2 * k + 1, r = l + 1; let m = k; if (l < heap.length && heap[l][0] < heap[m][0]) m = l; if (r < heap.length && heap[r][0] < heap[m][0]) m = r; if (m === k) break; [heap[m], heap[k]] = [heap[k], heap[m]]; k = m; } } return top; };
+  let found = false;
+  while (heap.length) {
+    const [, cur] = pop();
+    if (closed[cur]) continue;
+    closed[cur] = 1;
+    if (cur === gi) { found = true; break; }
+    const ci = cur % GC, cj = Math.floor(cur / GC);
+    for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
+      if (!di && !dj) continue;
+      const ni = ci + di, nj = cj + dj;
+      if (ni < 0 || nj < 0 || ni >= GC || nj >= GR) continue;
+      const nk = nj * GC + ni;
+      if (!FREE[nk] || closed[nk]) continue;
+      if (di && dj && (!FREE[cj * GC + ni] || !FREE[nj * GC + ci])) continue;
+      const ng = gs[cur] + (di && dj ? 1.414 : 1);
+      if (ng < gs[nk]) { gs[nk] = ng; par[nk] = cur; push([ng + h(nk), nk]); }
+    }
+  }
+  const pts = [];
+  if (found) { for (let k = gi; k !== -1 && k !== si; k = par[k]) pts.push([(k % GC + 0.5) * CELL, (Math.floor(k / GC) + 0.5) * CELL]); pts.reverse(); }
+  pts.push(to.slice());
+  // 拉直：看得到就直接走過去
+  const out = [];
+  let cur = from;
+  let i = 0;
+  while (i < pts.length) {
+    let j = pts.length - 1;
+    while (j > i && !los(cur, pts[j])) j--;
+    out.push(pts[j]); cur = pts[j]; i = j + 1;
+  }
+  return out;
+}
+
+// ---- 模擬時間 ----
+let simT = 0;
+const timers = [];
+const wait = (ms) => new Promise((r) => timers.push({ at: simT + ms, r }));
+
+// ---- 角色 ----
+const actors = [];
+let stage, actorLayer, tableLayer, fxLayer;
+function makeActor(o) {
+  const a = { pos: [0, 0], path: null, speed: 70, face: 1, pose: '', prop: '', temp: '', busy: false, next: rand(2000, 12000), hidden: false, ...o };
+  const el = document.createElement('button');
+  el.type = 'button';
+  el.className = 'actor ' + (a.cls || '');
+  el.innerHTML = `<span class="fig">${a.svg}<span class="prop"></span></span><span class="tag">${a.name}</span><span class="bub"></span>`;
+  el.addEventListener('click', (e) => { e.stopPropagation(); tapActor(a); });
+  a.el = el; a.figEl = el.querySelector('.fig'); a.propEl = el.querySelector('.prop'); a.bubEl = el.querySelector('.bub');
+  actorLayer.appendChild(el);
+  actors.push(a);
+  return a;
+}
+function place(a) {
+  a.el.style.left = (a.pos[0] / SW * 100) + '%';
+  a.el.style.top = (a.pos[1] / SH * 100) + '%';
+  a.el.style.zIndex = String(Math.round(a.pos[1]) + (a.bubbleOn ? 3000 : 0) + (a.hl ? 4000 : 0));
+}
+function setPose(a, p) { if (a.pose === p) return; a.el.classList.remove('p-' + a.pose); a.pose = p; if (p) a.el.classList.add('p-' + p); }
+function showProp(a) { const p = a.temp || a.prop; if (a.propEl.textContent !== p) a.propEl.textContent = p; }
+function setFace(a, f) { if (a.face === f) return; a.face = f; a.figEl.classList.toggle('flip', f < 0); }
+let bubbleCount = 0;
+function say(a, text, ms = 2600, cls = '') {
+  if (a.hidden) return;
+  if (a.bubT) clearTimeout(a.bubT); else bubbleCount++;
+  a.bubEl.textContent = text;
+  a.bubEl.className = 'bub show ' + cls;
+  a.bubbleOn = true; place(a);
+  // 碰到上緣就改放在下面
+  a.bubEl.classList.toggle('below', a.pos[1] < 70);
+  a.bubT = setTimeout(() => { a.bubEl.className = 'bub'; a.bubbleOn = false; a.bubT = null; bubbleCount--; place(a); }, ms);
+}
+function walkTo(a, pt) {
+  return new Promise((res) => {
+    a.path = findPath(a.pos, pt);
+    a.onArrive = res;
+    setPose(a, 'walk');
+  });
+}
+const atSeat = (a) => a.seat && Math.hypot(a.pos[0] - a.seat.sit[0], a.pos[1] - a.seat.sit[1]) < 2;
+async function goHome(a) { if (a.seat) { await walkTo(a, a.seat.sit); settle(a); } }
+function settle(a) { setPose(a, 'sit'); a.temp = ''; showProp(a); setFace(a, a.seat && a.seat.side === 'right' ? -1 : 1); }
+async function routine(a, fn) {
+  a.busy = true;
+  try { await fn(); } finally { a.busy = false; a.next = simT + rand(4000, 14000); }
+}
+
+// ---- 舞台 DOM ----
+const svgEl = (s) => s;
+function areaSvg(a) {
+  const { x, y, w, h } = a;
+  const cx = x + w / 2, cy = y + h / 2;
+  const vert = w < h * 0.55;
+  const text = (t, dy = 0, size = 13, cls = 'lb') => vert
+    ? `<text class="${cls}" x="${cx + dy}" y="${cy}" font-size="${size}" text-anchor="middle" dominant-baseline="middle" style="writing-mode:vertical-rl">${t}</text>`
+    : `<text class="${cls}" x="${cx}" y="${cy + dy}" font-size="${size}" text-anchor="middle" dominant-baseline="middle">${t}</text>`;
+  switch (a.kind) {
+    case 'sign': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16" class="a-sign"/>${text(a.label, -10, 20, 'lb brand')}${text(a.sub, 14, 14, 'lb brand2')}`;
+    case 'room': {
+      let lines = '';
+      for (let k = 1; k < 4; k++) lines += ORI === 'land' ? `<path d="M${x + w * k / 4} ${y + 4} v${h - 8}" class="a-roomline"/>` : `<path d="M${x + 4} ${y + h * k / 4} h${w - 8}" class="a-roomline"/>`;
+      return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" class="a-room"/>${lines}${text(a.label, -6, 14)}${text(a.sub, 11, 9, 'lb sm')}`;
+    }
+    case 'zone': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" class="a-zone"/><circle cx="${cx}" cy="${y + 18}" r="7" class="a-knob"/>${text(a.label, -4, 12)}${text(a.sub, 14, 9, 'lb sm')}`;
+    case 'drink': return `<ellipse cx="${cx}" cy="${cy}" rx="${w / 2}" ry="${h / 2}" class="a-drink"/>
+      <g font-size="13" text-anchor="middle"><text x="${cx - 22}" y="${cy - 4}">🥤</text><text x="${cx}" y="${cy - 9}">🍹</text><text x="${cx + 22}" y="${cy - 4}">☕</text></g>${text(a.label, 12, 10, 'lb sm')}`;
+    case 'kitchen': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" class="a-kitchen"/>${text(a.label, 0, 11)}`;
+    case 'counter': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" class="a-counter"/>${text(a.label, 0, 18)}`;
+    case 'gift': return `<ellipse cx="${cx}" cy="${cy}" rx="${w / 2}" ry="${h / 2}" class="a-gift"/><text x="${cx}" y="${cy - (vert ? 14 : 6)}" font-size="13" text-anchor="middle">🧧</text>${vert ? text(a.label, 0, 10, 'lb sm') : text(a.label, 10, 10, 'lb sm')}`;
+    case 'door': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" class="a-door"/>${text(a.label, -14, 11, 'lb sm')}`;
+    case 'album': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${Math.min(w, h) / 2}" class="a-album"/><text x="${cx}" y="${cy + 4}" font-size="11" text-anchor="middle">📖 相本桌</text>`;
+    case 'stage': {
+      let tiles = '';
+      const s = 18;
+      for (let i = 0; i < Math.floor(w / s); i++) for (let j = 0; j < Math.floor(h / s); j++) if ((i + j) % 2) tiles += `<rect x="${x + 2 + i * s}" y="${y + 2 + j * s}" width="${s}" height="${s}" class="a-tile"/>`;
+      return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" class="a-stage"/>${tiles}${text(a.label, 0, 14, 'lb stage-lb')}`;
+    }
+    case 'screen': return '';
+    case 'long': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" class="a-long"/>${longDecor(a)}`;
+    case 'sofa': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="7" class="a-sofa"/>`;
+    case 'dash': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" class="a-dash"/>${text(a.label, 0, 11, 'lb sm')}`;
+  }
+  return '';
+}
+function longDecor(a) {
+  // 長桌上的花和蠟燭
+  let s = '';
+  const horiz = a.w >= a.h, n = 7;
+  for (let i = 0; i < n; i++) {
+    const t = (i + 0.5) / n;
+    const x = horiz ? a.x + a.w * t : a.x + a.w / 2, y = horiz ? a.y + a.h / 2 : a.y + a.h * t;
+    s += i % 2 ? `<circle cx="${x}" cy="${y}" r="3.2" fill="#ffe08a"/><circle cx="${x}" cy="${y}" r="6" fill="#ffe08a" opacity=".25" class="candle"/>`
+      : `<circle cx="${x - 3}" cy="${y}" r="3.4" fill="#f7a8c0"/><circle cx="${x + 3}" cy="${y - 1}" r="3.4" fill="#fff"/><circle cx="${x}" cy="${y + 3}" r="3" fill="#c9a0e6"/>`;
+  }
+  return s;
+}
+function drawFloor() {
+  const parts = [];
+  parts.push(`<defs><pattern id="wood" width="60" height="24" patternUnits="userSpaceOnUse"><rect width="60" height="24" fill="#ead6bf"/><path d="M0 12 H60 M30 0 V12 M0 24 H60 M10 12 V24" stroke="#dcc3a6" stroke-width="1"/></pattern>
+    <pattern id="tile" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#d9d4cf"/><rect width="8" height="8" fill="#e6e1dc"/><rect x="8" y="8" width="8" height="8" fill="#e6e1dc"/></pattern></defs>`);
+  const hall = mr({ x: 22, y: 18, w: 1092, h: 660 });
+  const outside = mr({ x: 0, y: 680, w: PW, h: 90 });
+  parts.push(`<rect x="0" y="0" width="${SW}" height="${SH}" fill="#cbb8a6"/>`);
+  parts.push(`<rect x="${outside.x}" y="${outside.y}" width="${outside.w}" height="${outside.h}" fill="url(#tile)"/>`);
+  parts.push(`<rect x="${hall.x}" y="${hall.y}" width="${hall.w}" height="${hall.h}" rx="10" fill="url(#wood)" stroke="#8a6a52" stroke-width="5"/>`);
+  // 入口 1 的門口（牆上的缺口）
+  const gap = mr({ x: 490, y: 672, w: 92, h: 12 });
+  parts.push(`<rect x="${gap.x}" y="${gap.y}" width="${gap.w}" height="${gap.h}" fill="#ead6bf"/>`);
+  // 建議進場動線
+  const route = [PTS.ent2, ...PTS.route].map(mp);
+  parts.push(`<path d="M${route.map((p) => p.join(' ')).join(' L')}" class="route"/>`);
+  // 牆上的串燈
+  let bulbs = '';
+  for (let i = 0; i < 26; i++) {
+    const [bx, by] = mp([560 + i * 21, 26 + (i % 2) * 5]);
+    bulbs += `<circle cx="${bx}" cy="${by}" r="3.2" class="bulb b${i % 3}"/>`;
+  }
+  parts.push(bulbs);
+  for (const a of L.areas) parts.push(areaSvg(a));
+  // 賓客入口箭頭
+  const [ax, ay] = mp([760, 752]);
+  parts.push(`<text x="${ax}" y="${ay}" class="lb sm" font-size="10" text-anchor="middle">${ORI === 'land' ? '← 賓客入口處' : '賓客入口 ↑'}</text>`);
+  // 氣球（活動區角落）
+  const st = L.areas.find((a) => a.id === 'stage');
+  parts.push(`<g class="balloons"><circle cx="${st.x + 8}" cy="${st.y + 6}" r="7" fill="#f7a8c0"/><circle cx="${st.x + 18}" cy="${st.y + 2}" r="7" fill="#fff"/><circle cx="${st.x + 4}" cy="${st.y - 6}" r="6" fill="#ffd66b"/></g>`);
+  $('#floor').setAttribute('viewBox', `0 0 ${SW} ${SH}`);
+  $('#floor').innerHTML = parts.join('');
+}
+function drawTables() {
+  tableLayer.innerHTML = '';
+  for (const T of L.tables) {
+    const d = document.createElement('div');
+    d.className = 'table' + (T.round ? ' round' : '') + (T.main ? ' main' : '');
+    d.style.left = (T.x / SW * 100) + '%'; d.style.top = (T.y / SH * 100) + '%';
+    d.style.width = (T.w / SW * 100) + '%'; d.style.height = (T.h / SH * 100) + '%';
+    d.style.zIndex = String(Math.round(T.cy));
+    const chairs = T.seatList.map((s) => {
+      const off = s.side === 'top' ? [0, -9] : s.side === 'bottom' ? [0, -16] : s.side === 'left' ? [-2, -13] : [2, -13];
+      return `<i class="chair" style="left:${((s.sit[0] + off[0] - T.x) / T.w * 100)}%;top:${((s.sit[1] + off[1] - T.y) / T.h * 100)}%"></i>`;
+    }).join('');
+    d.innerHTML = `<div class="cloth"></div>${chairs}<span class="tno">${T.main ? '主桌' : T.n}</span><span class="dishes"></span><span class="vase">💐</span>`;
+    T.el = d; T.dishEl = d.querySelector('.dishes');
+    d.addEventListener('click', (e) => { e.stopPropagation(); tapTable(T); });
+    tableLayer.appendChild(d);
+    renderDishes(T);
+  }
+  // 投影布幕
+  const sc = L.areas.find((a) => a.id === 'screen');
+  const s = $('#screen');
+  s.style.left = (sc.x / SW * 100) + '%'; s.style.top = (sc.y / SH * 100) + '%';
+  s.style.width = (sc.w / SW * 100) + '%'; s.style.height = (sc.h / SH * 100) + '%';
+  s.classList.toggle('vert', sc.w < sc.h);
+}
+function renderDishes(T) {
+  if (!T.dishes) T.dishes = [];
+  T.dishEl.innerHTML = T.dishes.map((d) => `<i style="opacity:${0.35 + 0.65 * d.left};transform:scale(${0.7 + 0.3 * d.left})">${d.left > 0.05 ? d.e : '🍽️'}</i>`).join('');
+}
+
+function sizeStage() {
+  const wrap = $('#stageWrap');
+  const zoom = ORI === 'port' ? ZOOM : 1;
+  const aw = wrap.clientWidth, ah = wrap.clientHeight;
+  let w = Math.min(aw, ah * SW / SH);
+  if (ORI === 'port') w = aw;
+  w *= zoom;
+  stage.style.width = w + 'px';
+  stage.style.height = (w * SH / SW) + 'px';
+  stage.style.setProperty('--u', (w / SW) + 'px');
+}
+let ZOOM = 1;
+
+// ---- 狀態與面板 ----
+const state = { phase: 'arrival', course: -1, toasts: 0, cheers: 0, event: '', toastOrder: [], names: false };
+function banner(text, ms = 3500) {
+  const b = $('#banner');
+  b.textContent = text; b.classList.add('show');
+  clearTimeout(banner.t);
+  banner.t = setTimeout(() => b.classList.remove('show'), ms);
+}
+function setStatus(text) { state.event = text; const e = $('#nowEvent'); if (e) e.textContent = text; }
+function logLine(text) {
+  const ul = $('#log');
+  if (!ul) return;
+  const li = document.createElement('li');
+  const d = new Date();
+  li.innerHTML = `<b>${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}</b> ${text}`;
+  ul.prepend(li);
+  while (ul.children.length > 8) ul.lastChild.remove();
+}
+// 投影布幕輪播
+const SLIDES = () => [
+  `${CFG.groom || '新郎'} ❤ ${CFG.bride || '新娘'}`, 'Welcome', '♥', CFG.date || 'Just Married', '謝謝大家', '💍',
+];
+let slideI = 0, screenOverride = null;
+function screenTick() {
+  const s = $('#screen .sc-in');
+  const list = SLIDES();
+  const t = screenOverride || list[slideI++ % list.length];
+  s.textContent = t;
+  s.classList.remove('pop'); void s.offsetWidth; s.classList.add('pop');
+}
+function screenShow(t, ms = 5000) { screenOverride = t; screenTick(); setTimeout(() => { screenOverride = null; }, ms); }
+
+// 飛的東西（愛心、捧花）
+function fx(text, pt, cls = 'heart', ms = 1800) {
+  const s = document.createElement('span');
+  s.className = 'fx ' + cls;
+  s.textContent = text;
+  s.style.left = (pt[0] / SW * 100) + '%'; s.style.top = (pt[1] / SH * 100) + '%';
+  s.style.setProperty('--dx', rand(-14, 14).toFixed(1));
+  fxLayer.appendChild(s);
+  setTimeout(() => s.remove(), ms);
+}
+function hearts(pt, n = 8, emoji = ['❤', '💕', '💖', '✨']) {
+  for (let i = 0; i < n; i++) setTimeout(() => fx(pick(emoji), [pt[0] + rand(-24, 24), pt[1] - rand(20, 40)]), i * 120);
+}
+function flyBouquet(from, to) {
+  return new Promise((res) => {
+    const s = document.createElement('span');
+    s.className = 'fx fly';
+    s.textContent = '💐';
+    fxLayer.appendChild(s);
+    const x0 = from[0] / SW * 100, y0 = (from[1] - 30) / SH * 100, x1 = to[0] / SW * 100, y1 = (to[1] - 30) / SH * 100;
+    const mx = (x0 + x1) / 2, my = Math.min(y0, y1) - 18;
+    s.animate([
+      { left: x0 + '%', top: y0 + '%', transform: 'translate(-50%,-50%) rotate(0deg)' },
+      { left: mx + '%', top: my + '%', transform: 'translate(-50%,-50%) rotate(300deg) scale(1.4)' },
+      { left: x1 + '%', top: y1 + '%', transform: 'translate(-50%,-50%) rotate(720deg)' },
+    ], { duration: 1500, easing: 'ease-in-out' }).onfinish = () => { s.remove(); res(); };
+  });
+}
+function flash() { const f = $('#flash'); f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); }
+
+// ---- 建立人物 ----
+const guests = [], vip = {}, staff = [];
+function createPeople() {
+  actorLayer.innerHTML = ''; actors.length = 0; guests.length = 0; staff.length = 0;
+  seed = 20261116;
+  const list = CFG.GUESTS || fakeGuests();
+  const byTable = {};
+  for (const p of list) (byTable[p.table] = byTable[p.table] || []).push(p);
+  for (const T of L.tables) {
+    if (T.main) continue;
+    const ps = byTable[T.n] || [];
+    // 先坐不會被桌子擋住的位子
+    const order = T.seatList.map((s, i) => i);
+    ps.forEach((p, k) => {
+      const si = order[k % order.length];
+      const lk = lookFor(p);
+      const a = makeActor({ kind: 'guest', name: p.name, info: p, lk, table: T, seatIdx: si, svg: personSvg(lk), speed: p.kid ? 95 : rand(62, 78), cls: p.kid ? 'kid' : '' });
+      a.seat = T.seatList[si];
+      guests.push(a);
+    });
+  }
+  const main = L.tables.find((t) => t.main);
+  const vipSeat = { groom: 0, bride: 1, gdad: 2, gmom: 3, bdad: 4, bmom: 5 };
+  for (const v of (CFG.vip || [])) {
+    const name = v.role === 'groom' ? (CFG.groom || v.name) : v.role === 'bride' ? (CFG.bride || v.name) : v.name;
+    const a = makeActor({ kind: v.role, name, svg: vipSvg(v.role, v.side), speed: 72, table: main, cls: 'vip ' + v.role, busy: true });
+    a.seat = main.seatList[vipSeat[v.id]];
+    vip[v.id] = a;
+  }
+  if (vip.bride) vip.bride.prop = '💐';
+  for (let i = 0; i < 3; i++) {
+    const a = makeActor({ kind: 'staff', name: '服務生', svg: staffSvg(), speed: 88, cls: 'staff', busy: true });
+    a.pos = L.P.staffIdle[i].slice();
+    staff.push(a);
+  }
+  for (const a of actors) { showProp(a); place(a); }
+}
+
+// ---- 每一幀 ----
+let last = 0;
+function tick(now) {
+  const dt = Math.min(0.1, last ? (now - last) / 1000 : 0);
+  last = now;
+  simT += dt * 1000;
+  for (let i = timers.length - 1; i >= 0; i--) if (timers[i].at <= simT) { const t = timers[i]; timers.splice(i, 1); t.r(); }
+  let walkers = 0;
+  for (const a of actors) {
+    if (a.path && a.path.length) {
+      walkers++;
+      const tgt = a.path[0];
+      const dx = tgt[0] - a.pos[0], dy = tgt[1] - a.pos[1], d = Math.hypot(dx, dy);
+      const step = a.speed * dt * (state.phase === 'arrival' && a.kind === 'guest' ? 1.4 : 1);
+      if (Math.abs(dx) > 0.5) setFace(a, dx < 0 ? -1 : 1);
+      if (d <= step) { a.pos = tgt.slice(); a.path.shift(); } else { a.pos[0] += dx / d * step; a.pos[1] += dy / d * step; }
+      if (!a.path.length) { a.path = null; setPose(a, ''); const f = a.onArrive; a.onArrive = null; if (f) f(); }
+      place(a);
+    }
+  }
+  if (state.phase === 'party') {
+    for (const a of guests) {
+      if (a.busy || a.path || simT < a.next || a.hidden) continue;
+      a.next = simT + rand(6000, 18000);
+      if (!atSeat(a)) { routine(a, () => goHome(a)); continue; }
+      guestAct(a, walkers);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+// ---- 賓客自己做的事 ----
+function seatedNeighbors(a) {
+  return guests.filter((b) => b !== a && b.table === a.table && !b.busy && atSeat(b) && !b.bubbleOn);
+}
+function guestAct(a, walkers) {
+  const r = Math.random();
+  const T = a.table;
+  if (a.info.kid && r < 0.45 && walkers < 14) { routine(a, () => kidRun(a)); return; }
+  const quiet = bubbleCount >= (ORI === 'port' ? 7 : 16);
+  if (r < 0.3 && !quiet) {
+    const nb = seatedNeighbors(a);
+    if (nb.length && !a.bubbleOn) {
+      const b = pick(nb), pair = pick(CHAT);
+      say(a, pair[0]); setFace(a, b.pos[0] < a.pos[0] ? -1 : 1);
+      setTimeout(() => { if (!b.busy) { say(b, pair[1]); setFace(b, a.pos[0] < b.pos[0] ? -1 : 1); } }, 1500);
+      return;
+    }
+  }
+  if (r < 0.58) {
+    const dish = (T.dishes || []).filter((d) => d.left > 0.05).pop();
+    if (dish) {
+      setPose(a, 'eat');
+      dish.left = Math.max(0, dish.left - 0.07);
+      renderDishes(T);
+      if (!quiet && Math.random() < 0.35) say(a, pick(['好好吃 😋', `${dish.name}好讚`, '再來一口', '這道必吃！']));
+      setTimeout(() => { if (a.pose === 'eat') setPose(a, 'sit'); }, 2400);
+      return;
+    }
+  }
+  if (r < 0.7 && walkers < 12) { routine(a, () => getDrink(a)); return; }
+  if (r < 0.78 && walkers < 12) { routine(a, () => visitFriend(a)); return; }
+  if (r < 0.84 && walkers < 12) { routine(a, () => stageFun(a)); return; }
+  if (r < 0.87 && walkers < 12) { routine(a, () => albumLook(a)); return; }
+  if (a.prop && Math.random() < 0.5) { setPose(a, 'sip'); setTimeout(() => { if (a.pose === 'sip') setPose(a, 'sit'); }, 1600); return; }
+  if (!quiet && !a.bubbleOn && Math.random() < 0.5) say(a, a.info.kid ? pick(KID_LINES) : pick(SOLO));
+}
+async function getDrink(a) {
+  const spot = pick(L.P.drink);
+  await walkTo(a, spot);
+  setPose(a, 'pour');
+  if (Math.random() < 0.4) say(a, pick(['要喝哪個呢～', '我要冰的！', '續杯！', '拿鐵好香']));
+  await wait(2200);
+  a.prop = a.info.kid ? '🧃' : pick(DRINKS);
+  showProp(a);
+  const keep = a.prop;
+  setTimeout(() => { if (a.prop === keep) { a.prop = ''; showProp(a); } }, rand(40000, 80000));
+  await goHome(a);
+}
+async function visitFriend(a) {
+  const others = guests.filter((b) => b.table !== a.table && !b.busy && atSeat(b) && !b.info.kid);
+  if (!others.length) return;
+  const b = pick(others);
+  b.busy = true;
+  try {
+    const s = b.seat.sit;
+    const off = ORI === 'land' ? [b.seat.side === 'right' ? 18 : -18, b.seat.side === 'top' ? -20 : 4] : [b.seat.side === 'right' ? 18 : -18, b.seat.side === 'top' ? -20 : 4];
+    await walkTo(a, [s[0] + off[0], s[1] + off[1]]);
+    setFace(a, b.pos[0] < a.pos[0] ? -1 : 1);
+    const pair = pick([['好久不見！', '你也來啦！'], ['敬你一杯！', '乾杯～'], ['最近好嗎？', '還不錯啊～'], ['等等一起拍照！', '好啊！'], ['這桌菜比較好吃嗎 😆', '哈哈都一樣啦']]);
+    say(a, pair[0]); await wait(1400); say(b, pair[1]);
+    if (pair[1].includes('乾杯')) { a.temp = '🥂'; b.temp = '🥂'; showProp(a); showProp(b); setPose(a, 'cheer'); setPose(b, 'cheer'); }
+    await wait(2400);
+    b.temp = ''; showProp(b); setPose(b, 'sit');
+  } finally { b.busy = false; }
+  await goHome(a);
+}
+function randomIn(r) {
+  for (let k = 0; k < 30; k++) {
+    const p = [r.x + rand(6, r.w - 6), r.y + rand(10, r.h - 4)];
+    if (isFreeAt(p[0], p[1])) return p;
+  }
+  return [r.x + r.w / 2, r.y + r.h / 2];
+}
+const stageRect = () => L.areas.find((x) => x.id === 'stage');
+async function stageFun(a) {
+  await walkTo(a, randomIn(inflate(stageRect(), -10)));
+  if (Math.random() < 0.5) { a.temp = '📷'; showProp(a); say(a, pick(['來自拍！✌', '跟布幕合照～', '這裡好好拍'])); setPose(a, 'cheer'); }
+  else { setPose(a, 'dance'); say(a, pick(['跳舞囉～ 🎶', '嘿咻嘿咻', '♪～'])); }
+  await wait(rand(4000, 7000));
+  a.temp = ''; showProp(a);
+  await goHome(a);
+}
+async function albumLook(a) {
+  await walkTo(a, [L.P.album[0] + rand(-30, 30), L.P.album[1] - rand(0, 8)]);
+  setPose(a, 'eat');
+  say(a, pick(['好多回憶～', '這張好可愛！', '新人小時候耶 🥹']));
+  await wait(3500);
+  await goHome(a);
+}
+async function kidRun(a) {
+  const n = Math.floor(rand(2, 4));
+  for (let i = 0; i < n; i++) {
+    await walkTo(a, randomIn(L.P.lounge));
+    if (Math.random() < 0.5) say(a, pick(KID_LINES));
+  }
+  await goHome(a);
+}
+
+// ---- 進場 ----
+async function arrival() {
+  state.phase = 'arrival';
+  setStatus('賓客入場中');
+  banner('🎉 歡迎光臨！賓客入場中', 5000);
+  logLine('賓客陸續入場');
+  // 新人和主婚人在門口迎賓
+  const order = ['groom', 'bride', 'gdad', 'gmom', 'bdad', 'bmom'];
+  order.forEach((id, i) => { const a = vip[id]; if (!a) return; a.pos = L.P.greet[i].slice(); setPose(a, ''); setFace(a, -1); showProp(a); place(a); });
+  const greetLoop = setInterval(() => { const a = vip[pick(order)]; if (a && !a.bubbleOn && state.phase === 'arrival') say(a, pick(['歡迎歡迎！', '謝謝你來！', '裡面請～', '好久不見！'])); }, 1400);
+  for (const s of staff) s.busy = true;
+  const list = shuffle(guests);
+  for (const a of list) { a.hidden = true; a.el.classList.add('hide'); a.pos = L.P.guestIn.slice(); place(a); }
+  const done = list.map((a, i) => (async () => {
+    await wait(i * 330);
+    a.hidden = false; a.el.classList.remove('hide');
+    await walkTo(a, L.P.ent1);
+    await walkTo(a, [L.P.gift[0] + rand(-4, 4), L.P.gift[1] + rand(-8, 8)]);
+    a.temp = '🧧'; showProp(a); setFace(a, -1);
+    if (Math.random() < 0.3) say(a, pick(['恭喜恭喜！', '新婚快樂！', '紅包在這～']), 1600);
+    await wait(500);
+    a.temp = ''; showProp(a);
+    await goHome(a);
+  })());
+  await Promise.all(done);
+  clearInterval(greetLoop);
+  await wait(1200);
+}
+async function entrance() {
+  state.phase = 'entrance';
+  setStatus('新人進場');
+  banner('💒 新人進場！', 6000);
+  logLine('新人進場');
+  screenShow(`${CFG.groom || '新郎'} ❤ ${CFG.bride || '新娘'}`, 16000);
+  const g = vip.groom, b = vip.bride;
+  // 主婚人回主桌
+  for (const id of ['gdad', 'gmom', 'bdad', 'bmom']) if (vip[id]) goHome(vip[id]);
+  // 新人從入口 2 沿著建議動線進場
+  for (const [a, off] of [[g, 0], [b, 1]]) { a.el.classList.add('hide'); a.hidden = true; }
+  await wait(1500);
+  const start = L.P.ent2;
+  g.pos = [start[0], start[1]]; b.pos = [start[0] + 16, start[1]];
+  for (const a of [g, b]) { a.el.classList.remove('hide'); a.hidden = false; place(a); }
+  const clap = setInterval(() => {
+    const c = pick(guests);
+    if (!c.busy) { setPose(c, 'clap'); if (!c.bubbleOn && Math.random() < 0.5) say(c, pick(['👏👏', '好美！', '新婚快樂！', '好帥！', '❤❤❤']), 1800); }
+  }, 260);
+  const trail = setInterval(() => { fx(pick(['❤', '✨', '💕']), [g.pos[0] + 8, g.pos[1] - 34]); }, 450);
+  const route = [...L.P.route, L.P.stageC];
+  const pair = async (a, dx) => { for (const p of route) await walkTo(a, [p[0] + dx, p[1]]); };
+  const ox = ORI === 'land' ? 16 : 16;
+  await Promise.all([pair(g, -ox / 2), pair(b, ox / 2)]);
+  clearInterval(trail);
+  setFace(g, 1); setFace(b, -1);
+  setPose(g, 'kiss'); setPose(b, 'kiss');
+  hearts([(g.pos[0] + b.pos[0]) / 2, g.pos[1]], 14);
+  say(g, '謝謝大家！', 2400, 'love');
+  await wait(1400);
+  say(b, '今天好開心 ❤', 2400, 'love');
+  await wait(2200);
+  clearInterval(clap);
+  for (const c of guests) if (c.pose === 'clap') setPose(c, 'sit');
+  setPose(g, ''); setPose(b, '');
+  await Promise.all([goHome(g), goHome(b)]);
+}
+
+// ---- 婚宴進行中 ----
+async function party() {
+  state.phase = 'party';
+  setStatus('用餐中');
+  logLine('開始上菜');
+  for (const a of guests) a.next = simT + rand(1000, 9000);
+  courseLoop();
+  staff.forEach((s, i) => staffLoop(s, i));
+  for (const id of ['gdad', 'gmom', 'bdad', 'bmom']) if (vip[id]) parentLoop(vip[id]);
+  await wait(9000);
+  for (;;) {
+    const ev = weighted([[toastTour, 34], [cheersAll, 18], [kissEvent, 16], [bouquetEvent, 12], [groupPhoto, 20]]);
+    try { await ev(); } catch (e) { console.error(e); }
+    setStatus(COURSES[Math.max(0, state.course) % COURSES.length][1] + ' 上菜中');
+    await wait(rand(16000, 30000));
+  }
+}
+function weighted(list) {
+  const tot = list.reduce((s, x) => s + x[1], 0);
+  let r = Math.random() * tot;
+  for (const [f, w] of list) { if ((r -= w) < 0) return f; }
+  return list[0][0];
+}
+async function courseLoop() {
+  for (;;) {
+    state.course++;
+    const c = COURSES[state.course % COURSES.length];
+    $('#nowCourse').textContent = `${c[0]} ${c[1]}`;
+    logLine(`上菜：${c[0]} ${c[1]}`);
+    await wait(rand(38000, 50000));
+  }
+}
+async function staffLoop(s, i) {
+  await wait(i * 1500);
+  for (;;) {
+    const need = L.tables.filter((t) => (t.course ?? -1) < state.course && !t.claimed);
+    if (!need.length) {
+      if (Math.random() < 0.5) await walkTo(s, L.P.staffIdle[i]);
+      await wait(rand(2000, 5000));
+      continue;
+    }
+    need.sort((a, b) => Math.hypot(a.serve[0] - L.P.kitchen[0], a.serve[1] - L.P.kitchen[1]) - Math.hypot(b.serve[0] - L.P.kitchen[0], b.serve[1] - L.P.kitchen[1]));
+    const T = need[Math.floor(Math.random() * Math.min(3, need.length))];
+    T.claimed = true;
+    await walkTo(s, [L.P.kitchen[0] + i * 6, L.P.kitchen[1] + i * 8]);
+    await wait(700);
+    const ci = state.course, c = COURSES[ci % COURSES.length];
+    s.temp = c[0]; showProp(s); setPose(s, 'carry');
+    await walkTo(s, T.serve);
+    setPose(s, '');
+    await wait(400);
+    T.dishes = (T.dishes || []).filter((d) => d.left > 0.05).slice(-1);
+    T.dishes.push({ e: c[0], name: c[1], left: 1 });
+    renderDishes(T);
+    T.course = ci; T.claimed = false;
+    s.temp = ''; showProp(s);
+    if (Math.random() < 0.4) say(s, pick(['上菜囉～', '小心燙喔', '請慢用', `${c[1]}來囉！`]));
+    // 同桌的人會開心
+    const tg = guests.filter((g) => g.table === T && !g.busy && atSeat(g));
+    if (tg.length && Math.random() < 0.5) { const g = pick(tg); setTimeout(() => say(g, pick(['哇～看起來好好吃', '好香！', `是${c[1]}！`, '開動！'])), 800); }
+    await wait(300);
+  }
+}
+async function parentLoop(p) {
+  await wait(rand(15000, 40000));
+  for (;;) {
+    if (!state.coupleAway || Math.random() < 0.5) {
+      const T = pick(L.tables.filter((t) => !t.main));
+      const tg = guests.filter((g) => g.table === T && !g.busy && atSeat(g));
+      await walkTo(p, [T.toast[0] + rand(-6, 6), T.toast[1] + rand(-4, 6)]);
+      say(p, pick(PARENT_LINES));
+      if (tg.length) { const g = pick(tg); await wait(1400); say(g, pick(GUEST_REPLY)); }
+      await wait(2600);
+      await goHome(p);
+    }
+    await wait(rand(35000, 70000));
+  }
+}
+const seatedOf = (T) => guests.filter((g) => g.table === T && !g.busy && atSeat(g));
+async function couplePair(pt, dx = 9) {
+  const g = vip.groom, b = vip.bride;
+  await Promise.all([walkTo(g, [pt[0] - dx, pt[1]]), walkTo(b, [pt[0] + dx, pt[1]])]);
+  setFace(g, 1); setFace(b, -1);
+}
+async function coupleHome() { await Promise.all([goHome(vip.groom), goHome(vip.bride)]); }
+async function toastTour() {
+  if (!state.toastOrder.length) state.toastOrder = shuffle(L.tables.filter((t) => !t.main));
+  const list = state.toastOrder.splice(0, 3);
+  state.coupleAway = true;
+  for (const T of list) {
+    setStatus(`新人敬酒 · 第 ${T.n} 桌`);
+    banner(`🥂 新人來第 ${T.n} 桌敬酒囉！`, 3500);
+    await couplePair(T.toast, 9);
+    const g = vip.groom, b = vip.bride;
+    g.temp = '🥂'; b.temp = '🥂'; showProp(g); showProp(b);
+    const tg = seatedOf(T);
+    tg.forEach((x, i) => setTimeout(() => { x.temp = '🥂'; showProp(x); setPose(x, 'cheer'); }, i * 120));
+    say(g, pick(COUPLE_THANKS), 2600, 'love');
+    for (const x of shuffle(tg).slice(0, 3)) { await wait(700); say(x, pick(BLESS), 2200); }
+    await wait(900);
+    say(b, '乾杯～ 🥂', 2000, 'love');
+    hearts([T.cx, T.cy - 10], 6, ['🥂', '✨', '❤']);
+    await wait(2400);
+    for (const x of tg) { x.temp = ''; showProp(x); if (x.pose === 'cheer') setPose(x, 'sit'); }
+    g.temp = ''; b.temp = ''; showProp(g); showProp(b);
+    state.toasts++;
+    logLine(`新人到第 ${T.n} 桌敬酒`);
+  }
+  await coupleHome();
+  state.coupleAway = false;
+}
+async function cheersAll() {
+  setStatus('全場乾杯');
+  banner('🥂 全場一起乾杯！', 4500);
+  screenShow('Cheers! 🥂', 5000);
+  logLine('全場乾杯');
+  const ppl = [...guests.filter((g) => !g.busy && atSeat(g)), ...Object.values(vip).filter((v) => atSeat(v))];
+  ppl.forEach((x, i) => setTimeout(() => { x.temp = '🥂'; showProp(x); setPose(x, 'cheer'); }, rand(0, 900)));
+  for (const x of shuffle(ppl).slice(0, 14)) setTimeout(() => say(x, pick(BLESS), 2200), rand(300, 2600));
+  await wait(4200);
+  for (const x of ppl) { x.temp = ''; showProp(x); if (x.pose === 'cheer') setPose(x, 'sit'); }
+  state.cheers++;
+}
+async function kissEvent() {
+  setStatus('親一個！');
+  banner('💋 大家起鬨：親一個！', 6000);
+  logLine('新人在活動區親親');
+  state.coupleAway = true;
+  const st = stageRect();
+  const ppl = guests.filter((g) => !g.busy && atSeat(g));
+  const crowd = setInterval(() => { const x = pick(ppl); if (!x.busy && !x.bubbleOn) say(x, pick(['親一個！', '親一個！', '在一起～', '喔喔喔～']), 1600); }, 300);
+  await couplePair([st.x + st.w / 2, st.y + st.h / 2 + 20], 8);
+  clearInterval(crowd);
+  setPose(vip.groom, 'kiss'); setPose(vip.bride, 'kiss');
+  screenShow('❤', 5000);
+  hearts([st.x + st.w / 2, st.y + st.h / 2 - 10], 18);
+  for (const x of shuffle(ppl).slice(0, 8)) setTimeout(() => { if (!x.busy) { setPose(x, 'clap'); say(x, pick(['呀～～', '好甜！', '👏👏👏', '閃瞎了 😎'])); } }, rand(200, 1500));
+  await wait(3800);
+  setPose(vip.groom, ''); setPose(vip.bride, '');
+  for (const x of ppl) if (x.pose === 'clap') setPose(x, 'sit');
+  await coupleHome();
+  state.coupleAway = false;
+}
+async function bouquetEvent() {
+  const cands = shuffle(guests.filter((g) => g.info.g === 'f' && !g.info.kid && !g.info.elder && !g.busy && atSeat(g))).slice(0, 6);
+  if (cands.length < 2) return cheersAll();
+  setStatus('拋捧花');
+  banner('💐 拋捧花！單身的快來～', 6000);
+  logLine('新娘拋捧花');
+  state.coupleAway = true;
+  const st = stageRect(), b = vip.bride;
+  const horiz = st.w >= st.h;
+  // 新娘站在活動區靠布幕那一側，接捧花的人站另一側
+  const bp = ORI === 'land' ? [st.x + st.w - 16, st.y + st.h / 2 + 20] : [st.x + st.w / 2, st.y + 30];
+  const spots = cands.map((_, i) => ORI === 'land'
+    ? [st.x - 14 + (i % 2) * 26, st.y + 30 + Math.floor(i / 2) * 42]
+    : [st.x + 20 + (i % 3) * 36, st.y + st.h + 18 + Math.floor(i / 3) * 30]);
+  for (const c of cands) c.busy = true;
+  try {
+    const arrive = Promise.all(cands.map((c, i) => walkTo(c, spots[i]).then(() => { setFace(c, ORI === 'land' ? 1 : 1); say(c, pick(['我我我！', '丟給我！', '等很久了！', '準備好了 🙌']), 2000); })));
+    await Promise.race([Promise.all([walkTo(b, bp), arrive]), wait(16000)]);
+    setFace(b, -1);
+    say(b, '要丟囉～ 1、2、3！', 2400, 'love');
+    await wait(2000);
+    b.temp = ' '; showProp(b);
+    const win = pick(cands);
+    await flyBouquet(b.pos, win.pos);
+    win.temp = '💐'; showProp(win); setPose(win, 'cheer');
+    say(win, '我接到了！💐', 3000, 'love');
+    hearts(win.pos, 10, ['🎉', '✨', '💐', '❤']);
+    screenShow('💐 Next!', 5000);
+    for (const c of cands) if (c !== win) setTimeout(() => say(c, pick(['啊～差一點！', '恭喜妳！', '下次換我！']), 2000), rand(300, 900));
+    logLine(`${win.name} 接到捧花！`);
+    await wait(3200);
+    b.temp = ''; showProp(b);
+    win.prop = '💐';
+    const goBack = cands.map(async (c) => { c.temp = ''; showProp(c); setPose(c, ''); await goHome(c); });
+    await Promise.all([...goBack, goHome(b)]);
+  } finally {
+    for (const c of cands) c.busy = false;
+    state.coupleAway = false;
+  }
+}
+async function groupPhoto() {
+  const tbls = shuffle(L.tables.filter((t) => !t.main)).slice(0, 2);
+  const ppl = tbls.flatMap((T) => seatedOf(T));
+  if (ppl.length < 3) return cheersAll();
+  setStatus(`大合照 · 第 ${tbls.map((t) => t.n).join('、')} 桌`);
+  banner(`📸 第 ${tbls.map((t) => t.n).join('、')} 桌上台大合照！`, 5000);
+  logLine(`第 ${tbls.map((t) => t.n).join('、')} 桌和新人合照`);
+  state.coupleAway = true;
+  const st = stageRect();
+  const c = [st.x + st.w / 2, st.y + st.h / 2];
+  for (const p of ppl) p.busy = true;
+  try {
+    const n = ppl.length;
+    const spots = ppl.map((_, i) => {
+      if (ORI === 'land') { const col = i % 3, row = Math.floor(i / 3); return [st.x + 14 + col * 30 + (row % 2) * 10, st.y + 28 + row * 26]; }
+      const col = i % 5, row = Math.floor(i / 5); return [st.x + 14 + col * 30 + (row % 2) * 10, st.y + 24 + row * 22];
+    });
+    const arrive = Promise.all(ppl.map((p, i) => walkTo(p, spots[i] && isFreeAt(spots[i][0], spots[i][1]) ? spots[i] : randomIn(st))));
+    await Promise.race([Promise.all([couplePair(ORI === 'land' ? [c[0] - 8, st.y + st.h - 18] : [c[0], st.y + st.h - 14], 9), arrive]), wait(18000)]);
+    say(vip.groom, '大家靠過來～', 2000, 'love');
+    await wait(1200);
+    for (const k of ['3', '2', '1']) { screenShow(k, 900); banner(`📸 ${k}…`, 900); await wait(800); }
+    for (const p of [...ppl, vip.groom, vip.bride]) { setPose(p, 'cheer'); p.temp = pick(['✌', '✌', '🎉', '❤']); showProp(p); }
+    flash();
+    screenShow('📸 Say Cheese!', 3000);
+    banner('📸 喀嚓！', 2000);
+    await wait(2600);
+    for (const p of [...ppl, vip.groom, vip.bride]) { p.temp = ''; showProp(p); setPose(p, ''); }
+    await Promise.all([...ppl.map((p) => goHome(p)), coupleHome()]);
+  } finally {
+    for (const p of ppl) p.busy = false;
+    state.coupleAway = false;
+  }
+}
+
+// ---- 點人／點桌／找座位 ----
+function clearHl() { for (const a of actors) if (a.hl) { a.hl = false; a.el.classList.remove('hl'); place(a); } for (const T of L.tables) T.el.classList.remove('hl'); }
+function tapActor(a) {
+  const who = a.kind === 'guest' ? `${a.name}（第 ${a.table.n} 桌）` : a.name;
+  const line = a.kind === 'guest' ? (a.info.kid ? pick(KID_LINES) : pick([...SOLO, ...GUEST_REPLY])) : a.kind === 'staff' ? pick(['請慢用～', '需要什麼嗎？']) : a.kind === 'groom' || a.kind === 'bride' ? pick(COUPLE_THANKS) : pick(PARENT_LINES);
+  say(a, `${who}：${line}`, 3200);
+  a.el.classList.add('poke'); setTimeout(() => a.el.classList.remove('poke'), 500);
+}
+function tapTable(T) {
+  const ppl = guests.filter((g) => g.table === T).map((g) => g.name);
+  const box = $('#tableInfo');
+  if (!box) return;
+  box.innerHTML = `<b>${T.main ? '主桌' : '第 ' + T.n + ' 桌'}</b>　${T.main ? '新郎、新娘、雙方主婚人' : ppl.join('、') || '（空桌）'}`;
+}
+function highlight(a) {
+  clearHl();
+  a.hl = true; a.el.classList.add('hl'); place(a);
+  if (a.table) { a.table.el.classList.add('hl'); tapTable(a.table); }
+  if (ORI === 'port') a.el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'smooth' });
+  setTimeout(() => { if (a.hl) { a.hl = false; a.el.classList.remove('hl'); place(a); a.table && a.table.el.classList.remove('hl'); } }, 12000);
+}
+function setupSearch() {
+  const inp = $('#find'), out = $('#findOut');
+  inp.addEventListener('input', () => {
+    const q = inp.value.trim();
+    out.innerHTML = '';
+    if (!q) return;
+    const hits = actors.filter((a) => a.kind !== 'staff' && a.name.includes(q)).slice(0, 8);
+    out.innerHTML = hits.length ? hits.map((a, i) => `<button type="button" data-i="${actors.indexOf(a)}">${a.name}${a.table ? ' · ' + (a.table.main ? '主桌' : '第 ' + a.table.n + ' 桌') : ''}</button>`).join('') : '<span class="muted">找不到這個名字</span>';
+  });
+  out.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) highlight(actors[+b.dataset.i]); });
+}
+
+// ---- 啟動 ----
+function rebuild() {
+  const prevOri = ORI;
+  const wasSeated = new Set(actors.filter((a) => atSeat(a) && !a.path));
+  buildLayout();
+  $('#app').dataset.ori = ORI;
+  drawFloor();
+  drawTables();
+  sizeStage();
+  if (prevOri !== ORI && actors.length) {
+    // 轉向：把每個人換到新的座標
+    for (const a of actors) {
+      const T = a.table, si = a.seatIdx;
+      if (T) { const nt = L.tables.find((t) => t.n === T.n && !!t.main === !!T.main); a.table = nt; }
+    }
+    for (const g of guests) { g.seat = g.table.seatList[g.seatIdx]; }
+    const vipSeat = { groom: 0, bride: 1, gdad: 2, gmom: 3, bdad: 4, bmom: 5 };
+    for (const id of Object.keys(vip)) vip[id].seat = vip[id].table.seatList[vipSeat[id]];
+    for (const a of actors) {
+      const p = a.pos;
+      // a.pos 是舊方向的座標，先換回平面圖座標再換到新方向
+      const plan = prevOri === 'land' ? p : [PW - p[1], p[0]];
+      a.pos = mp(plan);
+      if (a.path) a.path = a.path.map((q) => mp(prevOri === 'land' ? q : [PW - q[1], q[0]]));
+      if (wasSeated.has(a)) { a.pos = a.seat.sit.slice(); settle(a); }
+      place(a);
+    }
+    for (const T of L.tables) {
+      const old = TABLE_STATE[T.main ? 'main' : T.n];
+      if (old) { T.dishes = old.dishes; T.course = old.course; T.claimed = false; renderDishes(T); }
+    }
+  }
+  $('#app').dataset.ori = ORI;
+}
+const TABLE_STATE = {};
+function snapshotTables() { if (!L) return; for (const T of L.tables) TABLE_STATE[T.main ? 'main' : T.n] = { dishes: T.dishes, course: T.course }; }
+
+function init() {
+  stage = $('#stage'); actorLayer = $('#actors'); tableLayer = $('#tables'); fxLayer = $('#fx');
+  document.title = CFG.title || '婚禮派對';
+  $('#ttl').textContent = CFG.title || '我們的婚禮派對';
+  $('#sub').textContent = [`${CFG.groom || '新郎'} ❤ ${CFG.bride || '新娘'}`, CFG.date].filter(Boolean).join(' · ');
+  $('#venue').textContent = CFG.venue || '';
+  rebuild();
+  createPeople();
+  $('#count').textContent = `${guests.length + Object.keys(vip).length} 位`;
+  setupSearch();
+  let rt;
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { snapshotTables(); rebuild(); }, 150); });
+  $('#btnNames').addEventListener('click', (e) => { state.names = !state.names; stage.classList.toggle('names', state.names); e.currentTarget.classList.toggle('on', state.names); });
+  $('#btnFull').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); });
+  $('#btnPanel').addEventListener('click', () => { $('#app').classList.toggle('nopanel'); sizeStage(); });
+  $('#btnShow').addEventListener('click', () => { $('#app').classList.remove('nopanel'); sizeStage(); });
+  $('#btnReplay').addEventListener('click', () => { location.search = ''; location.reload(); });
+  $('#zoomIn').addEventListener('click', () => { ZOOM = Math.min(3, ZOOM + 0.5); sizeStage(); });
+  $('#zoomOut').addEventListener('click', () => { ZOOM = Math.max(1, ZOOM - 0.5); sizeStage(); });
+  stage.addEventListener('click', () => clearHl());
+  setInterval(screenTick, 4500); screenTick();
+  requestAnimationFrame(tick);
+  run();
+}
+async function run() {
+  if (params.has('skip')) {
+    for (const a of actors) { if (a.seat) { a.pos = a.seat.sit.slice(); settle(a); place(a); } }
+  } else {
+    await arrival();
+    await entrance();
+  }
+  for (const id of Object.keys(vip)) { vip[id].busy = true; if (atSeat(vip[id])) settle(vip[id]); }
+  for (const s of staff) s.busy = true;
+  party();
+}
+document.addEventListener('DOMContentLoaded', init);
