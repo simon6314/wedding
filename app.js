@@ -1286,7 +1286,7 @@ function renderSeatList() {
   box.innerHTML = order.map((T) => `<div class="seat-row"><b data-t="${T.main ? 'main' : T.n}">${tableTitle(T)}</b><span>${tableNames(T).map((n) => `<button type="button" data-name="${n.replace(/（.*）$/, '')}">${n}</button>`).join('') || `<em class="muted">${(CFG.tableNotes || {})[T.n] || '空桌'}</em>`}</span></div>`).join('');
   box.onclick = (e) => {
     const nb = e.target.closest('button[data-name]');
-    if (nb) { const a = actors.find((x) => x.name === nb.dataset.name); if (a) highlight(a); return; }
+    if (nb) { const n = nb.dataset.name; const a = actors.find((x) => x.name === n) || actors.find((x) => x.name.startsWith(n + '（')); if (a) highlight(a); return; }
     const tb = e.target.closest('b[data-t]');
     if (tb) { const T = L.tables.find((t) => (t.main ? 'main' : String(t.n)) === tb.dataset.t); if (T) { tapTable(T); if (PHONE) T.el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'smooth' }); } }
   };
