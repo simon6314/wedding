@@ -203,7 +203,7 @@ function personSvg(lk, extraBack = '', extraFront = '') {
 }
 function vipSvg(role, side) {
   if (role === 'bride') {
-    // 新娘：側馬尾（垂在右肩前）、纖細的身形、長睫毛
+    // 新娘：側邊辮子（垂在右肩前）、纖細的身形、長睫毛
     const lk = { g: 'f', skin: '#ffe6d6', hair: '#3e2a24', hs: 'sidepony', faceRx: 19.8, pretty: true };
     const h = lk.hair;
     const veil = `<path d="M23 22 Q40 4 57 22 Q68 52 65 86 Q40 92 15 86 Q12 52 23 22 Z" fill="#fff" opacity=".55" stroke="#efe2ea" stroke-width="1"/>
@@ -218,10 +218,14 @@ function vipSvg(role, side) {
       <circle cx="30" cy="75" r=".9" fill="#f0dce6"/><circle cx="50" cy="75" r=".9" fill="#f0dce6"/><circle cx="40" cy="77" r=".9" fill="#f0dce6"/>
       <g class="arm arm-l"><path d="M33 59 Q27 67 28.4 76" stroke="#ffe6d6" stroke-width="4.4" stroke-linecap="round" fill="none"/><circle cx="28.5" cy="77" r="2.7" fill="${lk.skin}" ${OUT}/></g>
       <g class="arm arm-r"><path d="M47 59 Q53 67 51.6 76" stroke="#ffe6d6" stroke-width="4.4" stroke-linecap="round" fill="none"/><circle cx="51.5" cy="77" r="2.7" fill="${lk.skin}" ${OUT}/></g>`;
-    // 側馬尾：從右耳後面綁起，垂到右肩前面
-    const pony = `<path d="M57 33 Q69 38 65.6 54 Q63.6 64 67 75 Q60.4 74 57.6 66 Q55 57 58.6 49 Q61 43 54 41 Z" fill="${h}" ${OUT}/>
-      <path d="M61 46 Q63.6 54 61.4 62 M64 52 Q65 60 63.4 68" stroke="#fff" stroke-opacity=".22" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-      <g transform="translate(60.5 31.5) scale(.85)"><circle r="3.4" fill="#fff" stroke="#f0d4e0" stroke-width=".6"/><circle cx="-2.4" cy="-1.8" r="2" fill="#ffd1dc"/><circle cx="2.4" cy="-1.8" r="2" fill="#ffd1dc"/><circle cy="2.6" r="2" fill="#ffd1dc"/><circle r="1.3" fill="#ffd66b"/></g>`;
+    // 側邊辮子：從右耳後面編下來，垂到右肩前面，髮尾綁小花
+    const braidPts = [[58.6, 37], [61.4, 42.6], [63.2, 48.4], [63.8, 54.2], [63.4, 60], [62.8, 65.8], [62.8, 71.4]];
+    const braid = braidPts.map(([x, y], k) => `<ellipse cx="${x}" cy="${y}" rx="4.6" ry="3.5" transform="rotate(${k % 2 ? 28 : -28} ${x} ${y})" fill="${h}" ${OUT}/>
+      <path d="M${x - 2.6} ${y - 0.6} Q${x} ${y + (k % 2 ? 1.6 : -1.6)} ${x + 2.6} ${y + 0.6}" stroke="#fff" stroke-opacity=".22" stroke-width="1" fill="none" stroke-linecap="round"/>`).join('');
+    const pony = `${braid}
+      <path d="M60.6 74.6 Q62.8 80.6 60 84 M62.8 74.8 Q64 80.4 63.4 84.6 M64.6 74.4 Q66.8 79.4 66.4 83" stroke="${h}" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <g transform="translate(62.8 74.4) scale(.75)"><circle r="3.4" fill="#fff" stroke="#f0d4e0" stroke-width=".6"/><circle cx="-2.4" cy="-1.8" r="2" fill="#ffd1dc"/><circle cx="2.4" cy="-1.8" r="2" fill="#ffd1dc"/><circle cy="2.6" r="2" fill="#ffd1dc"/><circle r="1.3" fill="#ffd66b"/></g>
+      <g transform="translate(60.5 31.5) scale(.7)"><circle r="3.4" fill="#fff" stroke="#f0d4e0" stroke-width=".6"/><circle cx="-2.4" cy="-1.8" r="2" fill="#ffd1dc"/><circle cx="2.4" cy="-1.8" r="2" fill="#ffd1dc"/><circle cy="2.6" r="2" fill="#ffd1dc"/><circle r="1.3" fill="#ffd66b"/></g>`;
     const bangs = `<path d="M19 34 Q16 10 42 11 Q64 12 61 33 Q56 20 46 19.4 Q36 20 30 27 Q24 30.4 19 34 Z" fill="${h}"/>
       <path d="M27 18 Q35 13.6 45 14.6" stroke="#fff" stroke-opacity=".28" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
     const tiara = '<path d="M32 15.6 l2.6 -4.4 2.6 3.4 2.8 -5 2.8 5 2.6 -3.4 2.6 4.4 Z" fill="#ffe08a" stroke="#d9a930" stroke-width=".7"/><circle cx="40" cy="10.4" r="1.4" fill="#ff8fb0"/>';
