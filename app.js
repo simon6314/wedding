@@ -126,7 +126,7 @@ function shade(hex, amt) {
 const OUT = 'stroke="rgba(92,60,40,.28)" stroke-width=".9"';
 // 臉：眉毛、有兩個亮點的眼睛、小鼻子、嘴巴、腮紅；女生有睫毛
 function faceSvg(lk) {
-  const brow = shade(lk.hair, -0.15);
+  const brow = lk.hairLine ? '#a39a9e' : shade(lk.hair, -0.15);   // 白髮的眉毛深一點，才看得到
   const lash = lk.pretty
     ? '<path d="M27.6 36 l-2.6 -1.4 M28 34.6 l-2 -2.2 M29.6 33.8 l-.9 -2.4 M52.4 36 l2.6 -1.4 M52 34.6 l2 -2.2 M50.4 33.8 l.9 -2.4" stroke="#2f2622" stroke-width="1" stroke-linecap="round"/>'
     : lk.g === 'f' ? '<path d="M27.7 36.2 l-2 -1.4 M52.3 36.2 l2 -1.4" stroke="#2f2622" stroke-width="1.1" stroke-linecap="round"/>' : '';
@@ -152,19 +152,21 @@ const CORSAGE = `<g><path d="M48.5 67 l-2.6 9 2 -1 1 2 M53.5 67 l2.6 9 -2 -1 -1 
 
 function hairBack(lk) {
   const h = lk.hair;
-  if (lk.hs === 'long') return `<path d="M18 34 Q15 11 40 11 Q65 11 62 34 L64 66 Q50 64 50 52 L30 52 Q30 64 16 66 Z" fill="${shade(h, -0.08)}"/>`;
-  if (lk.hs === 'bob') return `<path d="M17 36 Q14 11 40 11 Q66 11 63 36 L63 53 Q53 52 51 45 L29 45 Q27 52 17 53 Z" fill="${shade(h, -0.08)}"/>`;
-  if (lk.hs === 'pony') return `<path d="M57 20 Q77 24 71 54 Q66 42 57 36 Z" fill="${shade(h, -0.08)}"/><circle cx="59" cy="22" r="3" fill="#ef7d9a"/>`;
-  if (lk.hs === 'bun') return `<circle cx="40" cy="10" r="8.5" fill="${shade(h, -0.05)}"/><path d="M34 9 Q40 5 46 9" stroke="#fff" stroke-opacity=".25" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+  const st = lk.hairLine ? ' stroke="#c8c1d6" stroke-width="1"' : '';   // 淺色頭髮加細邊，才不會跟背景混在一起
+  if (lk.hs === 'long') return `<path d="M18 34 Q15 11 40 11 Q65 11 62 34 L64 66 Q50 64 50 52 L30 52 Q30 64 16 66 Z" fill="${shade(h, -0.08)}"${st}/>`;
+  if (lk.hs === 'bob') return `<path d="M17 36 Q14 11 40 11 Q66 11 63 36 L63 53 Q53 52 51 45 L29 45 Q27 52 17 53 Z" fill="${shade(h, -0.08)}"${st}/>`;
+  if (lk.hs === 'pony') return `<path d="M57 20 Q77 24 71 54 Q66 42 57 36 Z" fill="${shade(h, -0.08)}"${st}/><circle cx="59" cy="22" r="3" fill="#ef7d9a"/>`;
+  if (lk.hs === 'bun') return `<circle cx="40" cy="10" r="8.5" fill="${shade(h, -0.05)}"${st}/><path d="M34 9 Q40 5 46 9" stroke="#fff" stroke-opacity=".25" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
   return '';
 }
 function hairFront(lk) {
   const h = lk.hair;
+  const st = lk.hairLine ? ' stroke="#c8c1d6" stroke-width="1"' : '';
   if (lk.hs === 'none') return '';
   const hi = '<path d="M27 19 Q35 14 45 15" stroke="#fff" stroke-opacity=".28" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
-  if (lk.hs === 'short') return `<path d="M18.5 36 Q16 11 40 11 Q64 11 61.5 36 Q57 22 40 22 Q23 22 18.5 36 Z" fill="${h}"/>${hi}`;
-  if (lk.hs === 'side') return `<path d="M18.5 36 Q15 10 42 11 Q65 12 61.5 34 Q55 23 34 21 Q24 25 18.5 36 Z" fill="${h}"/>${hi}`;
-  return `<path d="M19 34 Q17 11 40 11 Q63 11 61 34 Q55 20 45 21 Q42 27 36 21 Q25 21 19 34 Z" fill="${h}"/>${hi}`;
+  if (lk.hs === 'short') return `<path d="M18.5 36 Q16 11 40 11 Q64 11 61.5 36 Q57 22 40 22 Q23 22 18.5 36 Z" fill="${h}"${st}/>${hi}`;
+  if (lk.hs === 'side') return `<path d="M18.5 36 Q15 10 42 11 Q65 12 61.5 34 Q55 23 34 21 Q24 25 18.5 36 Z" fill="${h}"${st}/>${hi}`;
+  return `<path d="M19 34 Q17 11 40 11 Q63 11 61 34 Q55 20 45 21 Q42 27 36 21 Q25 21 19 34 Z" fill="${h}"${st}/>${hi}`;
 }
 // 手臂：可以舉杯、拍手（CSS 轉動）
 function armsSvg(sleeve, skin) {
