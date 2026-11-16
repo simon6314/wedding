@@ -58,10 +58,10 @@ window.WEDDING = {
     { name: '士堯', table: 6, g: 'm' },
     // 第 7 桌
     { name: '宗益', table: 7, g: 'm', count: 4 },
-    { name: '玫秀', table: 7, g: 'f', note: '新娘大姑' },
+    { name: '玫秀', table: 7, g: 'f', look: { hair: '#e8e6e3' } },   // 白髮
     { name: '玉智', table: 7, g: 'f' },
-    { name: '小燕阿姨', table: 7, g: 'f' },
-    { name: '莊阿姨', table: 7, g: 'f' },
+    { name: '小燕', table: 7, g: 'f' },
+    { name: '莊', table: 7, g: 'f' },
     // 第 8 桌
     { name: '峻緯', table: 8, g: 'm', count: 3 },
     { name: '筠霏', table: 8, g: 'f', count: 2 },
