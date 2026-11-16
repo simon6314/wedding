@@ -124,7 +124,9 @@ const OUT = 'stroke="rgba(92,60,40,.28)" stroke-width=".9"';
 // 臉：眉毛、有兩個亮點的眼睛、小鼻子、嘴巴、腮紅；女生有睫毛
 function faceSvg(lk) {
   const brow = shade(lk.hair, -0.15);
-  const lash = lk.g === 'f' ? '<path d="M27.7 36.2 l-2 -1.4 M52.3 36.2 l2 -1.4" stroke="#2f2622" stroke-width="1.1" stroke-linecap="round"/>' : '';
+  const lash = lk.pretty
+    ? '<path d="M27.6 36 l-2.6 -1.4 M28 34.6 l-2 -2.2 M29.6 33.8 l-.9 -2.4 M52.4 36 l2.6 -1.4 M52 34.6 l2 -2.2 M50.4 33.8 l.9 -2.4" stroke="#2f2622" stroke-width="1" stroke-linecap="round"/>'
+    : lk.g === 'f' ? '<path d="M27.7 36.2 l-2 -1.4 M52.3 36.2 l2 -1.4" stroke="#2f2622" stroke-width="1.1" stroke-linecap="round"/>' : '';
   const lip = lk.g === 'f' ? '#d9667f' : '#b9728a';
   const eye = lk.eye || '#2f2622';
   const pupil = (cx) => (lk.eye ? `<circle cx="${cx}" cy="38.4" r="1.6" fill="#1f1a18"/>` : '');
@@ -135,7 +137,7 @@ function faceSvg(lk) {
     <ellipse cx="49" cy="38" rx="3.1" ry="3.7" fill="${eye}"/>${pupil(49)}<circle cx="50.2" cy="36.5" r="1.3" fill="#fff"/><circle cx="48.1" cy="39.7" r=".6" fill="#fff" opacity=".8"/>${lash}</g>
   <g class="eye-h"><path d="M27.5 39 Q31 35 34.5 39 M45.5 39 Q49 35 52.5 39" fill="none" stroke="#2f2622" stroke-width="1.8" stroke-linecap="round"/></g>
   <path d="M39.2 42.6 q.8 .7 1.6 0" fill="none" stroke="${shade(lk.skin, -0.25)}" stroke-width="1" stroke-linecap="round"/>
-  <path class="mouth" d="M36.4 46.2 Q40 49.4 43.6 46.2" fill="none" stroke="${lip}" stroke-width="1.5" stroke-linecap="round"/>
+  ${lk.pretty ? '<path class="mouth" d="M37 46 Q40 49.6 43 46 Q40 47.2 37 46Z" fill="#e8708c" stroke="#e8708c" stroke-width=".8" stroke-linejoin="round"/>' : `<path class="mouth" d="M36.4 46.2 Q40 49.4 43.6 46.2" fill="none" stroke="${lip}" stroke-width="1.5" stroke-linecap="round"/>`}
   <ellipse cx="24.5" cy="44" rx="3.8" ry="2.2" fill="#ff8fa6" opacity=".45"/>
   <ellipse cx="55.5" cy="44" rx="3.8" ry="2.2" fill="#ff8fa6" opacity=".45"/>`;
 }
@@ -155,6 +157,7 @@ function hairBack(lk) {
 }
 function hairFront(lk) {
   const h = lk.hair;
+  if (lk.hs === 'none') return '';
   const hi = '<path d="M27 19 Q35 14 45 15" stroke="#fff" stroke-opacity=".28" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
   if (lk.hs === 'short') return `<path d="M18.5 36 Q16 11 40 11 Q64 11 61.5 36 Q57 22 40 22 Q23 22 18.5 36 Z" fill="${h}"/>${hi}`;
   if (lk.hs === 'side') return `<path d="M18.5 36 Q15 10 42 11 Q65 12 61.5 34 Q55 23 34 21 Q24 25 18.5 36 Z" fill="${h}"/>${hi}`;
@@ -189,7 +192,7 @@ function bodySvg(lk) {
 }
 function headSvg(lk) {
   const ear = `<ellipse cx="19.6" cy="38.5" rx="3.2" ry="4" fill="${lk.skin}" ${OUT}/><ellipse cx="60.4" cy="38.5" rx="3.2" ry="4" fill="${lk.skin}" ${OUT}/>`;
-  return `<g class="hd">${ear}<ellipse cx="40" cy="36" rx="21" ry="20" fill="${lk.skin}" ${OUT}/>
+  return `<g class="hd">${ear}<ellipse cx="40" cy="36" rx="${lk.faceRx || 21}" ry="20" fill="${lk.skin}" ${OUT}/>
     <path d="M22 42 Q40 60 58 42 Q52 55 40 55.6 Q28 55 22 42Z" fill="#000" opacity=".04"/>
     ${faceSvg(lk)}${hairFront(lk)}${lk.glasses ? GLASSES : ''}</g>`;
 }
@@ -200,20 +203,32 @@ function personSvg(lk, extraBack = '', extraFront = '') {
 }
 function vipSvg(role, side) {
   if (role === 'bride') {
-    const lk = { g: 'f', skin: '#ffe4d0', hair: '#4a332a', hs: 'bun' };
-    const veil = `<path d="M21 22 Q40 3 59 22 Q73 52 69 87 Q40 93 11 87 Q7 52 21 22 Z" fill="#fff" opacity=".55" stroke="#efe2ea" stroke-width="1"/>
-      <path d="M17 50 Q14 70 15 84 M63 50 Q66 70 65 84" stroke="#fff" stroke-width="1.2" opacity=".8" fill="none"/>`;
-    const gown = `<path d="M30 56 Q40 52 50 56 L52 64 Q67 76 72 89 Q40 96 8 89 Q13 76 28 64 Z" fill="#fffafc" ${OUT}/>
-      <path d="M44 66 Q60 77 66 89 Q56 92 48 92.4 Q50 78 44 66Z" fill="#c8a8c0" opacity=".14"/>
-      <path d="M28 64 Q40 68.4 52 64" stroke="#f7a8c0" stroke-width="2.6" fill="none"/><path d="M38 66.6 l2 -2.2 2 2.2 -2 2.2 Z" fill="#f08fb0"/>
-      <path d="M22 80 Q27 77 32 80 Q37 83 42 80 Q47 77 52 80 Q57 83 62 80" stroke="#efd9e6" stroke-width="1.2" fill="none"/>
-      <path d="M17 87 Q23 84 29 87 Q35 90 41 87 Q47 84 53 87 Q59 90 65 87" stroke="#efd9e6" stroke-width="1.2" fill="none"/>
-      <circle cx="26" cy="74" r="1" fill="#f0dce6"/><circle cx="54" cy="74" r="1" fill="#f0dce6"/><circle cx="40" cy="76" r="1" fill="#f0dce6"/>
-      <path d="M32 58 Q40 62 48 58" stroke="#efd9e6" stroke-width="1" fill="none"/>
-      ${armsSvg('#fff6fa', lk.skin)}`;
-    const tiara = '<path d="M30 15 l3 -5 3 4 4 -6 4 6 3 -4 3 5 Z" fill="#ffe08a" stroke="#d9a930" stroke-width=".8"/><circle cx="40" cy="9" r="1.6" fill="#ff8fb0"/><circle cx="33" cy="11.6" r=".9" fill="#9fd0f0"/><circle cx="47" cy="11.6" r=".9" fill="#9fd0f0"/>';
-    const earring = '<circle cx="19.6" cy="44" r="1.3" fill="#fff" stroke="#e0c7d4" stroke-width=".5"/><circle cx="60.4" cy="44" r="1.3" fill="#fff" stroke="#e0c7d4" stroke-width=".5"/>';
-    return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="90" rx="27" ry="3.6" fill="rgba(70,40,20,0.22)"/>${veil}${hairBack(lk)}${gown}${headSvg(lk)}${tiara}${earring}</svg>`;
+    // 新娘：側馬尾（垂在右肩前）、纖細的身形、長睫毛
+    const lk = { g: 'f', skin: '#ffe6d6', hair: '#3e2a24', hs: 'sidepony', faceRx: 19.8, pretty: true };
+    const h = lk.hair;
+    const veil = `<path d="M23 22 Q40 4 57 22 Q68 52 65 86 Q40 92 15 86 Q12 52 23 22 Z" fill="#fff" opacity=".55" stroke="#efe2ea" stroke-width="1"/>
+      <path d="M18 50 Q16 70 17 84 M62 50 Q64 70 63 84" stroke="#fff" stroke-width="1.1" opacity=".8" fill="none"/>`;
+    const backHair = `<path d="M19 36 Q16 11 40 11 Q64 11 61 36 L59 46 L21 46 Z" fill="${shade(h, -0.08)}"/>`;
+    const gown = `<path d="M33.5 56 Q40 53 46.5 56 L48 65 Q61 76 66 89 Q40 94.6 14 89 Q19 76 32 65 Z" fill="#fffafc" ${OUT}/>
+      <path d="M44 66.6 Q57 77 61.6 89.6 Q53 91.8 47 92 Q48.6 78 44 66.6Z" fill="#c8a8c0" opacity=".14"/>
+      <path d="M32 65 Q40 67.8 48 65" stroke="#f7a8c0" stroke-width="2.2" fill="none"/><path d="M38.4 66.6 l1.6 -1.8 1.6 1.8 -1.6 1.8 Z" fill="#f08fb0"/>
+      <path d="M33.6 57.6 Q40 61.4 46.4 57.6" stroke="#efd9e6" stroke-width="1" fill="none"/>
+      <path d="M23 81 Q27.5 78.4 32 81 Q36.5 83.6 41 81 Q45.5 78.4 50 81 Q54.5 83.6 59 81" stroke="#efd9e6" stroke-width="1.1" fill="none"/>
+      <path d="M18 87.6 Q23.5 85 29 87.6 Q34.5 90.2 40 87.6 Q45.5 85 51 87.6 Q56.5 90.2 62 87.6" stroke="#efd9e6" stroke-width="1.1" fill="none"/>
+      <circle cx="30" cy="75" r=".9" fill="#f0dce6"/><circle cx="50" cy="75" r=".9" fill="#f0dce6"/><circle cx="40" cy="77" r=".9" fill="#f0dce6"/>
+      <g class="arm arm-l"><path d="M33 59 Q27 67 28.4 76" stroke="#ffe6d6" stroke-width="4.4" stroke-linecap="round" fill="none"/><circle cx="28.5" cy="77" r="2.7" fill="${lk.skin}" ${OUT}/></g>
+      <g class="arm arm-r"><path d="M47 59 Q53 67 51.6 76" stroke="#ffe6d6" stroke-width="4.4" stroke-linecap="round" fill="none"/><circle cx="51.5" cy="77" r="2.7" fill="${lk.skin}" ${OUT}/></g>`;
+    // 側馬尾：從右耳後面綁起，垂到右肩前面
+    const pony = `<path d="M57 33 Q69 38 65.6 54 Q63.6 64 67 75 Q60.4 74 57.6 66 Q55 57 58.6 49 Q61 43 54 41 Z" fill="${h}" ${OUT}/>
+      <path d="M61 46 Q63.6 54 61.4 62 M64 52 Q65 60 63.4 68" stroke="#fff" stroke-opacity=".22" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+      <g transform="translate(60.5 31.5) scale(.85)"><circle r="3.4" fill="#fff" stroke="#f0d4e0" stroke-width=".6"/><circle cx="-2.4" cy="-1.8" r="2" fill="#ffd1dc"/><circle cx="2.4" cy="-1.8" r="2" fill="#ffd1dc"/><circle cy="2.6" r="2" fill="#ffd1dc"/><circle r="1.3" fill="#ffd66b"/></g>`;
+    const bangs = `<path d="M19 34 Q16 10 42 11 Q64 12 61 33 Q56 20 46 19.4 Q36 20 30 27 Q24 30.4 19 34 Z" fill="${h}"/>
+      <path d="M27 18 Q35 13.6 45 14.6" stroke="#fff" stroke-opacity=".28" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+    const tiara = '<path d="M32 15.6 l2.6 -4.4 2.6 3.4 2.8 -5 2.8 5 2.6 -3.4 2.6 4.4 Z" fill="#ffe08a" stroke="#d9a930" stroke-width=".7"/><circle cx="40" cy="10.4" r="1.4" fill="#ff8fb0"/>';
+    const earring = '<path d="M19.6 43 v2.6" stroke="#e8d6c0" stroke-width=".6"/><circle cx="19.6" cy="46.4" r="1.3" fill="#fff" stroke="#e0c7d4" stroke-width=".5"/>';
+    const hsvg = headSvg({ ...lk, hs: 'none' });
+    const head = hsvg.slice(0, hsvg.lastIndexOf('</g>'));   // 頭的群組先不關，把瀏海、皇冠放進去一起動
+    return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="90" rx="24" ry="3.4" fill="rgba(70,40,20,0.22)"/>${veil}${backHair}${gown}${head}${bangs}${tiara}${earring}</g>${pony}</svg>`;
   }
   if (role === 'groom') {
     const lk = { g: 'm', skin: '#fcdcc4', hair: '#1f1d24', hs: 'side' };
