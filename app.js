@@ -838,7 +838,7 @@ function expandFamilies(list) {
     const n = Math.max(1, Math.round(+p.count || 1));
     const kids = Math.min(n - 1, Math.max(0, Math.round(+p.kids || 0)));
     const lap = Math.min(kids, Math.max(0, Math.round(+p.lap || 0)));   // 不佔座位、坐在大人腿上的小朋友
-    out.push({ ...p, family: n > 1 ? p.name : '', famSize: n, famIdx: 0 });
+    out.push({ ...p, lap: false, baby: false, family: n > 1 ? p.name : '', famSize: n, famIdx: 0 });   // 填表的人本身一定佔座位
     for (let i = 1; i < n; i++) {
       const kid = i >= n - kids;
       const onLap = i >= n - lap;
