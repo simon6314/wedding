@@ -111,6 +111,7 @@ function lookFor(p) {
   }
   lk.glasses = p.elder ? r() < 0.6 : r() < 0.12;
   if (p.kid) lk.cloth = p.g === 'f' ? pick(['#ffb3c8', '#ffd66b', '#b8e0a0']) : pick(['#7fb6f0', '#f2a03d', '#8fd3b0']);
+  if (p.look) Object.assign(lk, p.look);   // 名單裡指定的外型（髮色、膚色、眼睛顏色、鬍子…）
   return lk;
 }
 // 顏色加深（amt < 0）或變淺（amt > 0）
@@ -125,10 +126,13 @@ function faceSvg(lk) {
   const brow = shade(lk.hair, -0.15);
   const lash = lk.g === 'f' ? '<path d="M27.7 36.2 l-2 -1.4 M52.3 36.2 l2 -1.4" stroke="#2f2622" stroke-width="1.1" stroke-linecap="round"/>' : '';
   const lip = lk.g === 'f' ? '#d9667f' : '#b9728a';
-  return `
+  const eye = lk.eye || '#2f2622';
+  const pupil = (cx) => (lk.eye ? `<circle cx="${cx}" cy="38.4" r="1.6" fill="#1f1a18"/>` : '');
+  const beard = lk.beard ? `<path d="M24.5 44 Q26 54 40 56.2 Q54 54 55.5 44 Q52 51 46 50.6 Q43 48.6 40 49.4 Q37 48.6 34 50.6 Q28 51 24.5 44Z" fill="${shade(lk.hair, -0.05)}" opacity=".55"/>` : '';
+  return `${beard}
   <path d="M26.8 30.4 Q31 28.4 35 30.2 M45 30.2 Q49 28.4 53.2 30.4" fill="none" stroke="${brow}" stroke-width="1.5" stroke-linecap="round" opacity=".85"/>
-  <g class="eye"><ellipse cx="31" cy="38" rx="3.1" ry="3.7" fill="#2f2622"/><circle cx="32.2" cy="36.5" r="1.3" fill="#fff"/><circle cx="30.1" cy="39.7" r=".6" fill="#fff" opacity=".8"/>
-    <ellipse cx="49" cy="38" rx="3.1" ry="3.7" fill="#2f2622"/><circle cx="50.2" cy="36.5" r="1.3" fill="#fff"/><circle cx="48.1" cy="39.7" r=".6" fill="#fff" opacity=".8"/>${lash}</g>
+  <g class="eye"><ellipse cx="31" cy="38" rx="3.1" ry="3.7" fill="${eye}"/>${pupil(31)}<circle cx="32.2" cy="36.5" r="1.3" fill="#fff"/><circle cx="30.1" cy="39.7" r=".6" fill="#fff" opacity=".8"/>
+    <ellipse cx="49" cy="38" rx="3.1" ry="3.7" fill="${eye}"/>${pupil(49)}<circle cx="50.2" cy="36.5" r="1.3" fill="#fff"/><circle cx="48.1" cy="39.7" r=".6" fill="#fff" opacity=".8"/>${lash}</g>
   <g class="eye-h"><path d="M27.5 39 Q31 35 34.5 39 M45.5 39 Q49 35 52.5 39" fill="none" stroke="#2f2622" stroke-width="1.8" stroke-linecap="round"/></g>
   <path d="M39.2 42.6 q.8 .7 1.6 0" fill="none" stroke="${shade(lk.skin, -0.25)}" stroke-width="1" stroke-linecap="round"/>
   <path class="mouth" d="M36.4 46.2 Q40 49.4 43.6 46.2" fill="none" stroke="${lip}" stroke-width="1.5" stroke-linecap="round"/>

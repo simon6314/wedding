@@ -37,7 +37,7 @@ window.WEDDING = {
     { name: '芸岑', table: 3, g: 'f', count: 2 },
     // 第 4 桌
     { name: '建智', table: 4, g: 'm', count: 2, note: '主持人' },
-    { name: 'glenn', table: 4, g: 'm', count: 2, note: '婚禮歌手' },
+    { name: 'Glenn', table: 4, g: 'm', count: 2, note: '婚禮歌手', look: { skin: '#fde9de', hair: '#d6a65a', hs: 'side', eye: '#4f86c6', beard: true } },   // 外國人：金髮、藍眼睛、短鬍子
     // 第 5 桌
     { name: '宜妏', table: 5, g: 'f', count: 5 },
     { name: '新娘大姨', table: 5, g: 'f' },
