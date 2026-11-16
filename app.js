@@ -325,9 +325,10 @@ const CHAT = [
   ['今天天氣真好', '新人運氣好～'],
   ['你們家寶寶好可愛', '謝謝～一直跑來跑去'],
 ];
-const SOLO = ['好好吃 😋', '好飽～', '要幸福喔！', '新婚快樂 🎉', '這杯好喝', '百年好合！', '永浴愛河 ❤', '吃不完了啦', '拍照拍照 📸'];
+const SOLO = ['好好吃 😋', '好飽～', '要幸福喔！', '新婚快樂 🎉', '這杯好喝', '百年好合！', '永浴愛河 ❤', '吃不完了啦', '拍照拍照 📸', '甜甜蜜蜜～', '佳偶天成 💕', '今天好幸福的感覺', '他們笑得好甜 🥰', '我也被閃到了 😎'];
 const KID_LINES = ['我要喝果汁！', '好好玩～', '新娘好像公主！', '我要吃蛋糕！', '抓不到我～', '嘿嘿'];
-const BLESS = ['乾杯！', '新婚快樂！', '百年好合！', '永浴愛河！', '白頭偕老！', '要幸福喔！', 'Cheers 🥂'];
+const BLESS = ['乾杯！', '新婚快樂！', '百年好合！', '永浴愛河！', '白頭偕老！', '要幸福喔！', 'Cheers 🥂',
+  '天作之合！', '幸福美滿！', '心心相印 💕', '恩恩愛愛一輩子！', '執子之手，與子偕老', '愛情長長久久 💕', '每天都像今天一樣幸福！', '要一直這麼甜喔！', '吵架都要讓新娘贏 😆', '記得常常請我們吃飯 😆', '一起去好多地方旅行 ✈️', '永遠是彼此最好的朋友'];
 const COUPLE_THANKS = ['謝謝大家來！', '吃飽喝足喔～', '今天好開心 ❤', '謝謝你們！', '多吃一點喔'];
 const PARENT_LINES = ['謝謝你們來！', '多吃一點喔', '招待不周請見諒', '今天好開心', '菜還合胃口嗎？'];
 const GUEST_REPLY = ['恭喜恭喜！', '好好吃！', '新娘好漂亮', '謝謝招待～', '恭喜您！'];
@@ -352,6 +353,11 @@ const EN = {
   '乾杯！': 'Cheers! 🥂', '新婚快樂！': 'Congratulations!', '永浴愛河！': 'Love always!',
   '白頭偕老！': 'Forever together!', '恭喜恭喜！': 'Congrats! 🎉', '好好吃！': 'Delicious!', '新娘好漂亮': 'Beautiful bride!',
   '謝謝招待～': 'Thanks for having us~', '恭喜您！': 'Congratulations!',
+  '甜甜蜜蜜～': 'So sweet~', '佳偶天成 💕': 'Made for each other 💕', '今天好幸福的感覺': 'Such a happy day', '他們笑得好甜 🥰': 'Their smiles are so sweet 🥰', '我也被閃到了 😎': 'Too much love in the air 😎',
+  '天作之合！': 'A match made in heaven!', '幸福美滿！': 'Wishing you a happy life!', '心心相印 💕': 'Two hearts as one 💕', '恩恩愛愛一輩子！': 'Love each other forever!',
+  '執子之手，與子偕老': 'Hand in hand, all life long', '愛情長長久久 💕': 'May your love last forever 💕', '每天都像今天一樣幸福！': 'May every day be as happy as today!',
+  '要一直這麼甜喔！': 'Stay this sweet!', '吵架都要讓新娘贏 😆': 'Groom, always let her win 😆', '記得常常請我們吃飯 😆': 'Invite us to dinner often 😆',
+  '一起去好多地方旅行 ✈️': 'Travel the world together ✈️', '永遠是彼此最好的朋友': 'Best friends forever',
   '親一個！': 'Kiss! Kiss! 💋', '👏👏👏': '👏👏👏', '呀～～': 'Awww~', '好甜！': 'So sweet!', '閃瞎了 😎': 'So romantic 😎',
 };
 const EN_ANY = ['This is delicious! 😋', 'So happy for you two!', 'What a lovely party! 🎉', 'Cheers! 🥂', 'Congrats! 💕', 'Great food!', 'Love this place ☕'];
