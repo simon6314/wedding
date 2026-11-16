@@ -111,66 +111,146 @@ function lookFor(p) {
   if (p.kid) lk.cloth = p.g === 'f' ? pick(['#ffb3c8', '#ffd66b', '#b8e0a0']) : pick(['#7fb6f0', '#f2a03d', '#8fd3b0']);
   return lk;
 }
-const FACE = (ey = 38) => `
-  <g class="eye"><circle cx="31" cy="${ey}" r="3" fill="#3b2f2f"/><circle cx="32" cy="${ey - 1}" r="1" fill="#fff"/><circle cx="49" cy="${ey}" r="3" fill="#3b2f2f"/><circle cx="50" cy="${ey - 1}" r="1" fill="#fff"/></g>
-  <g class="eye-h"><path d="M27.5 ${ey + 1} Q31 ${ey - 3} 34.5 ${ey + 1}" fill="none" stroke="#3b2f2f" stroke-width="1.8" stroke-linecap="round"/><path d="M45.5 ${ey + 1} Q49 ${ey - 3} 52.5 ${ey + 1}" fill="none" stroke="#3b2f2f" stroke-width="1.8" stroke-linecap="round"/></g>
-  <path class="mouth" d="M36 ${ey + 9} Q40 ${ey + 12.5} 44 ${ey + 9}" fill="none" stroke="#b9728a" stroke-width="1.5" stroke-linecap="round"/>
-  <ellipse cx="24.5" cy="${ey + 6}" rx="3.8" ry="2.3" fill="#ff9fb0" opacity="0.6"/>
-  <ellipse cx="55.5" cy="${ey + 6}" rx="3.8" ry="2.3" fill="#ff9fb0" opacity="0.6"/>`;
-const GLASSES = '<circle cx="31" cy="38" r="5.6" fill="rgba(255,255,255,0.35)" stroke="#5a5360" stroke-width="1.5"/><circle cx="49" cy="38" r="5.6" fill="rgba(255,255,255,0.35)" stroke="#5a5360" stroke-width="1.5"/><path d="M36.6 38 h6.8" stroke="#5a5360" stroke-width="1.5"/>';
-const CORSAGE = '<g><path d="M49 66 l-2.4 9 M53 66 l2.4 9" stroke="#e8455f" stroke-width="2.2" stroke-linecap="round"/><circle cx="51" cy="64" r="4.2" fill="#e8455f"/><circle cx="51" cy="64" r="1.8" fill="#ffd66b"/></g>';
+// 顏色加深（amt < 0）或變淺（amt > 0）
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const f = (c) => Math.round(amt < 0 ? c * (1 + amt) : c + (255 - c) * amt);
+  return '#' + [n >> 16, (n >> 8) & 255, n & 255].map((c) => f(c).toString(16).padStart(2, '0')).join('');
+}
+const OUT = 'stroke="rgba(92,60,40,.28)" stroke-width=".9"';
+// 臉：眉毛、有兩個亮點的眼睛、小鼻子、嘴巴、腮紅；女生有睫毛
+function faceSvg(lk) {
+  const brow = shade(lk.hair, -0.15);
+  const lash = lk.g === 'f' ? '<path d="M27.7 36.2 l-2 -1.4 M52.3 36.2 l2 -1.4" stroke="#2f2622" stroke-width="1.1" stroke-linecap="round"/>' : '';
+  const lip = lk.g === 'f' ? '#d9667f' : '#b9728a';
+  return `
+  <path d="M26.8 30.4 Q31 28.4 35 30.2 M45 30.2 Q49 28.4 53.2 30.4" fill="none" stroke="${brow}" stroke-width="1.5" stroke-linecap="round" opacity=".85"/>
+  <g class="eye"><ellipse cx="31" cy="38" rx="3.1" ry="3.7" fill="#2f2622"/><circle cx="32.2" cy="36.5" r="1.3" fill="#fff"/><circle cx="30.1" cy="39.7" r=".6" fill="#fff" opacity=".8"/>
+    <ellipse cx="49" cy="38" rx="3.1" ry="3.7" fill="#2f2622"/><circle cx="50.2" cy="36.5" r="1.3" fill="#fff"/><circle cx="48.1" cy="39.7" r=".6" fill="#fff" opacity=".8"/>${lash}</g>
+  <g class="eye-h"><path d="M27.5 39 Q31 35 34.5 39 M45.5 39 Q49 35 52.5 39" fill="none" stroke="#2f2622" stroke-width="1.8" stroke-linecap="round"/></g>
+  <path d="M39.2 42.6 q.8 .7 1.6 0" fill="none" stroke="${shade(lk.skin, -0.25)}" stroke-width="1" stroke-linecap="round"/>
+  <path class="mouth" d="M36.4 46.2 Q40 49.4 43.6 46.2" fill="none" stroke="${lip}" stroke-width="1.5" stroke-linecap="round"/>
+  <ellipse cx="24.5" cy="44" rx="3.8" ry="2.2" fill="#ff8fa6" opacity=".45"/>
+  <ellipse cx="55.5" cy="44" rx="3.8" ry="2.2" fill="#ff8fa6" opacity=".45"/>`;
+}
+const GLASSES = '<circle cx="31" cy="38" r="5.8" fill="rgba(255,255,255,0.28)" stroke="#5a5360" stroke-width="1.4"/><circle cx="49" cy="38" r="5.8" fill="rgba(255,255,255,0.28)" stroke="#5a5360" stroke-width="1.4"/><path d="M36.8 38 h6.4" stroke="#5a5360" stroke-width="1.4"/><path d="M27.5 35.5 l2 -1.2" stroke="#fff" stroke-width="1" opacity=".7"/>';
+// 主婚人胸花（紅玫瑰＋緞帶）
+const CORSAGE = `<g><path d="M48.5 67 l-2.6 9 2 -1 1 2 M53.5 67 l2.6 9 -2 -1 -1 2" fill="#e8455f" stroke="#c8344d" stroke-width="1.4" stroke-linejoin="round"/>
+  <circle cx="51" cy="64.5" r="4.4" fill="#e8455f"/><path d="M48.6 64 q2.4 -2.6 4.8 0 q-2.4 2.4 -4.8 0" fill="none" stroke="#b72a44" stroke-width=".9"/><circle cx="51" cy="64.5" r="1.3" fill="#b72a44"/>
+  <path d="M46.5 62 q-2 -1 -2.8 1.2 q2 .8 2.8 -1.2 M55.5 62 q2 -1 2.8 1.2 q-2 .8 -2.8 -1.2" fill="#7bb36d"/></g>`;
 
 function hairBack(lk) {
   const h = lk.hair;
-  if (lk.hs === 'long') return `<path d="M18 34 Q15 11 40 11 Q65 11 62 34 L64 66 Q50 64 50 52 L30 52 Q30 64 16 66 Z" fill="${h}"/>`;
-  if (lk.hs === 'bob') return `<path d="M17 36 Q14 11 40 11 Q66 11 63 36 L63 53 Q53 52 51 45 L29 45 Q27 52 17 53 Z" fill="${h}"/>`;
-  if (lk.hs === 'pony') return `<path d="M57 20 Q76 24 71 52 Q66 41 57 36 Z" fill="${h}"/>`;
-  if (lk.hs === 'bun') return `<circle cx="40" cy="10" r="8.5" fill="${h}"/>`;
+  if (lk.hs === 'long') return `<path d="M18 34 Q15 11 40 11 Q65 11 62 34 L64 66 Q50 64 50 52 L30 52 Q30 64 16 66 Z" fill="${shade(h, -0.08)}"/>`;
+  if (lk.hs === 'bob') return `<path d="M17 36 Q14 11 40 11 Q66 11 63 36 L63 53 Q53 52 51 45 L29 45 Q27 52 17 53 Z" fill="${shade(h, -0.08)}"/>`;
+  if (lk.hs === 'pony') return `<path d="M57 20 Q77 24 71 54 Q66 42 57 36 Z" fill="${shade(h, -0.08)}"/><circle cx="59" cy="22" r="3" fill="#ef7d9a"/>`;
+  if (lk.hs === 'bun') return `<circle cx="40" cy="10" r="8.5" fill="${shade(h, -0.05)}"/><path d="M34 9 Q40 5 46 9" stroke="#fff" stroke-opacity=".25" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
   return '';
 }
 function hairFront(lk) {
   const h = lk.hair;
-  if (lk.hs === 'short') return `<path d="M18.5 36 Q16 11 40 11 Q64 11 61.5 36 Q57 22 40 22 Q23 22 18.5 36 Z" fill="${h}"/>`;
-  if (lk.hs === 'side') return `<path d="M18.5 36 Q15 10 42 11 Q65 12 61.5 34 Q55 23 34 21 Q24 25 18.5 36 Z" fill="${h}"/>`;
-  return `<path d="M19 34 Q17 11 40 11 Q63 11 61 34 Q55 20 45 21 Q42 27 36 21 Q25 21 19 34 Z" fill="${h}"/>`;
+  const hi = '<path d="M27 19 Q35 14 45 15" stroke="#fff" stroke-opacity=".28" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+  if (lk.hs === 'short') return `<path d="M18.5 36 Q16 11 40 11 Q64 11 61.5 36 Q57 22 40 22 Q23 22 18.5 36 Z" fill="${h}"/>${hi}`;
+  if (lk.hs === 'side') return `<path d="M18.5 36 Q15 10 42 11 Q65 12 61.5 34 Q55 23 34 21 Q24 25 18.5 36 Z" fill="${h}"/>${hi}`;
+  return `<path d="M19 34 Q17 11 40 11 Q63 11 61 34 Q55 20 45 21 Q42 27 36 21 Q25 21 19 34 Z" fill="${h}"/>${hi}`;
+}
+// 手臂：可以舉杯、拍手（CSS 轉動）
+function armsSvg(sleeve, skin) {
+  return `<g class="arm arm-l"><path d="M25.5 61 Q19 68 21.4 77" stroke="${sleeve}" stroke-width="6.6" stroke-linecap="round" fill="none"/><circle cx="21.5" cy="78.2" r="3.3" fill="${skin}" ${OUT}/></g>
+    <g class="arm arm-r"><path d="M54.5 61 Q61 68 58.6 77" stroke="${sleeve}" stroke-width="6.6" stroke-linecap="round" fill="none"/><circle cx="58.5" cy="78.2" r="3.3" fill="${skin}" ${OUT}/></g>`;
 }
 function bodySvg(lk) {
-  if (lk.g === 'f') return `<path d="M28 58 Q40 54 52 58 L60 88 Q40 92 20 88 Z" fill="${lk.cloth}"/><path d="M31 60 Q40 65 49 60" stroke="#fff" stroke-width="1.6" fill="none" opacity=".75"/>`;
-  return `<ellipse cx="40" cy="73" rx="16.5" ry="14.5" fill="${lk.cloth}"/><path d="M34 59 L40 68 L46 59 Z" fill="#fff"/><path d="M40 62 L38 71 L40 74 L42 71 Z" fill="${lk.tie || '#e8574f'}"/>`;
+  const c = lk.cloth, d = shade(c, -0.22);
+  if (lk.g === 'f') {
+    return `<ellipse cx="34" cy="89" rx="4.2" ry="2.2" fill="${shade(c, -0.4)}"/><ellipse cx="46" cy="89" rx="4.2" ry="2.2" fill="${shade(c, -0.4)}"/>
+      <path d="M28 57 Q40 53 52 57 L54 66 L61 87 Q40 92 19 87 L26 66 Z" fill="${c}" ${OUT}/>
+      <path d="M46 67 L52 67 L58 86 Q53 88 48 88.6 Z" fill="#000" opacity=".07"/>
+      <path d="M26.6 66 Q40 69.4 53.4 66" stroke="${d}" stroke-width="2.4" fill="none"/>
+      <path d="M33.5 72 L30.5 86 M40 71.5 V88.5 M46.5 72 L49.5 86" stroke="${d}" stroke-width=".9" opacity=".55"/>
+      <path d="M32 58.6 Q40 63.6 48 58.6" stroke="#fff" stroke-width="1.4" fill="none" opacity=".7"/>
+      <circle cx="36.4" cy="61.4" r="1" fill="#fff"/><circle cx="40" cy="62.4" r="1.1" fill="#fff"/><circle cx="43.6" cy="61.4" r="1" fill="#fff"/>
+      ${armsSvg(c, lk.skin)}`;
+  }
+  return `<ellipse cx="33.5" cy="88.6" rx="5" ry="2.6" fill="#3a2f2b"/><ellipse cx="46.5" cy="88.6" rx="5" ry="2.6" fill="#3a2f2b"/>
+    <ellipse cx="40" cy="73" rx="16.5" ry="14.5" fill="${c}" ${OUT}/>
+    <path d="M47 60 Q57 66 56 78 Q53 85 44 87 Q52 76 47 60Z" fill="#000" opacity=".08"/>
+    <path d="M34 59 L40 69 L46 59 Z" fill="#fff"/>
+    <path d="M40 62 L38.2 71 L40 74 L41.8 71 Z" fill="${lk.tie || '#e8574f'}"/><path d="M38.6 61 h2.8 l-.6 1.8 h-1.6 Z" fill="${shade(lk.tie || '#e8574f', -0.2)}"/>
+    <path d="M33.6 58.6 L38.6 71 L32.6 66.4 Z M46.4 58.6 L41.4 71 L47.4 66.4 Z" fill="${d}"/>
+    <circle cx="40" cy="77.5" r="1" fill="${shade(c, -0.45)}"/><circle cx="40" cy="81.5" r="1" fill="${shade(c, -0.45)}"/>
+    <path d="M45.4 67.4 l5.2 -.8 -.6 2.2 Z" fill="#fff" opacity=".9"/>
+    ${armsSvg(d, lk.skin)}`;
+}
+function headSvg(lk) {
+  const ear = `<ellipse cx="19.6" cy="38.5" rx="3.2" ry="4" fill="${lk.skin}" ${OUT}/><ellipse cx="60.4" cy="38.5" rx="3.2" ry="4" fill="${lk.skin}" ${OUT}/>`;
+  return `<g class="hd">${ear}<ellipse cx="40" cy="36" rx="21" ry="20" fill="${lk.skin}" ${OUT}/>
+    <path d="M22 42 Q40 60 58 42 Q52 55 40 55.6 Q28 55 22 42Z" fill="#000" opacity=".04"/>
+    ${faceSvg(lk)}${hairFront(lk)}${lk.glasses ? GLASSES : ''}</g>`;
 }
 function personSvg(lk, extraBack = '', extraFront = '') {
-  const inner = `${extraBack}${hairBack(lk)}${bodySvg(lk)}
-    <g class="hd"><ellipse cx="40" cy="36" rx="21" ry="20" fill="${lk.skin}"/>${FACE()}${hairFront(lk)}${lk.glasses ? GLASSES : ''}</g>${extraFront}`;
-  const g = lk.kid ? `<g transform="translate(40 90) scale(0.78) translate(-40 -90)">${inner}</g>` : inner;
-  return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="88" rx="17" ry="3.6" fill="rgba(80,50,30,0.2)"/>${g}</svg>`;
+  const inner = `${extraBack}${hairBack(lk)}${lk.bodyOverride || bodySvg(lk)}${headSvg(lk)}${extraFront}`;
+  const g = lk.kid ? `<g transform="translate(40 92) scale(0.78) translate(-40 -92)">${inner}</g>` : inner;
+  return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="89" rx="18" ry="3.6" fill="rgba(70,40,20,0.22)"/>${g}</svg>`;
 }
 function vipSvg(role, side) {
   if (role === 'bride') {
     const lk = { g: 'f', skin: '#ffe4d0', hair: '#4a332a', hs: 'bun' };
-    const veil = '<path d="M21 22 Q40 4 59 22 Q72 52 68 86 Q40 92 12 86 Q8 52 21 22 Z" fill="#fff" opacity=".6" stroke="#efe2ea" stroke-width="1"/>';
-    const gown = '<path d="M30 56 Q40 52 50 56 L52 64 Q66 76 71 89 Q40 95 9 89 Q14 76 28 64 Z" fill="#fffafc" stroke="#e8d3df" stroke-width="1.3"/><path d="M28 64 Q40 68 52 64" stroke="#f7a8c0" stroke-width="2.4" fill="none"/><circle cx="24" cy="82" r="1.3" fill="#f0dce6"/><circle cx="36" cy="86" r="1.3" fill="#f0dce6"/><circle cx="50" cy="85" r="1.3" fill="#f0dce6"/><circle cx="60" cy="81" r="1.3" fill="#f0dce6"/>';
-    const tiara = '<path d="M30 15 l3 -5 3 4 4 -6 4 6 3 -4 3 5 Z" fill="#ffe08a" stroke="#d9a930" stroke-width=".8"/><circle cx="40" cy="9" r="1.5" fill="#ff8fb0"/>';
-    return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="89" rx="26" ry="3.6" fill="rgba(80,50,30,0.2)"/>${veil}${hairBack(lk)}${gown}
-      <g class="hd"><ellipse cx="40" cy="36" rx="21" ry="20" fill="${lk.skin}"/>${FACE()}${hairFront(lk)}${tiara}</g></svg>`;
+    const veil = `<path d="M21 22 Q40 3 59 22 Q73 52 69 87 Q40 93 11 87 Q7 52 21 22 Z" fill="#fff" opacity=".55" stroke="#efe2ea" stroke-width="1"/>
+      <path d="M17 50 Q14 70 15 84 M63 50 Q66 70 65 84" stroke="#fff" stroke-width="1.2" opacity=".8" fill="none"/>`;
+    const gown = `<path d="M30 56 Q40 52 50 56 L52 64 Q67 76 72 89 Q40 96 8 89 Q13 76 28 64 Z" fill="#fffafc" ${OUT}/>
+      <path d="M44 66 Q60 77 66 89 Q56 92 48 92.4 Q50 78 44 66Z" fill="#c8a8c0" opacity=".14"/>
+      <path d="M28 64 Q40 68.4 52 64" stroke="#f7a8c0" stroke-width="2.6" fill="none"/><path d="M38 66.6 l2 -2.2 2 2.2 -2 2.2 Z" fill="#f08fb0"/>
+      <path d="M22 80 Q27 77 32 80 Q37 83 42 80 Q47 77 52 80 Q57 83 62 80" stroke="#efd9e6" stroke-width="1.2" fill="none"/>
+      <path d="M17 87 Q23 84 29 87 Q35 90 41 87 Q47 84 53 87 Q59 90 65 87" stroke="#efd9e6" stroke-width="1.2" fill="none"/>
+      <circle cx="26" cy="74" r="1" fill="#f0dce6"/><circle cx="54" cy="74" r="1" fill="#f0dce6"/><circle cx="40" cy="76" r="1" fill="#f0dce6"/>
+      <path d="M32 58 Q40 62 48 58" stroke="#efd9e6" stroke-width="1" fill="none"/>
+      ${armsSvg('#fff6fa', lk.skin)}`;
+    const tiara = '<path d="M30 15 l3 -5 3 4 4 -6 4 6 3 -4 3 5 Z" fill="#ffe08a" stroke="#d9a930" stroke-width=".8"/><circle cx="40" cy="9" r="1.6" fill="#ff8fb0"/><circle cx="33" cy="11.6" r=".9" fill="#9fd0f0"/><circle cx="47" cy="11.6" r=".9" fill="#9fd0f0"/>';
+    const earring = '<circle cx="19.6" cy="44" r="1.3" fill="#fff" stroke="#e0c7d4" stroke-width=".5"/><circle cx="60.4" cy="44" r="1.3" fill="#fff" stroke="#e0c7d4" stroke-width=".5"/>';
+    return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="90" rx="27" ry="3.6" fill="rgba(70,40,20,0.22)"/>${veil}${hairBack(lk)}${gown}${headSvg(lk)}${tiara}${earring}</svg>`;
   }
   if (role === 'groom') {
-    const lk = { g: 'm', skin: '#fcdcc4', hair: '#1f1d24', hs: 'side', cloth: '#2b2b33' };
-    const body = '<ellipse cx="40" cy="73" rx="16.5" ry="14.5" fill="#2b2b33"/><path d="M33 59 L40 72 L47 59 Z" fill="#fff"/><path d="M34.5 61 L40 63.5 L34.5 66 Z M45.5 61 L40 63.5 L45.5 66 Z" fill="#141418"/><circle cx="40" cy="63.5" r="1.5" fill="#141418"/><circle cx="51" cy="66" r="3.4" fill="#fff"/><circle cx="51" cy="66" r="1.3" fill="#ffd66b"/><path d="M51 69 l-1 4" stroke="#6fae6a" stroke-width="1.6"/>';
-    return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="88" rx="17" ry="3.6" fill="rgba(80,50,30,0.2)"/>${body}
-      <g class="hd"><ellipse cx="40" cy="36" rx="21" ry="20" fill="${lk.skin}"/>${FACE()}${hairFront(lk)}</g></svg>`;
+    const lk = { g: 'm', skin: '#fcdcc4', hair: '#1f1d24', hs: 'side' };
+    const c = '#2b2b33';
+    const body = `<ellipse cx="33.5" cy="88.6" rx="5" ry="2.6" fill="#141418"/><ellipse cx="46.5" cy="88.6" rx="5" ry="2.6" fill="#141418"/><path d="M30 88 h7 M43 88 h7" stroke="#fff" stroke-width=".8" opacity=".35"/>
+      <ellipse cx="40" cy="73" rx="16.5" ry="14.5" fill="${c}" ${OUT}/>
+      <path d="M33 59 L40 73 L47 59 Z" fill="#fff"/>
+      <path d="M33.4 58.6 L39 73 L31.8 67 Z M46.6 58.6 L41 73 L48.2 67 Z" fill="#18181e"/>
+      <path d="M34.5 61 L40 63.5 L34.5 66 Z M45.5 61 L40 63.5 L45.5 66 Z" fill="#141418"/><circle cx="40" cy="63.5" r="1.6" fill="#141418"/>
+      <circle cx="40" cy="67.6" r=".7" fill="#ccc"/><circle cx="40" cy="70.6" r=".7" fill="#ccc"/>
+      <g transform="translate(50.5 66.5)"><circle r="3.6" fill="#fff"/><circle cx="-1.6" cy="-1" r="1.8" fill="#fff" stroke="#eee" stroke-width=".5"/><circle cx="1.6" cy="-1" r="1.8" fill="#fff" stroke="#eee" stroke-width=".5"/><circle r="1.3" fill="#ffd66b"/><path d="M0 3.4 l-1.2 4" stroke="#6fae6a" stroke-width="1.6"/></g>
+      <path d="M47 60 Q57 66 56 78 Q53 85 44 87 Q52 76 47 60Z" fill="#fff" opacity=".05"/>
+      ${armsSvg('#22222a', lk.skin)}`;
+    return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="89" rx="18" ry="3.6" fill="rgba(70,40,20,0.22)"/>${body}${headSvg(lk)}</svg>`;
   }
   if (role === 'dad') {
     const lk = { g: 'm', skin: side === 'g' ? '#f6d2b8' : '#fcdcc4', hair: side === 'g' ? '#6e6a70' : '#3b3438', hs: side === 'g' ? 'short' : 'side', cloth: side === 'g' ? '#34405a' : '#4a4a52', tie: '#c23b4a', glasses: side === 'b' };
     return personSvg(lk, '', CORSAGE);
   }
-  // mom：旗袍＋包頭
+  // 主婚人媽媽：旗袍＋包頭＋珍珠耳環
   const lk = { g: 'f', skin: '#ffe4d0', hair: side === 'g' ? '#3b2f2f' : '#5b3a29', hs: 'bun', cloth: side === 'g' ? '#c23b4a' : '#7b4fa0', glasses: side === 'g' };
-  const qipao = `<path d="M35 57 Q40 61 45 57" stroke="#ffd66b" stroke-width="1.6" fill="none"/><path d="M40 61 Q46 66 47 74" stroke="#ffd66b" stroke-width="1.3" fill="none"/>`;
-  return personSvg(lk, '', qipao + CORSAGE);
+  const c = lk.cloth, d = shade(c, -0.22);
+  lk.bodyOverride = `<ellipse cx="34" cy="89" rx="4.2" ry="2.2" fill="#3a2f2b"/><ellipse cx="46" cy="89" rx="4.2" ry="2.2" fill="#3a2f2b"/>
+    <path d="M29 57 Q40 53 51 57 L55 70 L58 88 Q40 91.5 22 88 L25 70 Z" fill="${c}" ${OUT}/>
+    <path d="M46 62 L55 70 L58 88 Q53 89.6 49 90 Z" fill="#000" opacity=".08"/>
+    <path d="M35 56.6 Q40 60.4 45 56.6" stroke="#ffd66b" stroke-width="1.8" fill="none"/>
+    <path d="M40 60 Q47 64 48 72" stroke="#ffd66b" stroke-width="1.3" fill="none"/>
+    <circle cx="44" cy="62" r=".9" fill="#ffd66b"/><circle cx="46.6" cy="66" r=".9" fill="#ffd66b"/>
+    <path d="M30 76 q3 -3 6 0 q-3 3 -6 0 M44 80 q3 -3 6 0 q-3 3 -6 0" fill="${shade(c, 0.25)}" opacity=".8"/>
+    <path d="M55.6 76 L57.4 88" stroke="${d}" stroke-width="1"/>
+    ${armsSvg(c, lk.skin)}`;
+  const pearl = '<circle cx="19.6" cy="44" r="1.4" fill="#fffaf0" stroke="#d9cbb8" stroke-width=".5"/><circle cx="60.4" cy="44" r="1.4" fill="#fffaf0" stroke="#d9cbb8" stroke-width=".5"/>';
+  return personSvg(lk, '', CORSAGE + pearl);
 }
 function staffSvg() {
   const lk = { g: 'm', skin: '#fcdcc4', hair: pick(['#2e2a30', '#5b3a29']), hs: 'short', cloth: '#f4f1ec', tie: '#2b2b33' };
-  return personSvg(lk, '', '<path d="M29 70 h22 l2 16 h-26 Z" fill="#2b2b33"/><path d="M33 74 h14" stroke="#c9a27c" stroke-width="1.4"/>');
+  lk.bodyOverride = `<ellipse cx="33.5" cy="88.6" rx="5" ry="2.6" fill="#2b2b33"/><ellipse cx="46.5" cy="88.6" rx="5" ry="2.6" fill="#2b2b33"/>
+    <ellipse cx="40" cy="73" rx="16.5" ry="14.5" fill="#f7f4ef" ${OUT}/>
+    <path d="M34.5 61 L40 63.5 L34.5 66 Z M45.5 61 L40 63.5 L45.5 66 Z" fill="#2b2b33"/>
+    <path d="M28 70 h24 l2.4 16 Q40 89 25.6 86 Z" fill="#3a3330"/><path d="M28 70 Q40 72 52 70" stroke="#c9a27c" stroke-width="1.6" fill="none"/>
+    <rect x="44" y="74" width="5" height="4" rx="1" fill="#c9a27c" opacity=".7"/>
+    ${armsSvg('#ece7e0', lk.skin)}`;
+  return personSvg(lk);
 }
 
 // ---- 台詞 ----
@@ -388,7 +468,13 @@ async function routine(a, fn) {
 }
 
 // ---- 舞台 DOM ----
-const svgEl = (s) => s;
+// 盆栽
+function plantSvg(x, y, s = 1, kind = 0) {
+  const leaves = kind
+    ? `<path d="M0 -14 Q-12 -30 -4 -42 Q2 -28 0 -14 Z M0 -14 Q10 -32 18 -36 Q12 -20 0 -14 Z M0 -14 Q-18 -22 -22 -32 Q-8 -28 0 -14 Z" fill="#6aa86b"/><path d="M0 -14 Q4 -26 6 -40 Q10 -26 0 -14 Z" fill="#82be7c"/>`
+    : `<ellipse cx="-7" cy="-24" rx="9" ry="13" fill="#5f9e62" transform="rotate(-25 -7 -24)"/><ellipse cx="8" cy="-26" rx="9" ry="14" fill="#6fb06f" transform="rotate(22 8 -26)"/><ellipse cx="0" cy="-34" rx="8" ry="12" fill="#82be7c"/><path d="M-7 -24 l4 6 M8 -26 l-4 7 M0 -34 v12" stroke="#4d8a52" stroke-width="1.2"/>`;
+  return `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="2" rx="13" ry="4" fill="rgba(70,40,20,.18)"/>${leaves}<path d="M-10 -14 h20 l-3 16 h-14 Z" fill="#d98f5c"/><rect x="-11" y="-16" width="22" height="4" rx="2" fill="#c47a48"/></g>`;
+}
 function areaSvg(a) {
   const { x, y, w, h } = a;
   const cx = x + w / 2, cy = y + h / 2;
@@ -396,74 +482,208 @@ function areaSvg(a) {
   const text = (t, dy = 0, size = 13, cls = 'lb') => vert
     ? `<text class="${cls}" x="${cx + dy}" y="${cy}" font-size="${size}" text-anchor="middle" dominant-baseline="middle" style="writing-mode:vertical-rl">${t}</text>`
     : `<text class="${cls}" x="${cx}" y="${cy + dy}" font-size="${size}" text-anchor="middle" dominant-baseline="middle">${t}</text>`;
+  const shadow = (rx = 8) => `<rect x="${x + 2}" y="${y + 4}" width="${w}" height="${h}" rx="${rx}" fill="rgba(70,40,20,.14)"/>`;
   switch (a.kind) {
-    case 'sign': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16" class="a-sign"/>${text(a.label, -10, 20, 'lb brand')}${text(a.sub, 14, 14, 'lb brand2')}`;
-    case 'room': {
-      let lines = '';
-      for (let k = 1; k < 4; k++) lines += ORI === 'land' ? `<path d="M${x + w * k / 4} ${y + 4} v${h - 8}" class="a-roomline"/>` : `<path d="M${x + 4} ${y + h * k / 4} h${w - 8}" class="a-roomline"/>`;
-      return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" class="a-room"/>${lines}${text(a.label, -6, 14)}${text(a.sub, 11, 9, 'lb sm')}`;
+    case 'sign': {
+      // 木頭招牌牆＋小蜂蜜罐
+      const hx = vert ? cx : x + 26, hy = vert ? y + 24 : cy;
+      return `${shadow(16)}<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16" fill="url(#plank)" stroke="#8a6248" stroke-width="3"/>
+        <rect x="${x + 7}" y="${y + 7}" width="${w - 14}" height="${h - 14}" rx="11" fill="none" stroke="#f3dcc0" stroke-width="1.4" opacity=".7"/>
+        <g transform="translate(${hx} ${hy})"><path d="M-9 -4 Q-9 -12 0 -12 Q9 -12 9 -4 L8 9 Q0 13 -8 9 Z" fill="#f2b33d" stroke="#c9862a" stroke-width="1.2"/><rect x="-7" y="-15" width="14" height="5" rx="2" fill="#c9862a"/><path d="M-4 -4 q4 3 8 0" stroke="#fff" stroke-width="1.2" fill="none" opacity=".7"/></g>
+        ${text(a.label, -10, 22, 'lb brand')}${text(a.sub, 15, 14, 'lb brand2')}`;
     }
-    case 'zone': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" class="a-zone"/><circle cx="${cx}" cy="${y + 18}" r="7" class="a-knob"/>${text(a.label, -4, 12)}${text(a.sub, 14, 9, 'lb sm')}`;
-    case 'drink': return `<ellipse cx="${cx}" cy="${cy}" rx="${w / 2}" ry="${h / 2}" class="a-drink"/>
-      <g font-size="13" text-anchor="middle"><text x="${cx - 22}" y="${cy - 4}">🥤</text><text x="${cx}" y="${cy - 9}">🍹</text><text x="${cx + 22}" y="${cy - 4}">☕</text></g>${text(a.label, 12, 10, 'lb sm')}`;
-    case 'kitchen': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" class="a-kitchen"/>${text(a.label, 0, 11)}`;
-    case 'counter': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" class="a-counter"/>${text(a.label, 0, 18)}`;
-    case 'gift': return `<ellipse cx="${cx}" cy="${cy}" rx="${w / 2}" ry="${h / 2}" class="a-gift"/><text x="${cx}" y="${cy - (vert ? 14 : 6)}" font-size="13" text-anchor="middle">🧧</text>${vert ? text(a.label, 0, 10, 'lb sm') : text(a.label, 10, 10, 'lb sm')}`;
-    case 'door': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" class="a-door"/>${text(a.label, -14, 11, 'lb sm')}`;
-    case 'album': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${Math.min(w, h) / 2}" class="a-album"/><text x="${cx}" y="${cy + 4}" font-size="11" text-anchor="middle">📖 相本桌</text>`;
+    case 'room': {
+      let lines = '', doors = '';
+      for (let k = 1; k < 4; k++) lines += ORI === 'land' ? `<path d="M${x + w * k / 4} ${y + 4} v${h - 8}" class="a-roomline"/>` : `<path d="M${x + 4} ${y + h * k / 4} h${w - 8}" class="a-roomline"/>`;
+      for (let k = 0; k < 4; k++) {
+        doors += ORI === 'land'
+          ? `<path d="M${x + w * k / 4 + 12} ${y + h - 3} h${w / 4 - 24}" stroke="#f4eee8" stroke-width="5"/><path d="M${x + w * k / 4 + 12} ${y + h - 3} a${w / 4 - 24} ${w / 4 - 24} 0 0 0 ${w / 4 - 24} ${-(w / 4 - 24)}" fill="none" stroke="#b9a898" stroke-width="1" stroke-dasharray="3 3"/>`
+          : '';
+      }
+      return `${shadow(6)}<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="url(#roomfloor)" stroke="#3d3532" stroke-width="4"/>${lines}${doors}${text(a.label, -6, 15)}${text(a.sub, 12, 9, 'lb sm')}`;
+    }
+    case 'zone': {
+      // 音控台：混音器＋喇叭
+      const bx = vert ? cx : cx, by = y + 24;
+      return `${shadow(8)}<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="#f6f0ea" stroke="#b9a898" stroke-width="1.5"/>
+        <g transform="translate(${bx} ${by})"><rect x="-22" y="-10" width="44" height="18" rx="3" fill="#4a4a52"/>${[-15, -7, 1, 9].map((dx, i) => `<rect x="${dx}" y="-6" width="3" height="10" rx="1" fill="#2b2b33"/><rect x="${dx - 1}" y="${-4 + (i % 3) * 3}" width="5" height="2.4" rx="1" fill="${['#ef7d9a', '#ffd66b', '#9fd0f0', '#8fd3b0'][i]}"/>`).join('')}<circle cx="17" cy="-5" r="2" fill="#8fd3b0" class="led"/></g>
+        <g transform="translate(${x + 14} ${y + h - 18})"><rect x="-7" y="-10" width="14" height="20" rx="3" fill="#3d3532"/><circle cy="-3" r="3.6" fill="#6b6260"/><circle cy="5" r="2" fill="#6b6260"/></g>
+        <g transform="translate(${x + w - 14} ${y + h - 18})"><rect x="-7" y="-10" width="14" height="20" rx="3" fill="#3d3532"/><circle cy="-3" r="3.6" fill="#6b6260"/><circle cy="5" r="2" fill="#6b6260"/></g>
+        ${text(a.label, 6, 12)}${text(a.sub, 22, 9, 'lb sm')}`;
+    }
+    case 'drink': {
+      // 飲料吧台：三桶飲料、一疊杯子
+      const disp = (dx, c) => `<g transform="translate(${cx + dx} ${cy - 6})"><rect x="-6" y="-12" width="12" height="18" rx="3" fill="rgba(255,255,255,.75)" stroke="#c9b6a6" stroke-width="1"/><rect x="-5" y="-4" width="10" height="9" rx="2" fill="${c}" opacity=".85"/><rect x="-4" y="-15" width="8" height="3" rx="1" fill="#b98a62"/><rect x="-1.2" y="6" width="2.4" height="3" fill="#8a6a52"/></g>`;
+      return `<ellipse cx="${cx + 2}" cy="${cy + 4}" rx="${w / 2}" ry="${h / 2}" fill="rgba(70,40,20,.14)"/>
+        <ellipse cx="${cx}" cy="${cy}" rx="${w / 2}" ry="${h / 2}" fill="#fff8ef" stroke="#c98f5c" stroke-width="3"/>
+        <ellipse cx="${cx}" cy="${cy}" rx="${w / 2 - 6}" ry="${h / 2 - 6}" fill="none" stroke="#ecd6bd" stroke-width="1.2"/>
+        ${disp(-20, '#f6a05a')}${disp(0, '#ef7d9a')}${disp(20, '#8fd3b0')}
+        <g transform="translate(${cx + 30} ${cy + 4})"><path d="M-3 -6 h6 l-1 8 h-4 Z" fill="#fff" stroke="#d9c4b0" stroke-width=".8"/><path d="M-3 -9 h6 l-1 3 h-4 Z" fill="#fff" stroke="#d9c4b0" stroke-width=".8"/></g>
+        ${text(a.label, 15, 10, 'lb sm')}`;
+    }
+    case 'kitchen': return `${shadow(6)}<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="#f3ece5" stroke="#b9a898" stroke-width="1.5"/>
+        <rect x="${x + 6}" y="${y + 6}" width="${w - 12}" height="${h - 12}" rx="4" fill="none" stroke="#e0d2c4" stroke-width="1" stroke-dasharray="4 3"/>
+        <ellipse cx="${cx}" cy="${y + 14}" rx="${Math.min(w, h) / 3}" ry="4" fill="#ffd66b" opacity=".35" class="candle"/>
+        <g transform="translate(${cx} ${cy + 14})"><path d="M-6 0 Q-6 -7 0 -7 Q6 -7 6 0 Z" fill="#e0b04a"/><rect x="-8" y="0" width="16" height="2.4" rx="1" fill="#c9962e"/><circle cy="-8.4" r="1.4" fill="#c9962e"/></g>
+        ${text(a.label, -4, 11)}`;
+    case 'counter': {
+      let deco = '';
+      const n = 5;
+      for (let i = 0; i < n; i++) {
+        const t = (i + 0.5) / n;
+        const px = w >= h ? x + w * t : x + 22, py = w >= h ? y + 20 : y + h * t;
+        deco += i % 2
+          ? `<g transform="translate(${px} ${py})"><ellipse rx="10" ry="5" fill="#fff" stroke="#e0d2c4"/><circle cx="-3" cy="-2" r="2.4" fill="#e8a65e"/><circle cx="3" cy="-1" r="2.4" fill="#d9864a"/></g>`
+          : `<g transform="translate(${px} ${py})"><rect x="-8" y="-5" width="16" height="10" rx="2" fill="#efe5da"/><rect x="-6" y="-3" width="12" height="6" rx="1" fill="#e2d4c6"/></g>`;
+      }
+      return `${shadow(22)}<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="#fffdf9" stroke="#a98c7a" stroke-width="3"/>
+        <rect x="${x + 8}" y="${y + 8}" width="${w - 16}" height="${h - 16}" rx="16" fill="url(#marble)" stroke="#eadfd4" stroke-width="1"/>${deco}${text(a.label, w >= h ? 10 : 0, 18)}`;
+    }
+    case 'gift': return `<ellipse cx="${cx + 2}" cy="${cy + 4}" rx="${w / 2}" ry="${h / 2}" fill="rgba(70,40,20,.14)"/>
+        <ellipse cx="${cx}" cy="${cy}" rx="${w / 2}" ry="${h / 2}" fill="#fff4f2" stroke="#d98b8b" stroke-width="2.4"/>
+        <g transform="translate(${cx} ${cy - (vert ? 18 : h * 0.3)})"><rect x="-9" y="-7" width="18" height="14" rx="2" fill="#d94a4a"/><path d="M-9 -2 h18" stroke="#ffd66b" stroke-width="1.6"/><circle r="2.6" fill="#ffd66b"/></g>
+        <g transform="translate(${cx} ${cy + (vert ? 22 : h * 0.28)})"><rect x="-8" y="-4" width="16" height="8" rx="1" fill="#fff" stroke="#d9c4b0" stroke-width=".8"/><path d="M0 -4 v8" stroke="#d9c4b0" stroke-width=".8"/><path d="M5 -6 l3 6" stroke="#5a4636" stroke-width="1.2"/></g>
+        ${text(a.label, vert ? 3 : 0, 10, 'lb sm')}`;
+    case 'door': {
+      const panes = ORI === 'land' ? [0, 1, 2, 3].map((k) => `<rect x="${x + 6 + k * (w - 12) / 4}" y="${y + 4}" width="${(w - 12) / 4 - 4}" height="${h - 8}" rx="2" fill="rgba(200,230,245,.5)" stroke="#9ab7c6" stroke-width="1"/><path d="M${x + 12 + k * (w - 12) / 4} ${y + 12} l10 -6" stroke="#fff" stroke-width="1.6" opacity=".7"/>`).join('') : '';
+      return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="rgba(220,240,250,.35)" stroke="#9ab7c6" stroke-width="1.5" stroke-dasharray="6 4"/>${panes}${text(a.label, -14, 11, 'lb sm')}`;
+    }
+    case 'album': return `<rect x="${x + 2}" y="${y + 3}" width="${w}" height="${h}" rx="${Math.min(w, h) / 2}" fill="rgba(70,40,20,.14)"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${Math.min(w, h) / 2}" fill="#fff8ef" stroke="#c98f5c" stroke-width="2"/>
+        <g transform="translate(${cx - 18} ${cy})"><path d="M-9 -6 Q-4 -8 0 -6 Q4 -8 9 -6 V6 Q4 4 0 6 Q-4 4 -9 6 Z" fill="#fff" stroke="#c9a27c" stroke-width="1"/><path d="M0 -6 V6" stroke="#c9a27c"/><rect x="-7" y="-4" width="5" height="4" fill="#9fd0f0"/><rect x="2" y="-4" width="5" height="4" fill="#f7a8c0"/></g>
+        <text class="lb sm" x="${cx + 8}" y="${cy + 1}" font-size="10" text-anchor="middle" dominant-baseline="middle">相本桌</text>`;
     case 'stage': {
       let tiles = '';
       const s = 18;
       for (let i = 0; i < Math.floor(w / s); i++) for (let j = 0; j < Math.floor(h / s); j++) if ((i + j) % 2) tiles += `<rect x="${x + 2 + i * s}" y="${y + 2 + j * s}" width="${s}" height="${s}" class="a-tile"/>`;
-      return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" class="a-stage"/>${tiles}${text(a.label, 0, 14, 'lb stage-lb')}`;
+      // 靠布幕那一側的花拱門
+      let arch = '';
+      const n = 11;
+      for (let i = 0; i < n; i++) {
+        const t = i / (n - 1);
+        const [px, py] = ORI === 'land' ? [x + w - 6 - Math.sin(t * Math.PI) * 14, y + 8 + t * (h - 16)] : [x + 8 + t * (w - 16), y + 6 + Math.sin(t * Math.PI) * 14];
+        arch += `<circle cx="${px}" cy="${py}" r="5.4" fill="${['#f7a8c0', '#fff', '#ffd1dc', '#c9a0e6'][i % 4]}" stroke="rgba(200,120,150,.35)" stroke-width=".8"/>`;
+        if (i % 2) arch += `<ellipse cx="${px + 4}" cy="${py + 3}" rx="3.4" ry="1.8" fill="#7bb36d"/>`;
+      }
+      return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="rgba(255,240,246,.8)" stroke="#d9a7c2" stroke-width="2" stroke-dasharray="7 5"/>${tiles}
+        <ellipse cx="${cx}" cy="${cy}" rx="${w / 2 - 10}" ry="${h / 2 - 10}" fill="url(#spot)"/>${arch}${text(a.label, 0, 15, 'lb stage-lb')}`;
     }
-    case 'screen': return '';
-    case 'long': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" class="a-long"/>${longDecor(a)}`;
-    case 'sofa': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="7" class="a-sofa"/>`;
-    case 'dash': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" class="a-dash"/>${text(a.label, 0, 11, 'lb sm')}`;
+    case 'screen': return `<rect x="${x + 3}" y="${y + 4}" width="${w}" height="${h}" rx="3" fill="rgba(70,40,20,.2)"/>`;
+    case 'long': return `<rect x="${x + 2}" y="${y + 4}" width="${w}" height="${h}" rx="5" fill="rgba(70,40,20,.14)"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="#fffdf9" stroke="#c9b3a0" stroke-width="2"/>
+        <rect x="${a.w >= a.h ? x : cx - 5}" y="${a.w >= a.h ? cy - 5 : y}" width="${a.w >= a.h ? w : 10}" height="${a.w >= a.h ? 10 : h}" fill="#f6d5dc" opacity=".8"/>${longDecor(a)}`;
+    case 'sofa': {
+      const horiz = w >= h, k = Math.max(1, Math.round((horiz ? w : h) / 34));
+      let cush = '';
+      for (let i = 0; i < k; i++) cush += horiz ? `<rect x="${x + 5 + i * (w - 10) / k}" y="${y + 9}" width="${(w - 10) / k - 3}" height="${h - 13}" rx="5" fill="#bfa392"/>` : `<rect x="${x + 9}" y="${y + 5 + i * (h - 10) / k}" width="${w - 13}" height="${(h - 10) / k - 3}" rx="5" fill="#bfa392"/>`;
+      return `${shadow(8)}<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="#9c7d6a" stroke="#7d604f" stroke-width="2"/>${cush}`;
+    }
+    case 'dash': return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="rgba(255,255,255,.4)" stroke="#a8968a" stroke-width="1.5" stroke-dasharray="5 4"/>${text(a.label, 0, 11, 'lb sm')}`;
   }
   return '';
 }
 function longDecor(a) {
-  // 長桌上的花和蠟燭
+  // 長桌：花、蠟燭、小燭台
   let s = '';
-  const horiz = a.w >= a.h, n = 7;
+  const horiz = a.w >= a.h, n = 9;
   for (let i = 0; i < n; i++) {
     const t = (i + 0.5) / n;
     const x = horiz ? a.x + a.w * t : a.x + a.w / 2, y = horiz ? a.y + a.h / 2 : a.y + a.h * t;
-    s += i % 2 ? `<circle cx="${x}" cy="${y}" r="3.2" fill="#ffe08a"/><circle cx="${x}" cy="${y}" r="6" fill="#ffe08a" opacity=".25" class="candle"/>`
-      : `<circle cx="${x - 3}" cy="${y}" r="3.4" fill="#f7a8c0"/><circle cx="${x + 3}" cy="${y - 1}" r="3.4" fill="#fff"/><circle cx="${x}" cy="${y + 3}" r="3" fill="#c9a0e6"/>`;
+    s += i % 2
+      ? `<circle cx="${x}" cy="${y}" r="7" fill="#ffe08a" opacity=".25" class="candle"/><rect x="${x - 2}" y="${y - 3}" width="4" height="6" rx="1" fill="#fff8e6" stroke="#e8d3a0" stroke-width=".6"/><circle cx="${x}" cy="${y - 4}" r="1.6" fill="#ffb84d"/>`
+      : `<circle cx="${x - 3.4}" cy="${y + 1}" r="3.6" fill="#f7a8c0"/><circle cx="${x + 3.2}" cy="${y}" r="3.6" fill="#fff" stroke="#f0dce6" stroke-width=".6"/><circle cx="${x}" cy="${y - 3}" r="3.2" fill="#c9a0e6"/><circle cx="${x}" cy="${y + 3.6}" r="2.6" fill="#ffd1dc"/><circle cx="${x - 3.4}" cy="${y + 1}" r="1.1" fill="#e07a98"/><ellipse cx="${x + 6}" cy="${y + 3}" rx="3" ry="1.5" fill="#7bb36d"/>`;
   }
   return s;
 }
 function drawFloor() {
   const parts = [];
-  parts.push(`<defs><pattern id="wood" width="60" height="24" patternUnits="userSpaceOnUse"><rect width="60" height="24" fill="#ead6bf"/><path d="M0 12 H60 M30 0 V12 M0 24 H60 M10 12 V24" stroke="#dcc3a6" stroke-width="1"/></pattern>
-    <pattern id="tile" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#d9d4cf"/><rect width="8" height="8" fill="#e6e1dc"/><rect x="8" y="8" width="8" height="8" fill="#e6e1dc"/></pattern></defs>`);
+  parts.push(`<defs>
+    <pattern id="wood" width="120" height="22" patternUnits="userSpaceOnUse" ${ORI === 'port' ? 'patternTransform="rotate(90)"' : ''}>
+      <rect width="120" height="22" fill="#ecd9c2"/><rect y="0" width="70" height="11" fill="#e8d2b8"/><rect x="70" y="0" width="50" height="11" fill="#efdcc6"/>
+      <rect x="0" y="11" width="35" height="11" fill="#f0dec9"/><rect x="35" y="11" width="85" height="11" fill="#e6d0b5"/>
+      <path d="M0 11 H120 M0 22 H120 M70 0 V11 M35 11 V22" stroke="#d6bc9c" stroke-width="1"/>
+      <path d="M8 5 q12 -2 24 0 M80 6 q10 2 22 0 M44 16 q14 -2 28 0" stroke="#dcc3a6" stroke-width=".8" fill="none"/></pattern>
+    <pattern id="tile" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="18" fill="#d9d4cf"/><rect width="9" height="9" fill="#e7e2dc"/><rect x="9" y="9" width="9" height="9" fill="#e7e2dc"/></pattern>
+    <pattern id="plank" width="40" height="12" patternUnits="userSpaceOnUse"><rect width="40" height="12" fill="#c99b72"/><rect width="40" height="6" fill="#c2936a"/><path d="M0 6 H40 M0 12 H40 M22 0 V6 M8 6 V12" stroke="#a87b56" stroke-width=".8"/></pattern>
+    <pattern id="roomfloor" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#f4eee8"/><path d="M0 14 L14 0" stroke="#e8ded4" stroke-width="1"/></pattern>
+    <pattern id="marble" width="60" height="40" patternUnits="userSpaceOnUse"><rect width="60" height="40" fill="#fbf8f4"/><path d="M0 30 Q15 22 30 28 T60 20 M10 0 Q20 12 40 8" stroke="#ece4da" stroke-width="1.2" fill="none"/></pattern>
+    <radialGradient id="glow"><stop offset="0" stop-color="#fff3c4" stop-opacity=".55"/><stop offset="1" stop-color="#fff3c4" stop-opacity="0"/></radialGradient>
+    <radialGradient id="spot"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="vign" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#5a3a24" stop-opacity="0"/><stop offset="1" stop-color="#5a3a24" stop-opacity=".22"/></radialGradient>
+  </defs>`);
   const hall = mr({ x: 22, y: 18, w: 1092, h: 660 });
   const outside = mr({ x: 0, y: 680, w: PW, h: 90 });
-  parts.push(`<rect x="0" y="0" width="${SW}" height="${SH}" fill="#cbb8a6"/>`);
+  parts.push(`<rect x="0" y="0" width="${SW}" height="${SH}" fill="#bfae9e"/>`);
   parts.push(`<rect x="${outside.x}" y="${outside.y}" width="${outside.w}" height="${outside.h}" fill="url(#tile)"/>`);
-  parts.push(`<rect x="${hall.x}" y="${hall.y}" width="${hall.w}" height="${hall.h}" rx="10" fill="url(#wood)" stroke="#8a6a52" stroke-width="5"/>`);
-  // 入口 1 的門口（牆上的缺口）
-  const gap = mr({ x: 490, y: 672, w: 92, h: 12 });
-  parts.push(`<rect x="${gap.x}" y="${gap.y}" width="${gap.w}" height="${gap.h}" fill="#ead6bf"/>`);
-  // 牆上的串燈
-  let bulbs = '';
-  for (let i = 0; i < 26; i++) {
-    const [bx, by] = mp([560 + i * 21, 26 + (i % 2) * 5]);
-    bulbs += `<circle cx="${bx}" cy="${by}" r="3.2" class="bulb b${i % 3}"/>`;
-  }
-  parts.push(bulbs);
+  // 門外的人行道花圃
+  for (const [px, py, k] of [[700, 724, 0], [860, 724, 1], [960, 724, 0], [380, 724, 1]]) { const [qx, qy] = mp([px, py]); parts.push(plantSvg(qx, qy + 14, 0.8, k)); }
+  // 牆：外框深色、內側一條淺色飾條
+  parts.push(`<rect x="${hall.x - 4}" y="${hall.y - 4}" width="${hall.w + 8}" height="${hall.h + 8}" rx="14" fill="#7a5a44"/>`);
+  parts.push(`<rect x="${hall.x}" y="${hall.y}" width="${hall.w}" height="${hall.h}" rx="10" fill="url(#wood)"/>`);
+  parts.push(`<rect x="${hall.x + 3}" y="${hall.y + 3}" width="${hall.w - 6}" height="${hall.h - 6}" rx="8" fill="none" stroke="#f6e7d4" stroke-width="2" opacity=".8"/>`);
+  // 入口 1 的門口
+  const gap = mr({ x: 490, y: 668, w: 92, h: 16 });
+  parts.push(`<rect x="${gap.x}" y="${gap.y}" width="${gap.w}" height="${gap.h}" fill="#e7d3bb"/>`);
+  const mat = mr({ x: 500, y: 650, w: 72, h: 20 });
+  parts.push(`<rect x="${mat.x}" y="${mat.y}" width="${mat.w}" height="${mat.h}" rx="4" fill="#b85a5a" opacity=".85"/><rect x="${mat.x + 3}" y="${mat.y + 3}" width="${mat.w - 6}" height="${mat.h - 6}" rx="3" fill="none" stroke="#f3c6a0" stroke-width="1" stroke-dasharray="3 2"/>`);
+  // 每張桌子上方的吊燈光暈
+  for (const T of L.tables) parts.push(`<ellipse cx="${T.cx}" cy="${T.cy}" rx="${T.w / 2 + 40}" ry="${T.h / 2 + 40}" fill="url(#glow)"/>`);
+  // 牆上的串燈（掛線＋燈泡）
+  const bl = [];
+  for (let i = 0; i < 27; i++) bl.push(mp([560 + i * 20.5, 28 + Math.sin(i * 0.9) * 4]));
+  parts.push(`<path d="M${bl.map((p) => p.join(' ')).join(' L')}" fill="none" stroke="#6b5444" stroke-width="1" opacity=".5"/>`);
+  parts.push(bl.map(([bx, by], i) => `<circle cx="${bx}" cy="${by}" r="7" fill="url(#glow)"/><circle cx="${bx}" cy="${by + 1.5}" r="2.8" class="bulb b${i % 3}"/>`).join(''));
+  // 盆栽（左牆、入口旁、右下角）
+  for (const [px, py, k] of [[62, 190, 0], [62, 330, 1], [62, 430, 0], [612, 664, 1], [1090, 640, 0], [1050, 660, 1], [460, 520, 0]]) { const [qx, qy] = mp([px, py]); parts.push(plantSvg(qx, qy, 1, k)); }
   for (const a of L.areas) parts.push(areaSvg(a));
-  // 賓客入口箭頭
   const [ax, ay] = mp([760, 752]);
   parts.push(`<text x="${ax}" y="${ay}" class="lb sm" font-size="10" text-anchor="middle">${ORI === 'land' ? '← 賓客入口處' : '賓客入口 ↑'}</text>`);
-  // 氣球（活動區角落）
+  // 氣球束（活動區兩角）
   const st = L.areas.find((a) => a.id === 'stage');
-  parts.push(`<g class="balloons"><circle cx="${st.x + 8}" cy="${st.y + 6}" r="7" fill="#f7a8c0"/><circle cx="${st.x + 18}" cy="${st.y + 2}" r="7" fill="#fff"/><circle cx="${st.x + 4}" cy="${st.y - 6}" r="6" fill="#ffd66b"/></g>`);
+  const balloon = (bx, by) => `<g class="balloons" transform="translate(${bx} ${by})"><path d="M0 18 Q-3 8 -7 -2 M0 18 Q1 6 4 -6 M0 18 Q4 10 10 0" stroke="#b9a898" stroke-width=".7" fill="none"/>
+    <ellipse cx="-7" cy="-6" rx="6.4" ry="7.6" fill="#f7a8c0"/><ellipse cx="4" cy="-11" rx="6.4" ry="7.6" fill="#fff" stroke="#f0dce6" stroke-width=".6"/><ellipse cx="10" cy="-3" rx="6" ry="7.2" fill="#ffd66b"/>
+    <path d="M-9 -9 q1 -2 3 -2 M2 -14 q1 -2 3 -2 M8 -6 q1 -2 3 -2" stroke="#fff" stroke-width="1.2" opacity=".8" fill="none"/></g>`;
+  parts.push(balloon(st.x + 10, st.y + 14), balloon(ORI === 'land' ? st.x + 10 : st.x + st.w - 14, ORI === 'land' ? st.y + st.h - 4 : st.y + 14));
+  // 四周暗角，讓畫面聚焦在中間
+  parts.push(`<rect x="0" y="0" width="${SW}" height="${SH}" fill="url(#vign)" pointer-events="none"/>`);
   $('#floor').setAttribute('viewBox', `0 0 ${SW} ${SH}`);
   $('#floor').innerHTML = parts.join('');
+}
+// 桌面：桌布、桌旗、每個座位的餐盤刀叉和酒杯、花和蠟燭
+function tableTopSvg(T) {
+  const w = T.w, h = T.h, horiz = w >= h;
+  const main = !!T.main;
+  const cloth = main ? '#fff6f8' : '#fffdf9', rim = main ? '#f2b9c8' : '#e3d2c2';
+  let s = '';
+  if (T.round) {
+    s += `<circle cx="${w / 2}" cy="${h / 2}" r="${w / 2 - 1}" fill="${cloth}" stroke="${rim}" stroke-width="2"/><circle cx="${w / 2}" cy="${h / 2}" r="${w / 2 - 6}" fill="none" stroke="${rim}" stroke-width=".8" stroke-dasharray="2 2"/>`;
+  } else {
+    s += `<rect x="1" y="1" width="${w - 2}" height="${h - 2}" rx="7" fill="${cloth}" stroke="${rim}" stroke-width="2"/>`;
+    s += `<rect x="5" y="5" width="${w - 10}" height="${h - 10}" rx="5" fill="none" stroke="${rim}" stroke-width=".8" stroke-dasharray="2 2"/>`;
+    // 桌旗
+    const rc = main ? '#f7b7c8' : '#f3d9c6';
+    s += horiz ? `<rect x="0" y="${h / 2 - h * 0.14}" width="${w}" height="${h * 0.28}" fill="${rc}" opacity=".75"/><path d="M0 ${h / 2 - h * 0.14} H${w} M0 ${h / 2 + h * 0.14} H${w}" stroke="#e0b46a" stroke-width=".9" opacity=".8"/>`
+      : `<rect x="${w / 2 - w * 0.14}" y="0" width="${w * 0.28}" height="${h}" fill="${rc}" opacity=".75"/><path d="M${w / 2 - w * 0.14} 0 V${h} M${w / 2 + w * 0.14} 0 V${h}" stroke="#e0b46a" stroke-width=".9" opacity=".8"/>`;
+  }
+  // 餐盤：在桌面靠近每個座位的地方
+  for (const st of T.seatList) {
+    let px = st.sit[0] - T.x, py;
+    if (T.round) { const dx = st.sit[0] - T.cx, dy = (st.side === 'top' ? T.y - 6 : st.sit[1] - 18) - T.cy; const d = Math.hypot(dx, dy) || 1; px = w / 2 + dx / d * (w / 2 - 9); py = h / 2 + dy / d * (h / 2 - 9); }
+    else if (st.side === 'top') py = 10;
+    else if (st.side === 'bottom') py = h - 10;
+    else if (st.side === 'left') { px = 10; py = st.sit[1] - 16 - T.y; }
+    else { px = w - 10; py = st.sit[1] - 16 - T.y; }
+    s += `<circle cx="${px}" cy="${py}" r="6.4" fill="#fff" stroke="#dacbbd" stroke-width=".9"/><circle cx="${px}" cy="${py}" r="4" fill="none" stroke="#ece2d8" stroke-width=".8"/>`;
+    if (!T.round) {
+      s += horiz ? `<path d="M${px - 9} ${py - 4} v8 M${px + 9} ${py - 4} v8" stroke="#bfb3a8" stroke-width="1.1" stroke-linecap="round"/><circle cx="${px + 13}" cy="${py + (st.side === 'top' ? 3 : -3)}" r="2.2" fill="rgba(220,235,245,.9)" stroke="#bcd0dc" stroke-width=".6"/>`
+        : `<path d="M${px - 4} ${py - 9} h8 M${px - 4} ${py + 9} h8" stroke="#bfb3a8" stroke-width="1.1" stroke-linecap="round"/>`;
+    }
+  }
+  // 花＋蠟燭（擺在桌子一端，中間留給菜）
+  const [fx, fy] = T.round ? [w / 2, h / 2 + 8] : horiz ? [w - 16, h / 2] : [w / 2, h - 18];
+  s += `<g transform="translate(${fx} ${fy})"><circle r="8" fill="#ffe08a" opacity=".22" class="candle"/>
+    <circle cx="-3" cy="1" r="3.2" fill="${main ? '#ef7d9a' : '#f7a8c0'}"/><circle cx="3" cy="0" r="3.2" fill="#fff" stroke="#f0dce6" stroke-width=".5"/><circle cx="0" cy="-3" r="2.8" fill="#c9a0e6"/><circle cx="0" cy="3.4" r="2.4" fill="#ffd1dc"/>
+    <ellipse cx="-5.6" cy="-2" rx="2.6" ry="1.3" fill="#7bb36d"/><ellipse cx="5.6" cy="3" rx="2.6" ry="1.3" fill="#7bb36d"/></g>`;
+  if (main) s += `<path transform="translate(${w / 2} ${h * 0.18})" d="M0 4 C-7 -2 -4 -8 0 -4 C4 -8 7 -2 0 4 Z" fill="#ef7d9a"/>`;
+  return `<svg class="top" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">${s}</svg>`;
 }
 function drawTables() {
   tableLayer.innerHTML = '';
@@ -474,16 +694,15 @@ function drawTables() {
     d.style.width = (T.w / SW * 100) + '%'; d.style.height = (T.h / SH * 100) + '%';
     d.style.zIndex = String(Math.round(T.cy));
     const chairs = T.seatList.map((s) => {
-      const off = s.side === 'top' ? [0, -9] : s.side === 'bottom' ? [0, -16] : s.side === 'left' ? [-2, -13] : [2, -13];
-      return `<i class="chair" style="left:${((s.sit[0] + off[0] - T.x) / T.w * 100)}%;top:${((s.sit[1] + off[1] - T.y) / T.h * 100)}%"></i>`;
+      const off = s.side === 'top' ? [0, -9] : s.side === 'bottom' ? [0, -16] : s.side === 'left' ? [-2, -13] : s.side === 'right' ? [2, -13] : [0, -13];
+      return `<i class="chair ${s.side}" style="left:${((s.sit[0] + off[0] - T.x) / T.w * 100)}%;top:${((s.sit[1] + off[1] - T.y) / T.h * 100)}%"></i>`;
     }).join('');
-    d.innerHTML = `<div class="cloth"></div>${chairs}<span class="tno">${T.main ? '主桌' : T.n}</span><span class="dishes"></span><span class="vase">💐</span>`;
+    d.innerHTML = `<div class="cloth">${tableTopSvg(T)}</div>${chairs}<span class="tno">${T.main ? '主桌' : T.n}</span><span class="dishes"></span>`;
     T.el = d; T.dishEl = d.querySelector('.dishes');
     d.addEventListener('click', (e) => { e.stopPropagation(); tapTable(T); });
     tableLayer.appendChild(d);
     renderDishes(T);
   }
-  // 投影布幕
   const sc = L.areas.find((a) => a.id === 'screen');
   const s = $('#screen');
   s.style.left = (sc.x / SW * 100) + '%'; s.style.top = (sc.y / SH * 100) + '%';
@@ -492,7 +711,7 @@ function drawTables() {
 }
 function renderDishes(T) {
   if (!T.dishes) T.dishes = [];
-  T.dishEl.innerHTML = T.dishes.map((d) => `<i style="opacity:${0.35 + 0.65 * d.left};transform:scale(${0.7 + 0.3 * d.left})">${d.left > 0.05 ? d.e : '🍽️'}</i>`).join('');
+  T.dishEl.innerHTML = T.dishes.map((d) => `<i style="opacity:${0.4 + 0.6 * d.left};--s:${(0.72 + 0.28 * d.left).toFixed(2)}">${d.left > 0.05 ? d.e : '🍽️'}</i>`).join('');
 }
 
 function sizeStage() {
