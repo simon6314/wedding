@@ -228,18 +228,18 @@ function vipSvg(role, side) {
     const lk = { g: 'm', skin: side === 'g' ? '#f6d2b8' : '#fcdcc4', hair: side === 'g' ? '#6e6a70' : '#3b3438', hs: side === 'g' ? 'short' : 'side', cloth: side === 'g' ? '#34405a' : '#4a4a52', tie: '#c23b4a', glasses: side === 'b' };
     return personSvg(lk, '', CORSAGE);
   }
-  // 主婚人媽媽：旗袍＋包頭＋珍珠耳環
-  const lk = { g: 'f', skin: '#ffe4d0', hair: side === 'g' ? '#3b2f2f' : '#5b3a29', hs: 'bun', cloth: side === 'g' ? '#c23b4a' : '#7b4fa0', glasses: side === 'g' };
-  const c = lk.cloth, d = shade(c, -0.22);
-  lk.bodyOverride = `<ellipse cx="34" cy="89" rx="4.2" ry="2.2" fill="#3a2f2b"/><ellipse cx="46" cy="89" rx="4.2" ry="2.2" fill="#3a2f2b"/>
-    <path d="M29 57 Q40 53 51 57 L55 70 L58 88 Q40 91.5 22 88 L25 70 Z" fill="${c}" ${OUT}/>
-    <path d="M46 62 L55 70 L58 88 Q53 89.6 49 90 Z" fill="#000" opacity=".08"/>
-    <path d="M35 56.6 Q40 60.4 45 56.6" stroke="#ffd66b" stroke-width="1.8" fill="none"/>
-    <path d="M40 60 Q47 64 48 72" stroke="#ffd66b" stroke-width="1.3" fill="none"/>
-    <circle cx="44" cy="62" r=".9" fill="#ffd66b"/><circle cx="46.6" cy="66" r=".9" fill="#ffd66b"/>
-    <path d="M30 76 q3 -3 6 0 q-3 3 -6 0 M44 80 q3 -3 6 0 q-3 3 -6 0" fill="${shade(c, 0.25)}" opacity=".8"/>
-    <path d="M55.6 76 L57.4 88" stroke="${d}" stroke-width="1"/>
-    ${armsSvg(c, lk.skin)}`;
+  // 主婚人媽媽：休閒穿搭（上衣＋開襟針織外套＋長褲）
+  const lk = { g: 'f', skin: '#ffe4d0', hair: side === 'g' ? '#3b2f2f' : '#5b3a29', hs: side === 'g' ? 'bob' : 'bun', glasses: side === 'g' };
+  const top = side === 'g' ? '#f6d6c8' : '#dfe8f4', cardi = side === 'g' ? '#c98f7a' : '#8fa8c9', pants = side === 'g' ? '#6b5a52' : '#4f5d75';
+  lk.bodyOverride = `<rect x="30" y="76" width="8.6" height="12" rx="3" fill="${pants}"/><rect x="41.4" y="76" width="8.6" height="12" rx="3" fill="${pants}"/>
+    <ellipse cx="34" cy="89" rx="4.6" ry="2.2" fill="#f4efe8" stroke="#cfc2b4" stroke-width=".6"/><ellipse cx="46" cy="89" rx="4.6" ry="2.2" fill="#f4efe8" stroke="#cfc2b4" stroke-width=".6"/>
+    <path d="M28 57 Q40 53 52 57 L54.5 78 Q40 81 25.5 78 Z" fill="${top}" ${OUT}/>
+    <path d="M34 57.4 Q40 62 46 57.4" stroke="${shade(top, -0.18)}" stroke-width="1.3" fill="none"/>
+    <path d="M28 57 Q31.5 56 34 57.6 L36.6 80 Q31 80 25.5 78 Z" fill="${cardi}" ${OUT}/>
+    <path d="M52 57 Q48.5 56 46 57.6 L43.4 80 Q49 80 54.5 78 Z" fill="${cardi}" ${OUT}/>
+    <path d="M30 66 h4.4 M45.6 66 h4.4 M30.6 70 h4.4 M45 70 h4.4" stroke="${shade(cardi, -0.15)}" stroke-width=".7" opacity=".7"/>
+    <circle cx="35.4" cy="73" r=".8" fill="${shade(cardi, -0.3)}"/>
+    ${armsSvg(cardi, lk.skin)}`;
   const pearl = '<circle cx="19.6" cy="44" r="1.4" fill="#fffaf0" stroke="#d9cbb8" stroke-width=".5"/><circle cx="60.4" cy="44" r="1.4" fill="#fffaf0" stroke="#d9cbb8" stroke-width=".5"/>';
   return personSvg(lk, '', CORSAGE + pearl);
 }
@@ -439,7 +439,10 @@ function makeActor(o) {
 function place(a) {
   a.el.style.left = (a.pos[0] / SW * 100) + '%';
   a.el.style.top = (a.pos[1] / SH * 100) + '%';
-  a.el.style.zIndex = String(Math.round(a.pos[1]) + (a.bubbleOn ? 3000 : 0) + (a.hl ? 4000 : 0));
+  // 坐在桌子左右兩側的人要畫在椅子和桌子前面
+  let z = a.pos[1];
+  if (a.seat && a.table && a.seat.side !== 'top' && a.seat.side !== 'bottom' && atSeat(a)) z = Math.max(z, a.table.cy + 1);
+  a.el.style.zIndex = String(Math.round(z) + (a.bubbleOn ? 3000 : 0) + (a.hl ? 4000 : 0));
 }
 function setPose(a, p) { if (a.pose === p) return; a.el.classList.remove('p-' + a.pose); a.pose = p; if (p) a.el.classList.add('p-' + p); }
 function showProp(a) { const p = a.temp || a.prop; if (a.propEl.textContent !== p) a.propEl.textContent = p; }
