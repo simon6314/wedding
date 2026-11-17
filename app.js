@@ -1029,7 +1029,7 @@ function createPeople() {
   const brideCfg = (CFG.vip || []).find((v) => v.id === 'bride');
   if (vip.bride && !(brideCfg && brideCfg.img)) vip.bride.prop = '💐';   // 圖片裡已經有捧花就不用再拿
   for (let i = 0; i < 3; i++) {
-    const a = makeActor({ kind: 'staff', name: '服務生', svg: staffSvg(), speed: 88, cls: 'staff', busy: true });
+    const a = makeActor({ kind: 'staff', name: '服務生', svg: i % 2 ? picSvg('img/staff_f.png', 234 / 512) : picSvg('img/staff_m.png', 242 / 512), speed: 88, cls: 'staff', busy: true });   // 服務生（Gemini 造型，男女交錯）
     a.pos = L.P.staffIdle[i].slice();
     staff.push(a);
   }
