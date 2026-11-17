@@ -9,6 +9,7 @@
 //     lap   小朋友裡有幾位不佔座位（坐大人腿上）；baby: true 表示是嬰兒（畫得更小）；highchair: true 表示坐兒童座椅
 //     note  身分備註，例如 '主持人'、'婚禮歌手'
 //     look  外型，例如 { hair: '#1f1b1d', skin: '#dba47c', hs: 'bob' }（hs 髮型：long/bob/pony/bun/short/side）
+//     img   用圖片當人物，例如 img: 'img/xxx.png', ratio: 寬 / 高
 //     members 家人的性別和外型，例如 [{ g: 'f', look: { hs: 'bob' } }]
 //   畫面上會出現 count 個人：代表本人＋「王小明的家人」，同一家坐在一起，
 //   點桌子會顯示「王小明（一家 4 位）」，搜尋王小明會把一家人一起標出來。
@@ -78,7 +79,7 @@ window.WEDDING = {
     // 第 11 桌
     { name: '國慶', table: 11, g: 'm', count: 4 },
     { name: '月裡', table: 11, g: 'f', count: 2 },
-    { name: '新郎阿嬤', table: 11, g: 'f', elder: true },
+    { name: '新郎阿嬤', table: 11, g: 'f', elder: true, img: 'img/grandma.png', ratio: 282 / 512 },   // Gemini 生成的圖
     { name: '新郎二舅舅', table: 11, g: 'm' },
     // 第 12 桌
     { name: '民政', table: 12, g: 'm', count: 4 },

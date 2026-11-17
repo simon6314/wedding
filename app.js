@@ -980,7 +980,7 @@ function createPeople() {
         seat = T.seatList[si];
         lastSeat = seat; lastSi = si;
       }
-      const a = makeActor({ kind: 'guest', name: p.name, info: p, lk, table: T, seatIdx: si, svg: p.highchair ? personSvg(lk, HIGHCHAIR_BACK, HIGHCHAIR_FRONT) : personSvg(lk), speed: p.kid ? 95 : rand(62, 78), cls: p.kid ? 'kid' : '' });
+      const a = makeActor({ kind: 'guest', name: p.name, info: p, lk, table: T, seatIdx: si, svg: p.img ? picSvg(p.img, p.ratio) : p.highchair ? personSvg(lk, HIGHCHAIR_BACK, HIGHCHAIR_FRONT) : personSvg(lk), speed: p.kid ? 95 : rand(62, 78), cls: p.kid ? 'kid' : '' });
       a.seat = seat;
       guests.push(a);
     });
