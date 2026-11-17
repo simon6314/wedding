@@ -45,7 +45,7 @@ window.WEDDING = {
     { name: '菁莓', table: 3, g: 'f' },
     { name: '嘉真', table: 3, g: 'f' },
     // 第 4 桌
-    { name: '建智', table: 4, g: 'm', count: 2, note: '主持人', members: [{ g: 'f', look: { hs: 'bob' } }] },   // 家人：短髮年輕女性
+    { name: '建智', table: 4, g: 'm', count: 2, note: '主持人', members: [{ g: 'f', age: 'young' }] },   // 家人：年輕女性
     { name: 'Glenn', table: 4, g: 'm', count: 2, note: '婚禮歌手', lang: 'en', img: 'img/guest/glenn.png', ratio: 230 / 512 },   // 只會英文；菲律賓人造型（Gemini）
     { name: '寶桂', table: 4, g: 'f', count: 2 },
     // 第 5 桌
