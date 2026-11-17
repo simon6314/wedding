@@ -1198,7 +1198,8 @@ async function staffLoop(s, i) {
 async function parentLoop(p) {
   await wait(rand(15000, 40000));
   for (;;) {
-    if (!state.coupleAway || Math.random() < 0.5) {
+    if (!p.inTour && (!state.coupleAway || Math.random() < 0.5)) {
+      p.visiting = true;
       const T = pick(L.tables.filter((t) => !t.main));
       const tg = guests.filter((g) => g.table === T && !g.busy && atSeat(g));
       await walkTo(p, [T.toast[0] + rand(-6, 6), T.toast[1] + rand(-4, 6)]);
@@ -1206,6 +1207,7 @@ async function parentLoop(p) {
       if (tg.length) { const g = pick(tg); await wait(1400); say(g, pick(GUEST_REPLY)); }
       await wait(2600);
       await goHome(p);
+      p.visiting = false;
     }
     await wait(rand(35000, 70000));
   }
@@ -1217,16 +1219,29 @@ async function couplePair(pt, dx = 9) {
   setFace(g, 1); setFace(b, -1);
 }
 async function coupleHome() { await Promise.all([goHome(vip.groom), goHome(vip.bride)]); }
+// 主婚人站在新人後面（離桌子遠一點的那一排）
+function parentSpots(T) {
+  const vx = T.toast[0] - T.cx, vy = T.toast[1] - T.cy, d = Math.hypot(vx, vy) || 1;
+  const ux = vx / d, uy = vy / d, px = -uy, py = ux;
+  return [-34, -12, 12, 34].map((k) => [T.toast[0] + ux * 26 + px * k, T.toast[1] + uy * 26 + py * k]);
+}
 async function toastTour() {
   if (!state.toastOrder.length) state.toastOrder = shuffle(L.tables.filter((t) => !t.main));
   const list = state.toastOrder.splice(0, 3);
   state.coupleAway = true;
+  // 主婚人一起去：先等正在別桌聊天的主婚人回來
+  const parents = ['gdad', 'gmom', 'bdad', 'bmom'].map((id) => vip[id]).filter(Boolean);
+  for (const p of parents) p.inTour = true;
+  for (let k = 0; k < 24 && parents.some((p) => p.visiting); k++) await wait(500);
   for (const T of list) {
     setStatus(`新人敬酒 · 第 ${T.n} 桌`);
-    banner(`🥂 新人來第 ${T.n} 桌敬酒囉！`, 3500);
-    await couplePair(T.toast, 9);
+    banner(`🥂 新人和主婚人來第 ${T.n} 桌敬酒囉！`, 3500);
+    const spots = parentSpots(T);
+    await Promise.all([couplePair(T.toast, 9), ...parents.map((p, i) => walkTo(p, spots[i]))]);
     const g = vip.groom, b = vip.bride;
     g.temp = '🥂'; b.temp = '🥂'; showProp(g); showProp(b);
+    for (const p of parents) { p.temp = '🥂'; showProp(p); setFace(p, T.cx < p.pos[0] ? -1 : 1); }
+    setTimeout(() => { const p = pick(parents); if (p) say(p, pick(['謝謝大家來！', '多吃一點喔', '今天謝謝你們', '招待不周請見諒']), 2400); }, 1600);
     const tg = seatedOf(T);
     tg.forEach((x, i) => setTimeout(() => { x.temp = '🥂'; showProp(x); setPose(x, 'cheer'); }, i * 120));
     say(g, pick(COUPLE_THANKS), 2600, 'love');
@@ -1237,10 +1252,12 @@ async function toastTour() {
     await wait(2400);
     for (const x of tg) { x.temp = ''; showProp(x); if (x.pose === 'cheer') setPose(x, 'sit'); }
     g.temp = ''; b.temp = ''; showProp(g); showProp(b);
+    for (const p of parents) { p.temp = ''; showProp(p); }
     state.toasts++;
-    logLine(`新人到第 ${T.n} 桌敬酒`);
+    logLine(`新人和主婚人到第 ${T.n} 桌敬酒`);
   }
-  await coupleHome();
+  await Promise.all([coupleHome(), ...parents.map((p) => goHome(p))]);
+  for (const p of parents) p.inTour = false;
   state.coupleAway = false;
 }
 async function cheersAll() {
