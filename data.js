@@ -32,7 +32,7 @@ window.WEDDING = {
   // 真名單放這裡；留 null 就會用假資料
   GUESTS: [
     // 第 2 桌
-    { name: '姵汝', table: 2, g: 'f' },
+    { name: '姵汝', table: 2, g: 'f', img: 'img/guest/young_f_jeans.png', ratio: 281 / 512 },   // 長髮＋牛仔褲造型
     { name: '鈺庭', table: 2, g: 'm', count: 3, kids: 1, lap: 1, baby: true, members: [{ g: 'f' }, { g: 'f' }] },   // 鈺庭（男）＋家人（女）＋未滿一歲的女兒
     { name: '明兌', table: 2, g: 'f', count: 2, kids: 1, lap: 1, highchair: true, members: [{ g: 'f' }] },   // 一位成人＋女兒（坐兒童座椅，不佔一般座位）
     { name: '閤祈', table: 2, g: 'f', count: 2, kids: 1, lap: 1, highchair: true, members: [{ g: 'f' }] },   // 加一位女兒（坐兒童座椅，不佔一般座位）
@@ -40,7 +40,7 @@ window.WEDDING = {
     // 第 3 桌
     { name: '麗珠', table: 3, g: 'f' },
     { name: '品劭', table: 3, g: 'f' },
-    { name: '芸岑', table: 3, g: 'f' },
+    { name: '芸岑', table: 3, g: 'f', img: 'img/guest/young_f_jeans.png', ratio: 281 / 512 },   // 長髮＋牛仔褲造型
     { name: '芸岑朋友', table: 3, g: 'm' },
     { name: '菁莓', table: 3, g: 'f' },
     { name: '嘉真', table: 3, g: 'f' },
@@ -52,10 +52,10 @@ window.WEDDING = {
     { name: '宜妏', table: 5, g: 'f', count: 5 },
     { name: '新娘大姨', table: 5, g: 'f' },
     // 第 6 桌
-    { name: '宜秀', table: 6, g: 'f' },
-    { name: '淑鈴', table: 6, g: 'f' },
-    { name: '昱靜', table: 6, g: 'f' },
-    { name: '芃磬', table: 6, g: 'f' },
+    { name: '宜秀', table: 6, g: 'f', img: 'img/guest/young_f_jeans.png', ratio: 281 / 512 },   // 長髮＋牛仔褲造型
+    { name: '淑鈴', table: 6, g: 'f', img: 'img/guest/young_f_jeans.png', ratio: 281 / 512 },   // 長髮＋牛仔褲造型
+    { name: '昱靜', table: 6, g: 'f', img: 'img/guest/young_f_jeans.png', ratio: 281 / 512 },   // 長髮＋牛仔褲造型
+    { name: '芃磬', table: 6, g: 'f', img: 'img/guest/young_f_jeans.png', ratio: 281 / 512 },   // 長髮＋牛仔褲造型
     { name: '瀅琦', table: 6, g: 'f' },
     { name: '士堯', table: 6, g: 'm' },
     // 第 7 桌
