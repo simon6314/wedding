@@ -60,7 +60,7 @@ window.WEDDING = {
     { name: '士堯', table: 6, g: 'm' },
     // 第 7 桌
     { name: '宗益', table: 7, g: 'm', count: 4 },
-    { name: '玫秀', table: 7, g: 'f', look: { hair: '#b9bcc4', hs: 'bob', skin: '#fcdcc4', cloth: '#ff8fab' } },   // 銀灰色短髮、年輕
+    { name: '玫秀', table: 7, g: 'f', img: 'img/guest/silver_f.png', ratio: 267 / 512 },   // 銀白短髮造型（Gemini）
     { name: '玉智', table: 7, g: 'f' },
     { name: '小燕', table: 7, g: 'f' },
     { name: '莊', table: 7, g: 'f' },
@@ -79,7 +79,7 @@ window.WEDDING = {
     { name: '娸華', table: 10, g: 'f', count: 2 },
     // 第 11 桌
     { name: '國慶', table: 11, g: 'm', count: 4 },
-    { name: '月裡', table: 11, g: 'f', count: 2 },
+    { name: '月裡', table: 11, g: 'f', count: 2, img: 'img/guest/silver_f.png', ratio: 267 / 512 },   // 銀白短髮造型（Gemini）
     { name: '新郎阿嬤', table: 11, g: 'f', elder: true, img: 'img/grandma.png', ratio: 282 / 512 },   // Gemini 生成的圖
     { name: '新郎二舅舅', table: 11, g: 'm' },
     // 第 12 桌
