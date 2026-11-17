@@ -20,8 +20,8 @@ window.WEDDING = {
   venue: 'Honeywood 美式饗宴',
   // 主桌：新郎新娘＋雙方主婚人（名字可改）
   vip: [
-    { id: 'groom', name: '思宏（新郎）', role: 'groom' },
-    { id: 'bride', name: '瀅安（新娘）', role: 'bride' },
+    { id: 'groom', name: '思宏（新郎）', role: 'groom', img: 'img/groom.png', ratio: 253 / 512 },   // Gemini 生成的圖
+    { id: 'bride', name: '瀅安（新娘）', role: 'bride', img: 'img/bride.png', ratio: 251 / 512 },
     { id: 'gdad', name: '民星（男方主婚人）', role: 'dad', side: 'g' },
     { id: 'gmom', name: '月娥（男方主婚人）', role: 'mom', side: 'g' },
     { id: 'bdad', name: '定震（女方主婚人）', role: 'dad', side: 'b' },

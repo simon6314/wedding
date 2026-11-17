@@ -211,6 +211,11 @@ function personSvg(lk, extraBack = '', extraFront = '') {
   const g = lk.kid ? `<g transform="translate(40 92) scale(${lk.baby ? 0.6 : 0.78}) translate(-40 -92)">${inner}</g>` : inner;
   return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="89" rx="18" ry="3.6" fill="rgba(70,40,20,0.22)"/>${g}</svg>`;
 }
+// 用圖片當人物（例如 Gemini 生成的圖）：圖比線條人物高一點，腳踩在同一個位置
+function picSvg(src, ratio = 0.49) {
+  const h = 118, w = h * ratio;
+  return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="89" rx="${Math.min(24, w / 2)}" ry="3.6" fill="rgba(70,40,20,0.22)"/><image href="${src}" x="${40 - w / 2}" y="${92 - h}" width="${w}" height="${h}" preserveAspectRatio="xMidYMax meet"/></svg>`;
+}
 function vipSvg(role, side) {
   if (role === 'bride') {
     // 新娘：側邊辮子（垂在右肩前）、纖細的身形、長睫毛
@@ -984,11 +989,12 @@ function createPeople() {
   const vipSeat = { groom: 0, bride: 1, gdad: 2, gmom: 3, bdad: 4, bmom: 5 };
   for (const v of (CFG.vip || [])) {
     const name = v.name;
-    const a = makeActor({ kind: v.role, name, svg: vipSvg(v.role, v.side), speed: 72, table: main, cls: 'vip ' + v.role, busy: true });
+    const a = makeActor({ kind: v.role, name, svg: v.img ? picSvg(v.img, v.ratio) : vipSvg(v.role, v.side), speed: 72, table: main, cls: 'vip ' + v.role, busy: true });
     a.seat = main.seatList[vipSeat[v.id]];
     vip[v.id] = a;
   }
-  if (vip.bride) vip.bride.prop = '💐';
+  const brideCfg = (CFG.vip || []).find((v) => v.id === 'bride');
+  if (vip.bride && !(brideCfg && brideCfg.img)) vip.bride.prop = '💐';   // 圖片裡已經有捧花就不用再拿
   for (let i = 0; i < 3; i++) {
     const a = makeActor({ kind: 'staff', name: '服務生', svg: staffSvg(), speed: 88, cls: 'staff', busy: true });
     a.pos = L.P.staffIdle[i].slice();
