@@ -25,7 +25,7 @@ window.WEDDING = {
     { id: 'gdad', name: '民星（男方主婚人）', role: 'dad', side: 'g', img: 'img/gdad.png', ratio: 226 / 512 },
     { id: 'gmom', name: '月娥（男方主婚人）', role: 'mom', side: 'g', img: 'img/gmom.png', ratio: 255 / 512 },
     { id: 'bdad', name: '定震（女方主婚人）', role: 'dad', side: 'b', img: 'img/bdad.png', ratio: 226 / 512 },
-    { id: 'bmom', name: '玉華（女方主婚人）', role: 'mom', side: 'b' },
+    { id: 'bmom', name: '玉華（女方主婚人）', role: 'mom', side: 'b', img: 'img/bmom.png', ratio: 274 / 512 },
   ],
   // 真名單放這裡；留 null 就會用假資料
   GUESTS: [
