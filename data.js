@@ -9,6 +9,7 @@
 //     lap   小朋友裡有幾位不佔座位（坐大人腿上）；baby: true 表示是嬰兒（畫得更小）；highchair: true 表示坐兒童座椅
 //     note  身分備註，例如 '主持人'、'婚禮歌手'
 //     look  外型，例如 { hair: '#1f1b1d', skin: '#dba47c', hs: 'bob' }（hs 髮型：long/bob/pony/bun/short/side）
+//     age   年齡層（換造型圖用）：'mid' 中年、'young' 年輕、'teen' 國中、'toddler' 幼兒；不填會照名字猜
 //     img   用圖片當人物，例如 img: 'img/xxx.png', ratio: 寬 / 高
 //     members 家人的性別和外型，例如 [{ g: 'f', look: { hs: 'bob' } }]
 //   畫面上會出現 count 個人：代表本人＋「王小明的家人」，同一家坐在一起，

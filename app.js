@@ -212,9 +212,42 @@ function personSvg(lk, extraBack = '', extraFront = '') {
   return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="89" rx="18" ry="3.6" fill="rgba(70,40,20,0.22)"/>${g}</svg>`;
 }
 // 用圖片當人物（例如 Gemini 生成的圖）：圖比線條人物高一點，腳踩在同一個位置
-function picSvg(src, ratio = 0.49) {
-  const h = 118, w = h * ratio;
-  return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="89" rx="${Math.min(24, w / 2)}" ry="3.6" fill="rgba(70,40,20,0.22)"/><image href="${src}" x="${40 - w / 2}" y="${92 - h}" width="${w}" height="${h}" preserveAspectRatio="xMidYMax meet"/></svg>`;
+function picSvg(src, ratio = 0.49, scale = 1, back = '', front = '') {
+  const h = 118 * scale, w = h * ratio;
+  return `<svg viewBox="0 0 80 92" aria-hidden="true"><ellipse cx="40" cy="89" rx="${Math.min(24, w / 2)}" ry="3.6" fill="rgba(70,40,20,0.22)"/>${back}<image href="${src}" x="${40 - w / 2}" y="${92 - h}" width="${w}" height="${h}" preserveAspectRatio="xMidYMax meet"/>${front}</svg>`;
+}
+// 一般賓客的 Gemini 造型圖：依「年齡層＋性別」分組，同一組有好幾種造型時照名字固定挑一張
+const GUEST_PICS = {
+  mid_m: [['mid_m_a', 228]], mid_f: [['mid_f_a', 290]],
+  young_m: [['young_m_a', 245]], young_f: [['young_f_a', 281], ['young_f_b', 281]],
+  teen_m: [['teen_m_a', 249]], teen_f: [['teen_f_a', 338]],
+  toddler_m: [], toddler_f: [['toddler_f_a', 255]],
+};
+// 沒在名單寫 age 的話，先用名字猜：這些人當成中年（他們的另一半也是）
+const MID_NAMES = ['新娘大姨', '新郎二舅媽', '新郎二舅舅', '新郎三姑姑', '小燕', '莊', '國隆', '月嬌', '國慶', '月裡', '民政', '寶桂', '麗珠'];
+function ageOf(p) {
+  if (p.age) return p.age;
+  if (p.kid) return 'toddler';
+  if (p.elder) return 'mid';
+  const head = p.family || p.name;
+  if (MID_NAMES.includes(head) && (p.famIdx || 0) <= 1) return 'mid';
+  return 'young';
+}
+function guestPic(p) {
+  const list = GUEST_PICS[`${ageOf(p)}_${p.g === 'f' ? 'f' : 'm'}`] || [];
+  if (!list.length) return null;
+  let h = 0;
+  for (const ch of `${p.name}#${p.famIdx || 0}`) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+  const [f, w] = list[h % list.length];
+  return { src: `img/guest/${f}.png`, ratio: w / 512 };
+}
+function guestSvg(p, lk) {
+  if (p.img) return picSvg(p.img, p.ratio);
+  const pic = p.look ? null : guestPic(p);   // 有特別指定外型的人維持線條人物
+  if (!pic) return p.highchair ? personSvg(lk, HIGHCHAIR_BACK, HIGHCHAIR_FRONT) : personSvg(lk);
+  const age = ageOf(p);
+  const scale = p.baby ? 0.5 : age === 'toddler' ? 0.6 : age === 'teen' ? 0.85 : 1;
+  return p.highchair ? picSvg(pic.src, pic.ratio, scale, HIGHCHAIR_BACK, HIGHCHAIR_FRONT) : picSvg(pic.src, pic.ratio, scale);
 }
 function vipSvg(role, side) {
   if (role === 'bride') {
@@ -980,7 +1013,7 @@ function createPeople() {
         seat = T.seatList[si];
         lastSeat = seat; lastSi = si;
       }
-      const a = makeActor({ kind: 'guest', name: p.name, info: p, lk, table: T, seatIdx: si, svg: p.img ? picSvg(p.img, p.ratio) : p.highchair ? personSvg(lk, HIGHCHAIR_BACK, HIGHCHAIR_FRONT) : personSvg(lk), speed: p.kid ? 95 : rand(62, 78), cls: p.kid ? 'kid' : '' });
+      const a = makeActor({ kind: 'guest', name: p.name, info: p, lk, table: T, seatIdx: si, svg: guestSvg(p, lk), speed: p.kid ? 95 : rand(62, 78), cls: p.kid ? 'kid' : '' });
       a.seat = seat;
       guests.push(a);
     });
