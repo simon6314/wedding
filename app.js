@@ -1434,7 +1434,7 @@ function tableNames(T) {
   if (T.main) return Object.values(vip).map((v) => v.name);
   // 同一家只列填表的人，後面標幾位
   return guests.filter((g) => g.table === T && !g.info.famIdx).map((g) => {
-    const tags = [g.info.note, g.info.famSize > 1 ? `一家 ${g.info.famSize} 位` : ''].filter(Boolean);
+    const tags = [g.info.note, g.info.famSize > 1 ? `${g.info.famSize} 位` : ''].filter(Boolean);
     return tags.length ? `${g.name}（${tags.join('・')}）` : g.name;
   });
 }
@@ -1487,7 +1487,7 @@ function setupSearch() {
     out.innerHTML = '';
     if (!q) return;
     const hits = actors.filter((a) => a.kind !== 'staff' && !(a.info && a.info.famIdx) && a.name.includes(q)).slice(0, 8);
-    out.innerHTML = hits.length ? hits.map((a, i) => `<button type="button" data-i="${actors.indexOf(a)}">${a.name}${a.info && a.info.famSize > 1 ? `（一家 ${a.info.famSize} 位）` : ''}${a.table ? ' · ' + (a.table.main ? '主桌' : '第 ' + a.table.n + ' 桌') : ''}</button>`).join('') : '<span class="muted">找不到這個名字</span>';
+    out.innerHTML = hits.length ? hits.map((a, i) => `<button type="button" data-i="${actors.indexOf(a)}">${a.name}${a.info && a.info.famSize > 1 ? `（${a.info.famSize} 位）` : ''}${a.table ? ' · ' + (a.table.main ? '主桌' : '第 ' + a.table.n + ' 桌') : ''}</button>`).join('') : '<span class="muted">找不到這個名字</span>';
   });
   out.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) highlight(actors[+b.dataset.i]); });
 }
