@@ -85,5 +85,5 @@ window.WEDDING = {
     { name: '新郎三姑姑', table: 12, g: 'f', count: 5, kids: 1, lap: 1, highchair: true },     // 含一位兒童（坐兒童座椅，不佔一般座位）
   ],
   // 桌子備註
-  tableNotes: { 13: '預備桌' },
+  tableNotes: {},
 };
