@@ -1476,7 +1476,8 @@ function highlight(a) {
   const fam = a.info && a.info.family ? guests.filter((g) => g.info.family === a.info.family && g.table === a.table) : [a];
   for (const m of fam) { m.hl = true; m.el.classList.add('hl'); place(m); setTimeout(() => { if (m.hl) { m.hl = false; m.el.classList.remove('hl'); place(m); } }, 12000); }
   if (a.table) { a.table.el.classList.add('hl'); tapTable(a.table); }
-  if (PHONE) a.el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'smooth' });
+  // 不論直向或橫向，都把畫面捲到這位客人的位置
+  a.el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'smooth' });
   setTimeout(() => { if (a.hl) { a.hl = false; a.el.classList.remove('hl'); place(a); a.table && a.table.el.classList.remove('hl'); } }, 12000);
 }
 function setupSearch() {
