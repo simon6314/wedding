@@ -39,7 +39,7 @@ window.WEDDING = {
     // 第 3 桌
     { name: '麗珠', table: 3, g: 'f' },
     { name: '品劭', table: 3, g: 'f' },
-    { name: '芸岑', table: 3, g: 'f', count: 2, members: [{ g: 'm' }], img: 'img/guest/young_f_jeans.png', ratio: 281 / 512 },   // 長髮＋牛仔褲造型；朋友（男）同行
+    { name: '芸岑', table: 3, g: 'f', count: 2, members: [{ g: 'f' }], img: 'img/guest/young_f_jeans.png', ratio: 281 / 512 },   // 長髮＋牛仔褲造型；朋友（女）同行
     { name: '菁莓', table: 3, g: 'f' },
     { name: '嘉真', table: 3, g: 'f' },
     // 第 4 桌
