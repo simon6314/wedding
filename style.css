@@ -199,10 +199,10 @@ button { font: inherit; color: inherit; }
 #tablePop span { display: flex; flex-wrap: wrap; gap: .3em; }
 #tablePop i { font-style: normal; background: #fff1f4; border-radius: 999px; padding: .1em .55em; white-space: nowrap; }
 /* 面板座位表 */
-#seatList { display: grid; gap: 8px; max-height: 34vh; overflow-y: auto; padding-right: 4px; }
+#seatList { display: grid; gap: 8px; padding-right: 4px; }
 /* 橫向（平板）：座位表放在場景正下方，多欄排列 */
 #app[data-ori="land"] #seatSec { flex: 0 0 auto; margin: 0 14px 12px; padding: 10px 14px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
-#app[data-ori="land"] #seatSec #seatList { max-height: 26vh; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 6px 16px; }
+#app[data-ori="land"] #seatSec #seatList { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 6px 16px; }
 #app[data-ori="port"] #seatList { max-height: none; }
 .seat-row { display: grid; grid-template-columns: 4.2em 1fr; gap: 6px; align-items: start; font-size: 16px; }
 .seat-row b { color: #8a6a52; cursor: pointer; padding-top: 3px; }
