@@ -878,6 +878,7 @@ function renderDishes(T) {
 }
 
 function sizeStage() {
+  placeSeat();   // 先確定座位表位置，場景才會依剩下的空間縮放
   const wrap = $('#stageWrap');
   const aw = wrap.clientWidth, ah = wrap.clientHeight;
   let w;
@@ -1502,12 +1503,22 @@ function rebuild() {
     }
   }
   $('#app').dataset.ori = PHONE ? 'port' : 'land';
+  placeSeat();
+  sizeStage();
 }
 // 視窗大小改變（手機網址列收合、轉向、全螢幕）：平面圖不用重畫，只調整大小，
 // 桌子物件保持同一份，賓客和桌子的對應才不會跑掉
+// 座位表：橫向（平板）時放在整個場景的正下方；直向（手機）時放回面板裡
+function placeSeat() {
+  const sec = document.getElementById('seatSec');
+  if (!sec) return;
+  if (PHONE) document.getElementById('panel').insertBefore(sec, document.getElementById('logSec'));
+  else document.getElementById('mainCol').appendChild(sec);
+}
 function relayout() {
   PHONE = innerWidth < innerHeight * 0.95;
   $('#app').dataset.ori = PHONE ? 'port' : 'land';
+  placeSeat();
   sizeStage();
 }
 const TABLE_STATE = {};
@@ -1524,6 +1535,7 @@ function init() {
   $('#count').textContent = `${guests.length + Object.keys(vip).length} 位`;
   setupSearch();
   renderSeatList();
+  sizeStage();   // 座位表內容填好後高度會變，場景要重新依剩下的空間縮放
   let rt;
   addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(relayout, 150); });
   $('#btnNames').addEventListener('click', (e) => { state.names = !state.names; stage.classList.toggle('names', state.names); e.currentTarget.classList.toggle('on', state.names); });

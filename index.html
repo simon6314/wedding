@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f6ece2">
 <title>婚禮派對</title>
-<link rel="stylesheet" href="style.css?v=20261117_14">
+<link rel="stylesheet" href="style.css?v=20261119b">
 </head>
 <body>
 <div id="app" data-ori="land">
+  <div id="mainCol">
   <div id="stageWrap">
     <div id="stage">
       <svg id="floor" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
@@ -21,6 +22,7 @@
       <div id="tablePop"></div>
     </div>
     <button type="button" id="btnShow">顯示面板</button>
+  </div>
   </div>
   <div id="swipeHint">← 左右滑動看全場 →</div>
   <aside id="panel">
@@ -39,11 +41,11 @@
       <div id="findOut"></div>
       <p id="tableInfo" class="muted">點一下桌子可以看這桌坐誰</p>
     </section>
-    <section>
+    <section id="seatSec">
       <span class="k">座位表</span>
       <div id="seatList"></div>
     </section>
-    <section>
+    <section id="logSec">
       <span class="k">最新動態</span>
       <ul id="log"></ul>
     </section>
@@ -56,6 +58,6 @@
   </aside>
 </div>
 <script src="data.js?v=20261119b"></script>
-<script src="app.js?v=20261117_14"></script>
+<script src="app.js?v=20261119b"></script>
 </body>
 </html>
