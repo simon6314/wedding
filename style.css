@@ -81,9 +81,9 @@ button { font: inherit; color: inherit; }
 @keyframes scpop { from { opacity: 0; transform: scale(.7); } }
 
 /* 人物 */
-.actor { position: absolute; left: 0; top: 0; will-change: transform; width: calc(var(--u) * 33); height: calc(var(--u) * 38); padding: 0; border: 0; background: none; transform: translate(-50%, -100%); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.actor { position: absolute; left: 0; top: 0; will-change: transform; width: calc(var(--u) * 26.5); height: calc(var(--u) * 30.5); padding: 0; border: 0; background: none; transform: translate(-50%, -100%); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .actor.kid { }
-.actor.vip.bride { width: calc(var(--u) * 37); height: calc(var(--u) * 42.5); }
+.actor.vip.bride { width: calc(var(--u) * 30); height: calc(var(--u) * 34); }
 .actor.hide { display: none; }
 .actor .fig { position: absolute; inset: 0; display: block; transition: transform .2s; }
 .actor .fig.flip { transform: scaleX(-1); }
