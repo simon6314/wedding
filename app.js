@@ -28,7 +28,7 @@ const AREAS = [
 ];
 // 桌子：seats = 座位數（第 8、10 桌是 6 人桌）
 const TABLES = [
-  { n: 1, round: true, cx: 1020, cy: 118, r: 25, seats: 6 },
+  { n: 13, round: true, cx: 1020, cy: 118, r: 25, seats: 6 },
   { n: 2, x: 868, y: 38, w: 84, h: 110, seats: 6 },
   { n: 3, x: 733, y: 38, w: 84, h: 110, seats: 6 },
   { n: 4, x: 598, y: 38, w: 84, h: 110, seats: 6 },
