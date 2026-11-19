@@ -885,7 +885,7 @@ function sizeStage() {
   if (PHONE) {
     // 高度大約佔螢幕七成，寬度跟著平面圖比例變寬，左右滑動看
     const h = Math.max(360, Math.min(innerHeight * 0.68, 640));
-    w = Math.max(aw, h * SW / SH * ZOOM);
+    w = Math.max(aw, h * SW / SH);   // 基準大小；放大縮小交給 setZoom（用 transform，不重新排版）
   } else {
     // 橫向：場景放大到佔滿主要區域的寬度，高度不夠的部分上下滑動看
     w = aw;
@@ -895,6 +895,7 @@ function sizeStage() {
   stage.style.height = (w * SH / SW) + 'px';
   stage.style.setProperty('--u', (w / SW) + 'px');
   UPX = w / SW;
+  applyZoomStyle();
   for (const a of actors) place(a);
   if (PHONE) {
     // 第一次先置中在用餐區；縮放時維持看的中心
@@ -903,6 +904,25 @@ function sizeStage() {
   }
 }
 let ZOOM = 1, UPX = 1;
+// 縮放只改 transform（GPU 處理，順）；寬高留出空間讓它可以滑動
+function applyZoomStyle() {
+  const base = parseFloat(stage.style.width) || 0;
+  stage.style.transform = ZOOM === 1 ? '' : `scale(${ZOOM})`;
+  stage.style.marginRight = PHONE ? `${base * (ZOOM - 1)}px` : '';
+  stage.style.marginBottom = PHONE ? `${base * SH / SW * (ZOOM - 1)}px` : '';
+}
+function setZoom(z) {
+  const wrap = $('#stageWrap');
+  const base = parseFloat(stage.style.width) || wrap.clientWidth;
+  const bh = base * SH / SW;
+  // 維持看的中心不變
+  const cx = (wrap.scrollLeft + wrap.clientWidth / 2) / (base * ZOOM);
+  const cy = (wrap.scrollTop + wrap.clientHeight / 2) / (bh * ZOOM);
+  ZOOM = z;
+  applyZoomStyle();
+  wrap.scrollLeft = cx * base * ZOOM - wrap.clientWidth / 2;
+  wrap.scrollTop = cy * bh * ZOOM - wrap.clientHeight / 2;
+}
 
 // ---- 狀態與面板 ----
 const state = { phase: 'party', course: -1, toasts: 0, cheers: 0, event: '', toastOrder: [], names: false };
@@ -1543,8 +1563,8 @@ function init() {
   $('#btnFull').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); });
   $('#btnPanel').addEventListener('click', () => { $('#app').classList.toggle('nopanel'); sizeStage(); });
   $('#btnShow').addEventListener('click', () => { $('#app').classList.remove('nopanel'); sizeStage(); });
-  $('#zoomIn').addEventListener('click', () => { ZOOM = Math.min(2.2, ZOOM * 1.25); sizeStage(); });
-  $('#zoomOut').addEventListener('click', () => { ZOOM = Math.max(0.3, ZOOM / 1.25); sizeStage(); });
+  $('#zoomIn').addEventListener('click', () => setZoom(Math.min(2.2, ZOOM * 1.25)));
+  $('#zoomOut').addEventListener('click', () => setZoom(Math.max(0.3, ZOOM / 1.25)));
   stage.addEventListener('click', () => { clearHl(); closePop(); });
   if (PHONE) { const hint = $('#swipeHint'); hint.style.top = (stage.offsetHeight - 46) + 'px'; hint.classList.add('show'); const off = () => hint.classList.remove('show'); setTimeout(off, 4500); setTimeout(() => $('#stageWrap').addEventListener('scroll', off, { once: true }), 800); }
   setInterval(screenTick, 4500); screenTick();
