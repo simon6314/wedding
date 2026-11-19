@@ -1557,8 +1557,17 @@ function init() {
   setupSearch();
   renderSeatList();
   sizeStage();   // 座位表內容填好後高度會變，場景要重新依剩下的空間縮放
-  let rt;
-  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(relayout, 150); });
+  // 平板手勢時瀏覽器工具列會伸縮，只改變高度；寬度沒變就不重新排版（避免卡頓）
+  let rt, lastVW = innerWidth, lastPhone = null;
+  addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => {
+      const phoneNow = innerWidth < innerHeight * 0.95;
+      if (innerWidth === lastVW && phoneNow === lastPhone) return;
+      lastVW = innerWidth; lastPhone = phoneNow;
+      relayout();
+    }, 150);
+  });
   $('#btnNames').addEventListener('click', (e) => { state.names = !state.names; stage.classList.toggle('names', state.names); e.currentTarget.classList.toggle('on', state.names); });
   $('#btnFull').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); });
   $('#btnPanel').addEventListener('click', () => { $('#app').classList.toggle('nopanel'); sizeStage(); });
