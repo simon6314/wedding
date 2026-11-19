@@ -16,6 +16,8 @@ button { font: inherit; color: inherit; }
 
 #stageWrap { flex: 1 1 auto; min-width: 0; min-height: 0; display: flex; align-items: center; justify-content: center; position: relative; }
 #mainCol { flex: 1 1 auto; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+#app[data-ori="land"] #mainCol { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+#app[data-ori="land"] #stageWrap { flex: none; min-height: auto; align-items: flex-start; }
 #app[data-ori="port"] #mainCol { display: block; }
 #app[data-ori="port"] #stageWrap { display: block; overflow: auto; flex: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
 #stage { position: relative; flex: none; overflow: hidden; border-radius: 14px; box-shadow: 0 6px 24px rgba(90, 60, 40, .18); background: #cbb8a6; user-select: none; -webkit-user-select: none; }

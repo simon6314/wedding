@@ -887,7 +887,8 @@ function sizeStage() {
     const h = Math.max(360, Math.min(innerHeight * 0.68, 640));
     w = Math.max(aw, h * SW / SH * ZOOM);
   } else {
-    w = Math.min(aw, ah * SW / SH);
+    // 橫向：場景放大到佔滿主要區域的寬度，高度不夠的部分上下滑動看
+    w = aw;
   }
   const prevW = parseFloat(stage.style.width) || 0;
   stage.style.width = w + 'px';
