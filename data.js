@@ -71,7 +71,7 @@ window.WEDDING = {
     { name: '月嬌', table: 9, g: 'f' },
     { name: '新郎二舅媽', table: 9, g: 'f' },
     { name: '佳紋', table: 9, g: 'f' },
-    { name: '明偉', table: 9, g: 'm' },
+    { name: '明緯', table: 9, g: 'm' },
     // 第 10 桌
     { name: '逸凱', table: 10, g: 'm', count: 4, age: 'mid', members: [{ g: 'f', age: 'mid' }, { g: 'm', age: 'teen' }, { g: 'f', age: 'teen' }] },   // 家人：太太＋國中男生＋國中女生
     { name: '娸華', table: 10, g: 'f', count: 2 },
