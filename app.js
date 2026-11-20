@@ -224,7 +224,7 @@ const GUEST_PICS = {
   toddler_m: [], toddler_f: [['toddler_f_a', 255]],
 };
 // 沒在名單寫 age 的話，先用名字猜：這些人當成中年（他們的另一半也是）
-const MID_NAMES = ['新娘大姨', '新郎二舅媽', '新郎二舅舅', '新郎三姑姑', '小燕', '莊', '國隆', '月嬌', '國慶', '月裡', '民政', '寶桂', '麗珠'];
+const MID_NAMES = ['新娘大姨', '新郎二舅媽', '國興', '月鳳', '小燕', '莊', '國隆', '月嬌', '國慶', '月裡', '民政', '寶桂', '麗珠'];
 function ageOf(p) {
   if (p.age) return p.age;
   if (p.kid) return 'toddler';
