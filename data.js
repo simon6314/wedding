@@ -79,10 +79,10 @@ window.WEDDING = {
     { name: '國慶', table: 11, g: 'm', count: 4 },
     { name: '月裡', table: 11, g: 'f', count: 2, img: 'img/guest/silver_f.png', ratio: 267 / 512 },   // 銀白短髮造型（Gemini）
     { name: '新郎阿嬤', table: 11, g: 'f', elder: true, img: 'img/grandma.png', ratio: 282 / 512 },   // Gemini 生成的圖
-    { name: '新郎二舅舅', table: 11, g: 'm' },
+    { name: '國興', table: 11, g: 'm' },
     // 第 12 桌
     { name: '民政', table: 12, g: 'm', count: 4 },
-    { name: '新郎三姑姑', table: 12, g: 'f', count: 5, kids: 1, lap: 1, highchair: true },     // 含一位兒童（坐兒童座椅，不佔一般座位）
+    { name: '月鳳', table: 12, g: 'f', count: 5, kids: 1, lap: 1, highchair: true },     // 含一位兒童（坐兒童座椅，不佔一般座位）
   ],
   // 桌子備註
   tableNotes: { 13: '預備桌' },
