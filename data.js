@@ -41,7 +41,7 @@ window.WEDDING = {
     { name: '品劭', table: 3, g: 'f' },
     { name: '芸岑', table: 3, g: 'f', count: 2, members: [{ g: 'f', rel: '朋友' }], img: 'img/guest/young_f_jeans.png', ratio: 281 / 512 },   // 長髮＋牛仔褲造型；朋友（女）同行，稱呼為「朋友」
     { name: '菁莓', table: 3, g: 'f' },
-    { name: '嘉真', table: 3, g: 'f' },
+    { name: '嘉真', table: 3, g: 'f', img: 'img/jiazhen.png', ratio: 287 / 512 },
     // 第 4 桌
     { name: '建智', table: 4, g: 'm', count: 2, note: '主持人', img: 'img/jianzhi.png', ratio: 225 / 512, members: [{ g: 'f', age: 'young' }] },   // 主持人；家人：年輕女性
     { name: 'Glenn', table: 4, g: 'm', count: 2, lang: 'en', img: 'img/guest/glenn.png', ratio: 230 / 512 },   // 只會英文；菲律賓人造型（Gemini）
