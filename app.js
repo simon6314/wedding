@@ -242,7 +242,11 @@ function guestPic(p) {
   return { src: `img/guest/${f}.png`, ratio: w / 512 };
 }
 function guestSvg(p, lk) {
-  if (p.img) return picSvg(p.img, p.ratio);
+  if (p.img) {
+    // 自訂圖也要套用幼兒比例，兒童座椅的前後擋板同樣要畫
+    const scale = p.baby ? 0.5 : p.kid ? 0.6 : 1;
+    return p.highchair ? picSvg(p.img, p.ratio, scale, HIGHCHAIR_BACK, HIGHCHAIR_FRONT) : picSvg(p.img, p.ratio, scale);
+  }
   const pic = p.look ? null : guestPic(p);   // 有特別指定外型的人維持線條人物
   if (!pic) return p.highchair ? personSvg(lk, HIGHCHAIR_BACK, HIGHCHAIR_FRONT) : personSvg(lk);
   const age = ageOf(p);
