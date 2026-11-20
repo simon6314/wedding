@@ -50,7 +50,7 @@ window.WEDDING = {
     { name: '宜妏', table: 5, g: 'f', count: 5 },
     { name: '新娘大姨', table: 5, g: 'f' },
     // 第 6 桌
-    { name: '宜秀', table: 6, g: 'f', img: 'img/yixiu.png', ratio: 304 / 512 },   // 新圖（去除白底）
+    { name: '宜秀', table: 6, g: 'f', img: 'img/yixiu_v2.png', ratio: 309 / 512 },   // 新圖（去除白底）
     { name: '淑鈴', table: 6, g: 'f', img: 'img/guest/young_f_jeans.png', ratio: 281 / 512 },   // 長髮＋牛仔褲造型
     { name: '昱靜', table: 6, g: 'f', img: 'img/guest/young_f_jeans.png', ratio: 281 / 512 },   // 長髮＋牛仔褲造型
     { name: '芃磬', table: 6, g: 'f', img: 'img/guest/young_f_jeans.png', ratio: 281 / 512 },   // 長髮＋牛仔褲造型
@@ -73,7 +73,7 @@ window.WEDDING = {
     { name: '佳紋', table: 9, g: 'f' },
     { name: '明緯', table: 9, g: 'm' },
     // 第 10 桌
-    { name: '逸凱', table: 10, g: 'm', count: 4, age: 'mid', members: [{ g: 'f', age: 'mid' }, { g: 'm', age: 'teen' }, { g: 'f', age: 'teen' }] },   // 家人：太太＋國中男生＋國中女生
+    { name: '逸凱', table: 10, g: 'm', count: 4, age: 'mid', members: [{ g: 'f', age: 'mid', img: 'img/yikai_wife.png', ratio: 304 / 512 }, { g: 'm', age: 'teen' }, { g: 'f', age: 'teen' }] },   // 家人：太太＋國中男生＋國中女生
     { name: '娸華', table: 10, g: 'f', count: 2 },
     // 第 11 桌
     { name: '國慶', table: 11, g: 'm', count: 4 },
