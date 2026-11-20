@@ -70,7 +70,7 @@ window.WEDDING = {
     { name: '國隆', table: 9, g: 'm' },
     { name: '月嬌', table: 9, g: 'f' },
     { name: '新郎二舅媽', table: 9, g: 'f' },
-    { name: '佳紋', table: 9, g: 'f' },
+    { name: '佳紋', table: 9, g: 'f', img: 'img/jiawen.png', ratio: 287 / 512 },
     { name: '明緯', table: 9, g: 'm' },
     // 第 10 桌
     { name: '逸凱', table: 10, g: 'm', count: 4, age: 'mid', members: [{ g: 'f', age: 'mid', img: 'img/yikai_wife.png', ratio: 304 / 512 }, { g: 'm', age: 'teen' }, { g: 'f', age: 'teen' }] },   // 家人：太太＋國中男生＋國中女生
