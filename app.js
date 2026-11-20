@@ -924,6 +924,18 @@ function setZoom(z) {
   wrap.scrollTop = cy * bh * ZOOM - wrap.clientHeight / 2;
 }
 
+// 滑鼠 Ctrl＋滾輪：以游標位置為中心縮放（電腦版）
+function zoomAt(z, cx, cy) {
+  const r = stage.getBoundingClientRect();
+  const fx = (cx - r.left) / r.width, fy = (cy - r.top) / r.height;   // 游標在場景上的相對位置
+  ZOOM = z;
+  applyZoomStyle();
+  const r2 = stage.getBoundingClientRect();
+  const sc = PHONE ? $('#stageWrap') : $('#mainCol');
+  sc.scrollLeft += (r2.left + fx * r2.width) - cx;
+  sc.scrollTop += (r2.top + fy * r2.height) - cy;
+}
+
 // ---- 狀態與面板 ----
 const state = { phase: 'party', course: -1, toasts: 0, cheers: 0, event: '', toastOrder: [], names: false };
 function banner(text, ms = 3500) {
@@ -1575,6 +1587,13 @@ function init() {
   $('#btnShow').addEventListener('click', () => { $('#app').classList.remove('nopanel'); sizeStage(); });
   $('#zoomIn').addEventListener('click', () => setZoom(Math.min(2.2, ZOOM * 1.25)));
   $('#zoomOut').addEventListener('click', () => setZoom(Math.max(0.3, ZOOM / 1.25)));
+  // 按住 Ctrl 再滾動滾輪：縮放場景（取代瀏覽器本身的整頁縮放）
+  $('#stageWrap').addEventListener('wheel', (e) => {
+    if (!e.ctrlKey) return;
+    e.preventDefault();
+    const z = Math.min(2.2, Math.max(0.3, ZOOM * (e.deltaY < 0 ? 1.1 : 1 / 1.1)));
+    if (Math.abs(z - ZOOM) > 1e-4) zoomAt(z, e.clientX, e.clientY);
+  }, { passive: false });
   stage.addEventListener('click', () => { clearHl(); closePop(); });
   if (PHONE) { const hint = $('#swipeHint'); hint.style.top = (stage.offsetHeight - 46) + 'px'; hint.classList.add('show'); const off = () => hint.classList.remove('show'); setTimeout(off, 4500); setTimeout(() => $('#stageWrap').addEventListener('scroll', off, { once: true }), 800); }
   setInterval(screenTick, 4500); screenTick();
