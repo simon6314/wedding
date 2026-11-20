@@ -34,7 +34,7 @@ window.WEDDING = {
     // 第 2 桌
     { name: '姵汝', table: 2, g: 'f', img: 'img/yuru.png', ratio: 295 / 512 },   // 新圖（去除白底）
     { name: '鈺庭', table: 2, g: 'm', count: 3, kids: 1, lap: 1, baby: true, members: [{ g: 'f' }, { g: 'f' }] },   // 鈺庭（男）＋家人（女）＋未滿一歲的女兒
-    { name: '明兌', table: 2, g: 'f', count: 2, kids: 1, lap: 1, highchair: true, members: [{ g: 'f' }] },   // 一位成人＋女兒（坐兒童座椅，不佔一般座位）
+    { name: '明兌', table: 2, g: 'f', count: 2, kids: 1, img: 'img/mingdui.png', ratio: 272 / 512, lap: 1, highchair: true, members: [{ g: 'f' }] },   // 一位成人＋女兒（坐兒童座椅，不佔一般座位）
     { name: '閤祈', table: 2, g: 'f', count: 3, img: 'img/heqi.png', ratio: 288 / 512, kids: 1, lap: 1, highchair: true, members: [{ g: 'm' }, { g: 'f' }] },   // 一家三位：閤祈＋先生＋女兒（女兒坐兒童座椅，不佔一般座位）
     // 第 3 桌
     { name: '麗珠', table: 3, g: 'f' },
