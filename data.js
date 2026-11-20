@@ -54,7 +54,7 @@ window.WEDDING = {
     { name: '淑鈴', table: 6, g: 'f', img: 'img/shuling.png', ratio: 240 / 512 },   // 新圖（去除白底）
     { name: '昱靜', table: 6, g: 'f', img: 'img/yujing.png', ratio: 251 / 512 },   // 新圖（去除白底）
     { name: '芃磬', table: 6, g: 'f', img: 'img/pengqing.png', ratio: 310 / 512 },   // 新圖（去除白底）
-    { name: '瀅琦', table: 6, g: 'f' },
+    { name: '瀅琦', table: 6, g: 'f', img: 'img/yanqi.png', ratio: 287 / 512 },
     { name: '士堯', table: 6, g: 'm' },
     // 第 7 桌
     { name: '宗益', table: 7, g: 'm', count: 4 },
