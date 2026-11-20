@@ -38,7 +38,7 @@ window.WEDDING = {
     { name: '閤祈', table: 2, g: 'f', count: 3, img: 'img/heqi.png', ratio: 288 / 512, kids: 1, lap: 1, highchair: true, members: [{ g: 'm' }, { g: 'f' }] },   // 一家三位：閤祈＋先生＋女兒（女兒坐兒童座椅，不佔一般座位）
     // 第 3 桌
     { name: '麗珠', table: 3, g: 'f', img: 'img/lizhu.png', ratio: 283 / 512 },
-    { name: '品劭', table: 3, g: 'f' },
+    { name: '品劭', table: 3, g: 'f', img: 'img/pinshao.png', ratio: 283 / 512 },
     { name: '芸岑', table: 3, g: 'f', count: 2, members: [{ g: 'f', rel: '朋友' }], img: 'img/yunqin_v2.png', ratio: 286 / 512 },   // 新圖（去除白底）；朋友（女）同行，稱呼為「朋友」
     { name: '菁莓', table: 3, g: 'f', img: 'img/jingmei.png', ratio: 251 / 512 },
     { name: '嘉真', table: 3, g: 'f', img: 'img/jiazhen.png', ratio: 287 / 512 },
