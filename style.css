@@ -212,3 +212,7 @@ button { font: inherit; color: inherit; }
 .seat-row button:hover { border-color: var(--pink); }
 
 .seat-row em { font-style: normal; padding-top: 4px; font-size: 21px; }
+
+/* 電腦版拖曳移動場景 */
+#stageWrap { cursor: grab; }
+#stageWrap.dragging { cursor: grabbing; user-select: none; }

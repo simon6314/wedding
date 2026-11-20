@@ -1587,6 +1587,35 @@ function init() {
   $('#btnShow').addEventListener('click', () => { $('#app').classList.remove('nopanel'); sizeStage(); });
   $('#zoomIn').addEventListener('click', () => setZoom(Math.min(2.2, ZOOM * 1.25)));
   $('#zoomOut').addEventListener('click', () => setZoom(Math.max(0.3, ZOOM / 1.25)));
+  // 電腦版：按住滑鼠左鍵拖曳來移動畫面（觸控仍用手指滑動）
+  {
+    const wrap = $('#stageWrap');
+    const scroller = () => (PHONE ? wrap : $('#mainCol'));
+    let drag = null, moved = false, eatClick = false;
+    wrap.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      const sc = scroller();
+      drag = { x: e.clientX, y: e.clientY, l: sc.scrollLeft, t: sc.scrollTop };
+      moved = false;
+    });
+    addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!moved && Math.hypot(dx, dy) < 5) return;
+      if (!moved) { moved = true; wrap.classList.add('dragging'); }
+      const sc = scroller();
+      sc.scrollLeft = drag.l - dx;
+      sc.scrollTop = drag.t - dy;
+    });
+    addEventListener('pointerup', () => {
+      if (!drag) return;
+      drag = null;
+      if (moved) { eatClick = true; setTimeout(() => { eatClick = false; }, 0); }
+      wrap.classList.remove('dragging');
+    });
+    // 拖曳結束時不要把這次放開當成點擊（不然會誤觸人物或桌子）
+    wrap.addEventListener('click', (e) => { if (eatClick) { e.stopPropagation(); e.preventDefault(); } }, true);
+  }
   // 按住 Ctrl 再滾動滾輪：縮放場景（取代瀏覽器本身的整頁縮放）
   $('#stageWrap').addEventListener('wheel', (e) => {
     if (!e.ctrlKey) return;
