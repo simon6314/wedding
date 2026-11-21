@@ -70,7 +70,7 @@ window.WEDDING = {
     { name: '嬌仙', table: 7, g: 'f', count: 1 },
     { name: '家禾', table: 7, g: 'm', count: 1 },
     { name: '家鋐', table: 7, g: 'm', count: 1 },
-    { name: '玫秀', table: 7, g: 'f', img: 'img/guest/silver_f.png', ratio: 267 / 512 },   // 銀白短髮造型（Gemini）
+    { name: '玫秀', table: 7, g: 'f', img: 'img/yixiu_mei_v3.png', ratio: 265 / 512 },   // 銀白短髮造型（Gemini）
     { name: '玉智', table: 7, g: 'f' },
     { name: '小燕', table: 7, g: 'f' },
     { name: '莊', table: 7, g: 'f' },
