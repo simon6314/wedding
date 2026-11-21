@@ -73,7 +73,7 @@ window.WEDDING = {
     { name: '玫秀', table: 7, g: 'f', img: 'img/yixiu_mei_v3.png', ratio: 265 / 512 },   // 銀白短髮造型（Gemini）
     { name: '玉智', table: 7, g: 'f' },
     { name: '小燕', table: 7, g: 'f' },
-    { name: '莊', table: 7, g: 'f' },
+    { name: '莊', table: 7, g: 'f', img: 'img/zhuang_v2.png', ratio: 265 / 512 },
     // 第 8 桌
     { name: '峻緯', table: 8, g: 'm', count: 3 },
     { name: '筠霏', table: 8, g: 'f', count: 2 },
