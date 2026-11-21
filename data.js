@@ -47,7 +47,11 @@ window.WEDDING = {
     { name: 'Glenn', table: 4, g: 'm', count: 2, lang: 'en', img: 'img/guest/glenn.png', ratio: 230 / 512 },   // 只會英文；菲律賓人造型（Gemini）
     { name: '寶桂', table: 4, g: 'f', count: 2, img: 'img/baogui.png', ratio: 283 / 512 },
     // 第 5 桌
-    { name: '宜妏', table: 5, g: 'f', count: 5, members: [{ g: 'f', nm: '靜芬', img: 'img/yixun_wife.png', ratio: 288 / 512 }, { g: 'm', nm: '宗城' }, { g: 'f', nm: '可欣' }, { g: 'm', nm: '皓宇' }] },
+    { name: '宜妏', table: 5, g: 'f', count: 1 },
+    { name: '宗城', table: 5, g: 'm', count: 1 },
+    { name: '靜芬', table: 5, g: 'f', count: 1, img: 'img/yixun_wife.png', ratio: 288 / 512 },
+    { name: '可欣', table: 5, g: 'f', count: 1 },
+    { name: '皓宇', table: 5, g: 'm', count: 1 },
     { name: '新娘大姨', table: 5, g: 'f' },
     // 第 6 桌
     { name: '宜秀', table: 6, g: 'f', img: 'img/yixiu_v2.png', ratio: 309 / 512 },   // 新圖（去除白底）
@@ -57,7 +61,10 @@ window.WEDDING = {
     { name: '瀅琦', table: 6, g: 'f', img: 'img/yanqi.png', ratio: 287 / 512 },
     { name: '士堯', table: 6, g: 'm' },
     // 第 7 桌
-    { name: '宗益', table: 7, g: 'm', count: 4, members: [{ g: 'f', nm: '嬌仙' }, { g: 'm', nm: '家禾' }, { g: 'm', nm: '家鋐' }] },
+    { name: '宗益', table: 7, g: 'm', count: 1 },
+    { name: '嬌仙', table: 7, g: 'f', count: 1 },
+    { name: '家禾', table: 7, g: 'm', count: 1 },
+    { name: '家鋐', table: 7, g: 'm', count: 1 },
     { name: '玫秀', table: 7, g: 'f', img: 'img/guest/silver_f.png', ratio: 267 / 512 },   // 銀白短髮造型（Gemini）
     { name: '玉智', table: 7, g: 'f' },
     { name: '小燕', table: 7, g: 'f' },
