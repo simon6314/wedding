@@ -1450,7 +1450,9 @@ function tableNames(T) {
   if (T.main) return Object.values(vip).map((v) => v.name);
   // 同一家只列填表的人，後面標幾位
   return guests.filter((g) => g.table === T && !g.info.famIdx).map((g) => {
-    const tags = [g.info.note, g.info.famSize > 1 ? `${g.info.famSize} 位` : ''].filter(Boolean);
+    // 有指定名字的家人，直接列出名字（沒有指定的仍寫幾位）
+    const named = guests.filter((x) => x.info.family === g.name && x.info.famIdx && !x.name.includes('的')).map((x) => x.name);
+    const tags = [g.info.note, named.length ? named.join('・') : (g.info.famSize > 1 ? `${g.info.famSize} 位` : '')].filter(Boolean);
     return tags.length ? `${g.name}（${tags.join('・')}）` : g.name;
   });
 }
