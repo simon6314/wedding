@@ -23,7 +23,7 @@ window.WEDDING = {
   // 主桌：新郎新娘＋雙方主婚人（名字可改）
   vip: [
     { id: 'groom', name: '思宏（新郎）', role: 'groom', img: 'img/groom_v2.png', ratio: 241 / 512 },   // Gemini 生成的圖
-    { id: 'bride', name: '瀅安（新娘）', role: 'bride', img: 'img/bride.png', ratio: 251 / 512 },
+    { id: 'bride', name: '瀅安（新娘）', role: 'bride', img: 'img/bride_v2.png', ratio: 340 / 512 },
     { id: 'gdad', name: '民星（男方主婚人）', role: 'dad', side: 'g', img: 'img/gdad.png', ratio: 226 / 512 },
     { id: 'gmom', name: '月娥（男方主婚人）', role: 'mom', side: 'g', img: 'img/gmom.png', ratio: 255 / 512 },
     { id: 'bdad', name: '定震（女方主婚人）', role: 'dad', side: 'b', img: 'img/bdad.png', ratio: 226 / 512 },
