@@ -52,7 +52,7 @@ window.WEDDING = {
     { name: 'Glenn', table: 4, g: 'm', count: 2, lang: 'en', img: 'img/guest/glenn.png', ratio: 230 / 512 },   // 只會英文；菲律賓人造型（Gemini）
     { name: '寶桂', table: 4, g: 'f', count: 2, img: 'img/baogui.png', ratio: 283 / 512 },
     // 第 5 桌
-    { name: '宜妏', table: 5, g: 'f', count: 1 },
+    { name: '宜妏', table: 5, g: 'f', count: 1, img: 'img/yixun_v2.png', ratio: 293 / 512 },
     { name: '宗城', table: 5, g: 'm', count: 1 },
     { name: '靜芬', table: 5, g: 'f', count: 1, img: 'img/jingfen.png', ratio: 285 / 512 },
     { name: '可欣', table: 5, g: 'f', count: 1, img: 'img/kexin.png', ratio: 265 / 512 },
