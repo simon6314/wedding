@@ -1456,6 +1456,26 @@ function tableNames(T) {
     return [tags.length ? `${g.name}（${tags.join('・')}）` : g.name];
   });
 }
+const tableTitle = (T) => (T.main ? '主桌' : '第 ' + T.n + ' 桌');
+// 點桌子：在桌子旁邊跳出這桌的名單（面板裡也會顯示）
+function tapTable(T) {
+  const ppl = tableNames(T);
+  const box = $('#tableInfo');
+  if (box) box.innerHTML = `<b>${tableTitle(T)}${(CFG.tableNotes || {})[T.n] ? '・' + CFG.tableNotes[T.n] : ''}</b>　${ppl.join('、') || '（空桌）'}`;
+  const pop = $('#tablePop');
+  const note = (CFG.tableNotes || {})[T.n];
+  pop.innerHTML = `<b>${tableTitle(T)}${note ? '・' + note : ''}</b><span>${ppl.length ? ppl.map((n) => `<i>${n}</i>`).join('') : '（空桌）'}</span>`;
+  const above = T.cy > SH * 0.42;
+  pop.style.left = Math.min(Math.max(T.cx / SW * 100, 12), 88) + '%';
+  pop.style.top = ((above ? T.y - 6 : T.y + T.h + 34) / SH * 100) + '%';
+  pop.classList.toggle('above', above);
+  pop.classList.add('show');
+  for (const t of L.tables) t.el.classList.toggle('hl', t === T);
+  clearTimeout(tapTable.t);
+  tapTable.t = setTimeout(closePop, 9000);
+}
+function closePop() { $('#tablePop').classList.remove('show'); for (const t of L.tables) t.el.classList.remove('hl'); }
+// 面板裡的完整座位表
 function renderSeatList() {
   const box = $('#seatList');
   if (!box) return;
