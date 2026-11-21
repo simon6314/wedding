@@ -38,7 +38,9 @@ window.WEDDING = {
     { name: '筠甯', table: 2, g: 'f', count: 1, kid: true, baby: true, lap: 1 },   // 未滿一歲，坐在品萱腿上（膝上）
     { name: '明兌', table: 2, g: 'f', count: 1, img: 'img/mingdui.png', ratio: 272 / 512 },
     { name: '樂樂', table: 2, g: 'f', count: 1, kid: true, lap: 1, highchair: true },   // 小孩，坐兒童座椅在明兌旁邊
-    { name: '閤祈', table: 2, g: 'f', count: 3, img: 'img/heqi.png', ratio: 288 / 512, kids: 1, lap: 1, highchair: true, members: [{ g: 'm' }, { g: 'f' }] },   // 一家三位：閤祈＋先生＋女兒（女兒坐兒童座椅，不佔一般座位）
+    { name: '閤祈', table: 2, g: 'f', count: 1, img: 'img/heqi.png', ratio: 288 / 512 },
+    { name: '孟庭', table: 2, g: 'm', count: 1 },
+    { name: '羽涵', table: 2, g: 'f', count: 1, kid: true, lap: 1, highchair: true },   // 幼童，坐幼童座椅在閤祈旁邊
     // 第 3 桌
     { name: '麗珠', table: 3, g: 'f', img: 'img/lizhu.png', ratio: 283 / 512 },
     { name: '品劭', table: 3, g: 'f', img: 'img/pinshao.png', ratio: 283 / 512 },
