@@ -1448,34 +1448,14 @@ function tapActor(a) {
 }
 function tableNames(T) {
   if (T.main) return Object.values(vip).map((v) => v.name);
-  // 同一家只列填表的人，後面標幾位
-  return guests.filter((g) => g.table === T && !g.info.famIdx).map((g) => {
-    // 有指定名字的家人，直接列出名字（沒有指定的仍寫幾位）
+  // 有指定名字的家人：每個人單獨列出名字；其他同一家只列填表的人，後面標幾位
+  return guests.filter((g) => g.table === T && !g.info.famIdx).flatMap((g) => {
     const named = guests.filter((x) => x.info.family === g.name && x.info.famIdx && !x.name.includes('的')).map((x) => x.name);
-    const tags = [g.info.note, named.length ? named.join('・') : (g.info.famSize > 1 ? `${g.info.famSize} 位` : '')].filter(Boolean);
-    return tags.length ? `${g.name}（${tags.join('・')}）` : g.name;
+    if (named.length) return [g.name, ...named];
+    const tags = [g.info.note, g.info.famSize > 1 ? `${g.info.famSize} 位` : ''].filter(Boolean);
+    return [tags.length ? `${g.name}（${tags.join('・')}）` : g.name];
   });
 }
-const tableTitle = (T) => (T.main ? '主桌' : '第 ' + T.n + ' 桌');
-// 點桌子：在桌子旁邊跳出這桌的名單（面板裡也會顯示）
-function tapTable(T) {
-  const ppl = tableNames(T);
-  const box = $('#tableInfo');
-  if (box) box.innerHTML = `<b>${tableTitle(T)}${(CFG.tableNotes || {})[T.n] ? '・' + CFG.tableNotes[T.n] : ''}</b>　${ppl.join('、') || '（空桌）'}`;
-  const pop = $('#tablePop');
-  const note = (CFG.tableNotes || {})[T.n];
-  pop.innerHTML = `<b>${tableTitle(T)}${note ? '・' + note : ''}</b><span>${ppl.length ? ppl.map((n) => `<i>${n}</i>`).join('') : '（空桌）'}</span>`;
-  const above = T.cy > SH * 0.42;
-  pop.style.left = Math.min(Math.max(T.cx / SW * 100, 12), 88) + '%';
-  pop.style.top = ((above ? T.y - 6 : T.y + T.h + 34) / SH * 100) + '%';
-  pop.classList.toggle('above', above);
-  pop.classList.add('show');
-  for (const t of L.tables) t.el.classList.toggle('hl', t === T);
-  clearTimeout(tapTable.t);
-  tapTable.t = setTimeout(closePop, 9000);
-}
-function closePop() { $('#tablePop').classList.remove('show'); for (const t of L.tables) t.el.classList.remove('hl'); }
-// 面板裡的完整座位表
 function renderSeatList() {
   const box = $('#seatList');
   if (!box) return;
