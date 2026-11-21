@@ -54,7 +54,7 @@ window.WEDDING = {
     // 第 5 桌
     { name: '宜妏', table: 5, g: 'f', count: 1 },
     { name: '宗城', table: 5, g: 'm', count: 1 },
-    { name: '靜芬', table: 5, g: 'f', count: 1, img: 'img/yixun_wife.png', ratio: 288 / 512 },
+    { name: '靜芬', table: 5, g: 'f', count: 1, img: 'img/jingfen.png', ratio: 285 / 512 },
     { name: '可欣', table: 5, g: 'f', count: 1 },
     { name: '皓宇', table: 5, g: 'm', count: 1 },
     { name: '新娘大姨', table: 5, g: 'f' },
