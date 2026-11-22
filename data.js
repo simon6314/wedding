@@ -90,7 +90,7 @@ window.WEDDING = {
     { name: '明緯', table: 9, g: 'm', img: 'img/mingwei.png', ratio: 251 / 512 },
     // 第 10 桌
     { name: '逸凱', table: 10, g: 'm', count: 4, img: 'img/yikai_v2.png', ratio: 263 / 512, members: [{ g: 'f', age: 'mid', img: 'img/yikai_wife.png', ratio: 304 / 512 }, { g: 'm', age: 'teen' }, { g: 'f', age: 'teen' }] },   // 家人：太太＋國中男生＋國中女生
-    { name: '娸華', table: 10, g: 'f', count: 2, img: 'img/huahua.png', ratio: 283 / 512 },
+    { name: '娸華', table: 10, g: 'f', count: 2, img: 'img/huahua.png', ratio: 283 / 512, members: [{ g: 'm', img: 'img/huahua_family.png', ratio: 222 / 512 }] },
     // 第 11 桌
     { name: '國慶', table: 11, g: 'm', count: 4, img: 'img/guoqing_v2.png', ratio: 253 / 512, members: [{ g: 'f', img: 'img/guoqing_wife.png', ratio: 288 / 512 }, { g: 'f', img: 'img/guoqing_girl.png', ratio: 296 / 512 }, { g: 'm', img: 'img/jiahong.png', ratio: 245 / 512 }] },
     { name: '月裡', table: 11, g: 'f', count: 2, img: 'img/guest/silver_f.png', ratio: 267 / 512, members: [{ g: 'm', age: 'mid' }] },   // 銀白短髮造型（Gemini）
