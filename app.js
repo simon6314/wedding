@@ -363,12 +363,12 @@ const CHAT = [
   ['好久不見！', '上次見是畢業耶'],
   ['他們好登對', '天生一對！'],
   ['這裡好溫馨', '咖啡廳婚禮好可愛'],
-  ['甜點什麼時候上？', '聽說今天冰淇淋很厲害'],
+  ['甜點什麼時候上？', '聽說今天甜點很厲害'],
   ['今天天氣真好', '新人運氣好～'],
   ['你們家寶寶好可愛', '謝謝～一直跑來跑去'],
 ];
 const SOLO = ['好好吃 😋', '好飽～', '要幸福喔！', '新婚快樂 🎉', '這杯好喝', '百年好合！', '永浴愛河 ❤', '吃不完了啦', '拍照拍照 📸', '甜甜蜜蜜～', '佳偶天成 💕', '今天好幸福的感覺', '他們笑得好甜 🥰', '我也被閃到了 😎'];
-const KID_LINES = ['我要喝果汁！', '好好玩～', '新娘好像公主！', '我要吃冰淇淋！', '抓不到我～', '嘿嘿'];
+const KID_LINES = ['我要喝果汁！', '好好玩～', '新娘好像公主！', '我要吃甜點！', '抓不到我～', '嘿嘿'];
 const BLESS = ['乾杯！', '新婚快樂！', '百年好合！', '永浴愛河！', '白頭偕老！', '要幸福喔！', 'Cheers 🥂',
   '天作之合！', '幸福美滿！', '心心相印 💕', '恩恩愛愛一輩子！', '執子之手，與子偕老', '愛情長長久久 💕', '每天都像今天一樣幸福！', '要一直這麼甜喔！', '吵架都要讓新娘贏 😆', '記得常常請我們吃飯 😆', '一起去好多地方旅行 ✈️', '永遠是彼此最好的朋友'];
 const COUPLE_THANKS = ['謝謝大家來！', '吃飽喝足喔～', '今天好開心 ❤', '謝謝你們！', '多吃一點喔'];
@@ -387,7 +387,7 @@ const EN = {
   '好久不見！': 'Long time no see!', '上次見是畢業耶': 'Since graduation!',
   '他們好登對': 'They look perfect together', '天生一對！': 'A perfect match!',
   '這裡好溫馨': 'Such a cozy place', '咖啡廳婚禮好可愛': 'Café weddings are so cute',
-  '甜點什麼時候上？': 'When is dessert?', '聽說今天冰淇淋很厲害': 'I heard the ice cream is amazing today!',
+  '甜點什麼時候上？': 'When is dessert?', '聽說今天甜點很厲害': 'I heard the dessert is amazing today!',
   '今天天氣真好': 'Lovely weather today', '新人運氣好～': 'Lucky couple~',
   '好好吃 😋': 'Yummy 😋', '好飽～': "I'm so full~", '要幸福喔！': 'Be happy forever!', '新婚快樂 🎉': 'Happy wedding day 🎉',
   '這杯好喝': 'Great drink!', '百年好合！': 'Best wishes!', '永浴愛河 ❤': 'Love always ❤',
@@ -1130,7 +1130,7 @@ function guestAct(a, walkers) {
       setPose(a, 'eat');
       dish.left = Math.max(0, dish.left - 0.07);
       renderDishes(T);
-      if (!quiet && Math.random() < 0.35) say(a, pick(['好好吃 😋', `${dish.name}好讚`, '再來一口', '這道必吃！']));
+      if (!quiet && Math.random() < 0.35) say(a, pick(['好好吃 😋', '好讚', '再來一口', '這道必吃！']));
       setTimeout(() => { if (a.pose === 'eat') setPose(a, 'sit'); }, 2400);
       return;
     }
@@ -1217,7 +1217,7 @@ async function party() {
   for (;;) {
     const ev = weighted([[toastTour, 34], [cheersAll, 18], [kissEvent, 16], [bouquetEvent, 12], [groupPhoto, 20]]);
     try { await ev(); } catch (e) { console.error(e); }
-    setStatus(COURSES[Math.max(0, state.course) % COURSES.length][1] + ' 上菜中');
+    setStatus('上菜中');
     await wait(rand(16000, 30000));
   }
 }
@@ -1231,8 +1231,8 @@ async function courseLoop() {
   for (;;) {
     state.course++;
     const c = COURSES[state.course % COURSES.length];
-    $('#nowCourse').textContent = `${c[0]} ${c[2] || c[1]}`;
-    logLine(`上菜：${c[0]} ${c[1]}`);
+    $('#nowCourse').textContent = c[0];
+    logLine(`上菜：${c[0]}`);
     await wait(rand(38000, 50000));
   }
 }
@@ -1260,10 +1260,10 @@ async function staffLoop(s, i) {
     renderDishes(T);
     T.course = ci; T.claimed = false;
     s.temp = ''; showProp(s);
-    if (Math.random() < 0.4) say(s, pick(['上菜囉～', '小心燙喔', '請慢用', `${c[1]}來囉！`]));
+    if (Math.random() < 0.4) say(s, pick(['上菜囉～', '小心燙喔', '請慢用', '來囉！']));
     // 同桌的人會開心
     const tg = guests.filter((g) => g.table === T && !g.busy && atSeat(g));
-    if (tg.length && Math.random() < 0.5) { const g = pick(tg); setTimeout(() => say(g, pick(['哇～看起來好好吃', '好香！', `是${c[1]}！`, '開動！'])), 800); }
+    if (tg.length && Math.random() < 0.5) { const g = pick(tg); setTimeout(() => say(g, pick(['哇～看起來好好吃', '好香！', '看起來超棒！', '開動！'])), 800); }
     await wait(300);
   }
 }
