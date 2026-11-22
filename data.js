@@ -50,8 +50,10 @@ window.WEDDING = {
     // 第 4 桌
     { name: '建智', table: 4, g: 'm', count: 1, note: '主持人', img: 'img/jianzhi.png', ratio: 225 / 512 },   // 主持人
     { name: '舒婷', table: 4, g: 'f', count: 1, img: 'img/shuting.png', ratio: 283 / 512 },
-    { name: '寶桂', table: 4, g: 'f', count: 2, img: 'img/baogui.png', ratio: 283 / 512 },
-    { name: 'Glenn', table: 4, g: 'm', count: 2, lang: 'en', img: 'img/guest/glenn.png', ratio: 230 / 512 },   // 只會英文；菲律賓人造型（Gemini）
+    { name: '寶桂', table: 4, g: 'f', count: 1, img: 'img/baogui.png', ratio: 283 / 512 },
+    { name: '寶桂的家人', table: 4, g: 'm' },
+    { name: 'Glenn', table: 4, g: 'm', count: 1, lang: 'en', img: 'img/guest/glenn.png', ratio: 230 / 512 },   // 只會英文；菲律賓人造型（Gemini）
+    { name: 'Glenn的家人', table: 4, g: 'f' },
     // 第 5 桌
     { name: '宜妏', table: 5, g: 'f', count: 1, img: 'img/yixun_v2.png', ratio: 293 / 512 },
     { name: '宗城', table: 5, g: 'm', count: 1, img: 'img/zongcheng.png', ratio: 257 / 512 },
