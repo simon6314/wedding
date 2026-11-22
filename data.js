@@ -97,7 +97,7 @@ window.WEDDING = {
     { name: '國興', table: 11, g: 'm' },
     // 第 12 桌
     { name: '民政', table: 12, g: 'm', count: 4, img: 'img/minzheng.png', ratio: 252 / 512 },
-    { name: '月鳳', table: 12, g: 'f', count: 5, kids: 1, lap: 1, highchair: true, members: [{}, { g: 'f', img: 'img/yueh_female.png', ratio: 250 / 512 }, {}, { g: 'm', img: 'img/yueh_kid.png', ratio: 256 / 512 }] },     // 含一位男性幼兒（坐兒童座椅，不佔一般座位）
+    { name: '月鳳', table: 12, g: 'f', count: 5, kids: 1, lap: 1, highchair: true, img: 'img/yueh_v2.png', ratio: 289 / 512, members: [{}, { g: 'f', img: 'img/yueh_female.png', ratio: 250 / 512 }, {}, { g: 'm', img: 'img/yueh_kid.png', ratio: 256 / 512 }] },     // 含一位男性幼兒（坐兒童座椅，不佔一般座位）
   ],
   // 桌子備註
   tableNotes: { 13: '預備桌' },
