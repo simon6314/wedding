@@ -77,7 +77,7 @@ window.WEDDING = {
     // 第 8 桌
     { name: '峻緯', table: 8, g: 'm', count: 3 },
     { name: '筠霏', table: 8, g: 'f', count: 2, img: 'img/yunfei.png', ratio: 264 / 512 },
-    { name: '仲蔚', table: 8, g: 'm' },
+    { name: '仲蔚', table: 8, g: 'm', img: 'img/zhongwei.png', ratio: 228 / 512 },
     // 第 9 桌
     { name: '國隆', table: 9, g: 'm' },
     { name: '月嬌', table: 9, g: 'f', img: 'img/yueh_aunt.png', ratio: 276 / 512 },
