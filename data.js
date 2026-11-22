@@ -66,7 +66,7 @@ window.WEDDING = {
     { name: '瀅琦', table: 6, g: 'f', img: 'img/yanqi.png', ratio: 287 / 512 },
     { name: '士堯', table: 6, g: 'm' },
     // 第 7 桌
-    { name: '宗益', table: 7, g: 'm', count: 1 },
+    { name: '宗益', table: 7, g: 'm', count: 1, img: 'img/zongyi.png', ratio: 257 / 512 },
     { name: '嬌仙', table: 7, g: 'f', count: 1, img: 'img/jiaoxian.png', ratio: 291 / 512 },
     { name: '家禾', table: 7, g: 'm', count: 1 },
     { name: '家鋐', table: 7, g: 'm', count: 1 },
