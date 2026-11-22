@@ -48,12 +48,12 @@ window.WEDDING = {
     { name: '菁莓', table: 3, g: 'f', img: 'img/jingmei.png', ratio: 251 / 512 },
     { name: '嘉真', table: 3, g: 'f', img: 'img/jiazhen.png', ratio: 287 / 512 },
     // 第 4 桌
-    { name: '建智', table: 4, g: 'm', count: 1, note: '主持人', img: 'img/jianzhi.png', ratio: 225 / 512 },   // 主持人
-    { name: '舒婷', table: 4, g: 'f', count: 1, img: 'img/shuting.png', ratio: 283 / 512 },
     { name: 'Glenn', table: 4, g: 'm', count: 1, lang: 'en', img: 'img/guest/glenn.png', ratio: 230 / 512 },   // 只會英文；菲律賓人造型（Gemini）
+    { name: '舒婷', table: 4, g: 'f', count: 1, img: 'img/shuting.png', ratio: 283 / 512 },
+    { name: '建智', table: 4, g: 'm', count: 1, note: '主持人', img: 'img/jianzhi.png', ratio: 225 / 512 },   // 主持人
+    { name: "Glenn's friend", table: 4, g: 'f' },
     { name: '寶桂的家人', table: 4, g: 'm' },
     { name: '寶桂', table: 4, g: 'f', count: 1, img: 'img/baogui.png', ratio: 283 / 512 },
-    { name: "Glenn's friend", table: 4, g: 'f' },
     // 第 5 桌
     { name: '宜妏', table: 5, g: 'f', count: 1, img: 'img/yixun_v3.png', ratio: 288 / 512 },
     { name: '可欣', table: 5, g: 'f', count: 1, img: 'img/kexin.png', ratio: 265 / 512 },
