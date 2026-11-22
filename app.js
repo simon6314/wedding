@@ -1058,7 +1058,7 @@ function createPeople() {
     });
   }
   const main = L.tables.find((t) => t.main);
-  const vipSeat = { groom: 0, bride: 1, gdad: 2, gmom: 3, bdad: 4, bmom: 5 };
+  const vipSeat = { groom: 0, bride: 1, gdad: 2, gmom: 5, bdad: 4, bmom: 3 };
   for (const v of (CFG.vip || [])) {
     const name = v.name;
     const a = makeActor({ kind: v.role, name, svg: v.img ? picSvg(v.img, v.ratio) : vipSvg(v.role, v.side), speed: 72, table: main, cls: 'vip ' + v.role, busy: true });
@@ -1527,7 +1527,7 @@ function rebuild() {
       if (T) { const nt = L.tables.find((t) => t.n === T.n && !!t.main === !!T.main); a.table = nt; }
     }
     for (const g of guests) { g.seat = g.table.seatList[g.seatIdx]; }
-    const vipSeat = { groom: 0, bride: 1, gdad: 2, gmom: 3, bdad: 4, bmom: 5 };
+    const vipSeat = { groom: 0, bride: 1, gdad: 2, gmom: 5, bdad: 4, bmom: 3 };
     for (const id of Object.keys(vip)) vip[id].seat = vip[id].table.seatList[vipSeat[id]];
     for (const a of actors) {
       const p = a.pos;
