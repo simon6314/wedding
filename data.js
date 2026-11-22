@@ -33,7 +33,7 @@ window.WEDDING = {
   GUESTS: [
     // 第 2 桌
     { name: '姵汝', table: 2, g: 'f', img: 'img/yuru.png', ratio: 295 / 512 },   // 新圖（去除白底）
-    { name: '鈺庭', table: 2, g: 'm', count: 1 },
+    { name: '鈺庭', table: 2, g: 'm', count: 1, img: 'img/tingting.png', ratio: 251 / 512 },
     { name: '品萱', table: 2, g: 'f', count: 1, img: 'img/pinxuan_v2.png', ratio: 251 / 512 },
     { name: '筠甯', table: 2, g: 'f', count: 1, kid: true, baby: true, lap: 1 },   // 未滿一歲，坐在品萱腿上（膝上）
     { name: '明兌', table: 2, g: 'f', count: 1, img: 'img/mingdui.png', ratio: 272 / 512 },
