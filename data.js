@@ -94,7 +94,7 @@ window.WEDDING = {
     { name: '國慶', table: 11, g: 'm', count: 4, img: 'img/guoqing_v2.png', ratio: 253 / 512, members: [{ g: 'f', img: 'img/guoqing_wife.png', ratio: 288 / 512 }, { g: 'f', img: 'img/guoqing_girl.png', ratio: 296 / 512 }, {}] },
     { name: '月裡', table: 11, g: 'f', count: 2, img: 'img/guest/silver_f.png', ratio: 267 / 512 },   // 銀白短髮造型（Gemini）
     { name: '新郎阿嬤', table: 11, g: 'f', elder: true, img: 'img/grandma.png', ratio: 282 / 512 },   // Gemini 生成的圖
-    { name: '國興', table: 11, g: 'm' },
+    { name: '國興', table: 11, g: 'm', img: 'img/guoxing.png', ratio: 256 / 512 },
     // 第 12 桌
     { name: '民政', table: 12, g: 'm', count: 4, img: 'img/minzheng.png', ratio: 252 / 512 },
     { name: '月鳳', table: 12, g: 'f', count: 5, kids: 1, lap: 1, highchair: true, img: 'img/yueh_v2.png', ratio: 289 / 512, members: [{}, { g: 'f', img: 'img/yueh_female.png', ratio: 250 / 512 }, {}, { g: 'm', img: 'img/yueh_kid.png', ratio: 256 / 512 }] },     // 含一位男性幼兒（坐兒童座椅，不佔一般座位）
