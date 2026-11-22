@@ -42,7 +42,8 @@ window.WEDDING = {
     { name: '明兌', table: 2, g: 'f', count: 1, img: 'img/mingdui.png', ratio: 272 / 512 },
     { name: '樂樂', table: 2, g: 'f', count: 1, kid: true, lap: 1, highchair: true },   // 小孩，坐兒童座椅在明兌旁邊
     // 第 3 桌
-    { name: '芸岑', table: 3, g: 'f', count: 2, members: [{ g: 'f', rel: '朋友', img: 'img/yunqin_friend.png', ratio: 275 / 512 }], img: 'img/yunqin_v2.png', ratio: 286 / 512 },   // 新圖（去除白底）；朋友（女）同行，稱呼為「朋友」
+    { name: '芸岑的朋友', table: 3, g: 'f', img: 'img/yunqin_friend.png', ratio: 275 / 512 },
+    { name: '芸岑', table: 3, g: 'f', count: 1, img: 'img/yunqin_v2.png', ratio: 286 / 512 },   // 新圖（去除白底）；朋友（女）同行，稱呼為「朋友」
     { name: '品劭', table: 3, g: 'f', img: 'img/pinshao.png', ratio: 283 / 512 },
     { name: '麗珠', table: 3, g: 'f', img: 'img/lizhu.png', ratio: 283 / 512 },
     { name: '菁莓', table: 3, g: 'f', img: 'img/jingmei.png', ratio: 251 / 512 },
