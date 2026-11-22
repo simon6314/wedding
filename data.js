@@ -48,7 +48,8 @@ window.WEDDING = {
     { name: '菁莓', table: 3, g: 'f', img: 'img/jingmei.png', ratio: 251 / 512 },
     { name: '嘉真', table: 3, g: 'f', img: 'img/jiazhen.png', ratio: 287 / 512 },
     // 第 4 桌
-    { name: '建智', table: 4, g: 'm', count: 2, note: '主持人', img: 'img/jianzhi.png', ratio: 225 / 512, members: [{ g: 'f', age: 'young' }] },   // 主持人；家人：年輕女性
+    { name: '建智', table: 4, g: 'm', count: 1, note: '主持人', img: 'img/jianzhi.png', ratio: 225 / 512 },   // 主持人
+    { name: '舒婷', table: 4, g: 'f', count: 1 },
     { name: 'Glenn', table: 4, g: 'm', count: 2, lang: 'en', img: 'img/guest/glenn.png', ratio: 230 / 512 },   // 只會英文；菲律賓人造型（Gemini）
     { name: '寶桂', table: 4, g: 'f', count: 2, img: 'img/baogui.png', ratio: 283 / 512 },
     // 第 5 桌
