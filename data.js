@@ -69,7 +69,7 @@ window.WEDDING = {
     { name: '昱靜', table: 6, g: 'f', img: 'img/yujing.png', ratio: 251 / 512 },   // 新圖（去除白底）
     { name: '瀅琦', table: 6, g: 'f', img: 'img/yanqi.png', ratio: 287 / 512 },
     // 第 7 桌
-    { name: '家鋐', table: 7, g: 'm', count: 1, img: 'img/jiahong.png', ratio: 245 / 512 },
+    { name: '家鋐', table: 7, g: 'm', count: 1, img: 'img/jiahong_v2.png', ratio: 222 / 512 },
     { name: '家禾', table: 7, g: 'm', count: 1, img: 'img/jiahe_v2.png', ratio: 247 / 512 },
     { name: '嬌仙', table: 7, g: 'f', count: 1, img: 'img/jiaoxian.png', ratio: 291 / 512 },
     { name: '宗益', table: 7, g: 'm', count: 1, img: 'img/zongyi_v2.png', ratio: 297 / 512 },
@@ -91,7 +91,7 @@ window.WEDDING = {
     { name: '逸凱', table: 10, g: 'm', count: 4, img: 'img/yikai_v2.png', ratio: 263 / 512, members: [{ g: 'f', age: 'mid', img: 'img/yikai_wife.png', ratio: 304 / 512 }, { g: 'm', age: 'teen' }, { g: 'f', age: 'teen' }] },   // 家人：太太＋國中男生＋國中女生
     { name: '娸華', table: 10, g: 'f', count: 2, img: 'img/huahua.png', ratio: 283 / 512 },
     // 第 11 桌
-    { name: '國慶', table: 11, g: 'm', count: 4, img: 'img/guoqing_v2.png', ratio: 253 / 512, members: [{ g: 'f', img: 'img/guoqing_wife.png', ratio: 288 / 512 }, { g: 'f', img: 'img/guoqing_girl.png', ratio: 296 / 512 }, {}] },
+    { name: '國慶', table: 11, g: 'm', count: 4, img: 'img/guoqing_v2.png', ratio: 253 / 512, members: [{ g: 'f', img: 'img/guoqing_wife.png', ratio: 288 / 512 }, { g: 'f', img: 'img/guoqing_girl.png', ratio: 296 / 512 }, { g: 'm', img: 'img/jiahong.png', ratio: 245 / 512 }] },
     { name: '月裡', table: 11, g: 'f', count: 2, img: 'img/guest/silver_f.png', ratio: 267 / 512, members: [{ g: 'm', age: 'mid' }] },   // 銀白短髮造型（Gemini）
     { name: '新郎阿嬤', table: 11, g: 'f', elder: true, img: 'img/grandma.png', ratio: 282 / 512 },   // Gemini 生成的圖
     { name: '國興', table: 11, g: 'm', img: 'img/guoxing.png', ratio: 256 / 512 },
