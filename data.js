@@ -69,14 +69,14 @@ window.WEDDING = {
     { name: '昱靜', table: 6, g: 'f', img: 'img/yujing.png', ratio: 251 / 512 },   // 新圖（去除白底）
     { name: '瀅琦', table: 6, g: 'f', img: 'img/yanqi.png', ratio: 287 / 512 },
     // 第 7 桌
-    { name: '宗益', table: 7, g: 'm', count: 1, img: 'img/zongyi.png', ratio: 257 / 512 },
-    { name: '嬌仙', table: 7, g: 'f', count: 1, img: 'img/jiaoxian.png', ratio: 291 / 512 },
-    { name: '家禾', table: 7, g: 'm', count: 1, img: 'img/jiahe_v2.png', ratio: 247 / 512 },
     { name: '家鋐', table: 7, g: 'm', count: 1, img: 'img/jiahong.png', ratio: 245 / 512 },
-    { name: '玫秀', table: 7, g: 'f', img: 'img/yixiu_mei_v3.png', ratio: 265 / 512 },   // 銀白短髮造型（Gemini）
-    { name: '玉智', table: 7, g: 'f', img: 'img/yuzhi_v2.png', ratio: 282 / 512 },
+    { name: '家禾', table: 7, g: 'm', count: 1, img: 'img/jiahe_v2.png', ratio: 247 / 512 },
+    { name: '嬌仙', table: 7, g: 'f', count: 1, img: 'img/jiaoxian.png', ratio: 291 / 512 },
+    { name: '宗益', table: 7, g: 'm', count: 1, img: 'img/zongyi.png', ratio: 257 / 512 },
     { name: '小燕', table: 7, g: 'f', img: 'img/xiaoyan_v4.png', ratio: 271 / 512 },
     { name: '莊', table: 7, g: 'f', img: 'img/zhuang_v2.png', ratio: 265 / 512 },
+    { name: '玉智', table: 7, g: 'f', img: 'img/yuzhi_v2.png', ratio: 282 / 512 },
+    { name: '玫秀', table: 7, g: 'f', img: 'img/yixiu_mei_v3.png', ratio: 265 / 512 },   // 銀白短髮造型（Gemini）
     // 第 8 桌
     { name: '峻緯', table: 8, g: 'm', count: 3, img: 'img/junwei.png', ratio: 244 / 512 },
     { name: '筠霏', table: 8, g: 'f', count: 2, img: 'img/yunfei.png', ratio: 264 / 512 },
