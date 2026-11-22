@@ -60,7 +60,7 @@ window.WEDDING = {
     { name: '皓宇', table: 5, g: 'm', count: 1, img: 'img/haoyu.png', ratio: 257 / 512 },
     { name: '新娘大姨', table: 5, g: 'f', img: 'img/dayi_v4.png', ratio: 281 / 512 },
     { name: '靜芬', table: 5, g: 'f', count: 1, img: 'img/jingfen.png', ratio: 285 / 512 },
-    { name: '宗城', table: 5, g: 'm', count: 1, img: 'img/zongcheng.png', ratio: 257 / 512 },
+    { name: '宗城', table: 5, g: 'm', count: 1, img: 'img/zongcheng_v2.png', ratio: 321 / 512 },
     // 第 6 桌
     { name: '宜秀', table: 6, g: 'f', img: 'img/yixiu_v2.png', ratio: 309 / 512 },   // 新圖（去除白底）
     { name: '淑鈴', table: 6, g: 'f', img: 'img/shuling.png', ratio: 240 / 512 },   // 新圖（去除白底）
